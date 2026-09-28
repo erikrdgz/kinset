@@ -24,6 +24,7 @@ Node.js 22 or later is recommended. Leave the Supabase fields empty to use demo 
 - Small general fitness template library selected by equipment and experience. Goals are recorded; this version does not generate individualized prescriptions or a fat-loss plan.
 - Workout logging with checked sets, previous performance, rest timer, active-session recovery, history and deletion.
 - Lazy-loaded React Three Fiber anatomical model and list-based exercise discovery.
+- Illustrative rigged movement previews for bodyweight squat, dumbbell curl, and dumbbell shoulder press. Play/pause, half speed, restart, front/side views, and a Movement/Muscles switch. The motions are authored approximations, not trainer-reviewed instructional assets; playback starts paused and suspends when the tab is hidden.
 - Supabase email signup, confirmation, login, password recovery, sign-out and an account-deletion Edge Function.
 - Per-account journals protected by row-level security, with atomic revision checks to detect concurrent device writes.
 - IndexedDB saving and retrying cloud sync while the app remains open. Full offline reopening / PWA installation is not implemented yet.
@@ -53,6 +54,7 @@ The manual `Deploy preview to GitHub Pages` workflow builds for `/kinset/`. Set 
 
 ## Before a public release
 
+- Have a qualified trainer review and correct the three procedural exercise motion previews before presenting them as instructional demonstrations. Character attribution is in `public/motion/CREDITS.md`.
 - Optimize the anatomy assets further for mobile (currently about 11.5 MB across two lazy-loaded GLBs); review exercise content and muscle mappings with a qualified professional.
 - Run the cloud authentication, row-access, sync conflict and deletion checks above.
 - Add durable offline app-shell caching, service-worker update handling, device cache controls and automated browser regression tests.

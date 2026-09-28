@@ -1394,3 +1394,99 @@ dialog.modal-backdrop::backdrop {
     transition: none !important;
   }
 }
+
+.motion-stage {
+  height: 320px;
+  position: relative;
+  background: radial-gradient(ellipse at 50% 80%, #302b27 0%, #202020 65%);
+  margin: 0 -12px;
+}
+.motion-badge {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: #a89b8d;
+  pointer-events: none;
+}
+.motion-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-block: 1px solid #463b31;
+  padding: 7px 0;
+}
+.motion-controls button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 40px;
+  padding: 8px;
+  font-size: 0.8rem;
+}
+.motion-controls .motion-play {
+  color: #ff692b;
+  font-weight: 600;
+}
+.motion-views {
+  display: flex;
+  margin-left: auto;
+  gap: 0;
+}
+.motion-views button {
+  border-bottom: 2px solid transparent;
+  color: #9e9084;
+}
+.motion-views button[aria-pressed="true"] {
+  color: #ff692b;
+  border-bottom-color: #ff692b;
+}
+.motion-note {
+  font-size: 0.75rem;
+  color: #a7998c;
+  margin: 10px 0 5px;
+}
+.motion-demo > .model-credit {
+  margin-top: 0;
+}
+.demo-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.03em;
+  color: #ff8c58;
+  border: 1px solid #75442d;
+  padding: 2px 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+@media (max-width: 760px) {
+  .motion-stage {
+    height: 300px;
+  }
+  .motion-controls button {
+    font-size: 0.75rem;
+    padding: 7px;
+    min-width: 38px;
+  }
+}
+
+.detail-tabs {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 8px;
+  margin-right: 40px;
+}
+.detail-tabs button {
+  font-size: 0.8rem;
+  border-bottom: 2px solid transparent;
+  color: #9e9084;
+}
+.detail-tabs button[aria-pressed="true"] {
+  border-color: #ff692b;
+  color: #ff692b;
+}
+
+.motion-loading{position:absolute;inset:0;display:grid;place-items:center;font-size:.85rem;color:#a7998c;z-index:1;pointer-events:none}

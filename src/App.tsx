@@ -42,6 +42,8 @@ import {
   type State,
 } from "./domain";
 import { useJournal } from "./storage";
+const ExerciseDemo = lazy(() => import("./ExerciseDemo"));
+const demoIds = new Set(["squat", "curl", "press"]);
 const Body = lazy(() => import("./Body"));
 const demoProfile: Profile = {
   name: "Alex",
@@ -547,6 +549,7 @@ function Journal({
   const [tab, setTab] = useState("Today"),
     [editing, setEditing] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
+    [showAnatomy, setShowAnatomy] = useState(false),
     [notice, setNotice] = useState(""),
     [muscle, setMuscle] = useState<Muscle | "All">("All"),
     [query, setQuery] = useState(""),
@@ -562,6 +565,9 @@ function Journal({
     const id = setInterval(() => setNow(Date.now()), 500);
     return () => clearInterval(id);
   }, [restUntil]);
+  useEffect(() => {
+    setShowAnatomy(false);
+  }, [selected]);
   if (!journal.ready)
     return (
       <div className="loading">
@@ -1347,26 +1353,61 @@ function Journal({
             >
               <X />
             </button>
-            <BodyPreview muscles={[preview.muscle]} />
+            {demoIds.has(preview.id) && (
+              <div
+                className="detail-tabs"
+                role="group"
+                aria-label="Exercise visualization"
+              >
+                <button
+                  aria-pressed={!showAnatomy}
+                  onClick={() => setShowAnatomy(false)}
+                >
+                  Movement
+                </button>
+                <button
+                  aria-pressed={showAnatomy}
+                  onClick={() => setShowAnatomy(true)}
+                >
+                  Muscles
+                </button>
+              </div>
+            )}
+            {demoIds.has(preview.id) && !showAnatomy ? (
+              <BodyBoundary>
+                <Suspense
+                  fallback={
+                    <div className="body-loading">Loading demonstration…</div>
+                  }
+                >
+                  <ExerciseDemo key={preview.id} exercise={preview} />
+                </Suspense>
+              </BodyBoundary>
+            ) : (
+              <BodyPreview muscles={[preview.muscle]} />
+            )}
             <span className="eyebrow">
               {preview.muscle} · {preview.equipment}
             </span>
             <h2>{preview.name}</h2>
             <p>{preview.cue}</p>
             <p className="fine">
-              Model highlights selected muscles, not every muscle involved.
-              Choose a comfortable range and stop if a movement causes pain.
+              Anatomy highlights selected muscles; movement previews illustrate
+              the exercise. Choose a comfortable range and stop if a movement
+              causes pain.
             </p>
-            <p className="model-credit">
-              Z-Anatomy / BodyParts3D ·{" "}
-              <a
-                href={import.meta.env.BASE_URL + "models/ATTRIBUTION.md"}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Model credits · CC BY-SA
-              </a>
-            </p>
+            {(!demoIds.has(preview.id) || showAnatomy) && (
+              <p className="model-credit">
+                Z-Anatomy / BodyParts3D ·{" "}
+                <a
+                  href={import.meta.env.BASE_URL + "models/ATTRIBUTION.md"}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Model credits · CC BY-SA
+                </a>
+              </p>
+            )}
             <button className="primary" onClick={() => setSelected(null)}>
               Got it
               <Check size={18} />

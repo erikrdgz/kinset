@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Bounds, Html, OrbitControls, useGLTF } from "@react-three/drei";
+import { Bounds, OrbitControls, useGLTF } from "@react-three/drei";
 import { Mesh, MeshStandardMaterial } from "three";
 import type { Muscle } from "./domain";
 const groups: Record<Muscle, RegExp> = {
@@ -95,7 +95,7 @@ export default function Body({ muscles }: { muscles: Muscle[] }) {
         <ambientLight intensity={1.3} />
         <directionalLight position={[3, 5, 4]} intensity={2.5} />
         <directionalLight position={[-3, 2, -3]} intensity={1.5} />
-        <Suspense fallback={<Html center><span className="fine">Loading anatomy…</span></Html>}>
+        <Suspense fallback={null}>
           <Bounds fit clip observe margin={1.05}>
             <Anatomy muscles={muscles} />
           </Bounds>
