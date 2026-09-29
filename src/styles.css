@@ -2805,9 +2805,9 @@ input::placeholder {
 }
 .auth-arrow {
   position: absolute;
-  right: 2%;
-  top: -14%;
-  height: 122%;
+  right: 3%;
+  top: -6%;
+  height: 62%;
   aspect-ratio: 1;
   fill: none;
   stroke: #fff;
@@ -2823,8 +2823,8 @@ input::placeholder {
 }
 @media (max-width: 760px) {
   .auth-arrow {
-    height: 108%;
-    top: -6%;
+    height: 64%;
+    top: -4%;
   }
 }
 
@@ -2869,4 +2869,50 @@ body .training-week .days span {
 .main-wrap,
 .auth-page {
   overflow-x: clip;
+}
+
+/* Offset blocks: layered, sharp, restrained. */
+.session-poster {
+  box-shadow: 12px 12px 0 #2b2724;
+  margin-right: 12px;
+  margin-bottom: 12px;
+}
+.movement-table > button:nth-child(even) {
+  margin-left: 32px;
+  width: calc(100% - 32px);
+}
+.training-week {
+  box-shadow: -10px 10px 0 #2b2724;
+  margin-left: 10px;
+}
+.auth-card {
+  position: relative;
+  top: 36px;
+}
+@media (max-width: 760px) {
+  .session-poster {
+    box-shadow: 8px 8px 0 #2b2724;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+  .movement-table > button:nth-child(even) {
+    margin-left: 14px;
+    width: calc(100% - 14px);
+  }
+  .training-week {
+    box-shadow: -6px 6px 0 #2b2724;
+    margin-left: 6px;
+  }
+  .auth-card {
+    top: 0;
+  }
+}
+body .routine-foot > span {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+body .routine-foot .text-button {
+  flex: none;
+  white-space: nowrap;
 }
