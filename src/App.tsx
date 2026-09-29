@@ -107,6 +107,46 @@ function Modal({
     </dialog>
   );
 }
+function Plate({ done, total }: { done: number; total: number }) {
+  const n = Math.max(total, 1);
+  const gap = 5;
+  const span = 360 / n - gap;
+  const pt = (deg: number, r: number) => {
+    const a = ((deg - 90) * Math.PI) / 180;
+    return `${60 + r * Math.cos(a)} ${60 + r * Math.sin(a)}`;
+  };
+  return (
+    <div
+      className="plate"
+      role="progressbar"
+      aria-label="Sessions this week"
+      aria-valuenow={done}
+      aria-valuemin={0}
+      aria-valuemax={Math.max(done, total)}
+    >
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle className="plate-rim" cx="60" cy="60" r="57" />
+        {Array.from({ length: n }, (_, i) => {
+          const a0 = i * (360 / n) + gap / 2;
+          const a1 = a0 + span;
+          return (
+            <path
+              key={i}
+              className={i < done ? "plate-seg on" : "plate-seg"}
+              d={`M ${pt(a0, 44)} A 44 44 0 ${span > 180 ? 1 : 0} 1 ${pt(a1, 44)}`}
+            />
+          );
+        })}
+        <circle className="plate-hole" cx="60" cy="60" r="21" />
+      </svg>
+      <b>
+        {done}
+        <i>/{total}</i>
+      </b>
+    </div>
+  );
+}
+
 function Brand() {
   return (
     <span className="brand">
@@ -210,6 +250,16 @@ function Auth({
     [password, setPassword] = useState(""),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
+  function launchCreate() {
+    if (!supabase) return onDemo();
+    setMode("signup");
+    setMessage("");
+    const field = emailRef.current;
+    if (!field) return;
+    field.scrollIntoView({ block: "center", behavior: "smooth" });
+    field.focus({ preventScroll: true });
+  }
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!supabase) return;
@@ -232,7 +282,10 @@ function Auth({
             : await supabase.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
       if (recovery) onRecovered?.();
-      else if (mode === "signup" && !("session" in result.data && result.data.session))
+      else if (
+        mode === "signup" &&
+        !("session" in result.data && result.data.session)
+      )
         setMessage("Check your email to confirm your account.");
       else if (mode === "reset")
         setMessage("If an account exists, a reset link is on its way.");
@@ -245,7 +298,11 @@ function Auth({
     }
   }
   return (
-    <div className="auth-page">
+    <div
+      className={
+        mode === "signup" && !recovery ? "auth-page is-creating" : "auth-page"
+      }
+    >
       <header>
         <Brand />
       </header>
@@ -255,34 +312,35 @@ function Auth({
             <span>STRENGTH, ON YOUR TERMS.</span>
           </div>
           <div className="auth-mast">
-          <h1 className="kinset-display">KINSET</h1>
-          <svg
-            className="auth-arrow"
-            viewBox="0 0 100 100"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path d="M4 96 L86 14" />
-            <path d="M30 8 H92 V70" />
-          </svg>
+            <h1 className="kinset-display">
+              KINSET
+              <button
+                type="button"
+                className="kinset-launch"
+                aria-label="Create an account"
+                onClick={launchCreate}
+              >
+                <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 58L58 6M16 6H58V48"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    strokeLinecap="square"
+                    strokeLinejoin="miter"
+                  />
+                </svg>
+              </button>
+            </h1>
           </div>
           <div className="auth-manifesto">
             <h2>
-              Make every
+              Show up.
               <br />
-              rep count.
+              Get better.
             </h2>
           </div>
-          <p>
-            Build your plan. Learn the movement.
-            <br />
-            Leave a record of the work.
-          </p>
-          <div className="auth-capabilities">
-            <span>PLAN</span>
-            <span>TRAIN</span>
-            <span>PROGRESS</span>
-          </div>
+          <p className="auth-pillars">Plan. Train. Progress.</p>
+          <p className="made-by">Made to make you happy. By Erik Rodriguez.</p>
         </section>
         <section className="auth-card">
           <h2>
@@ -298,12 +356,12 @@ function Auth({
             {recovery
               ? "Choose a new password for your account."
               : mode === "signup"
-                ? "Create an account to keep your training with you."
+                ? "Start your journey. Your progress goes wherever you do."
                 : mode === "reset"
                   ? "We’ll send a link to your email."
                   : !supabase
                     ? "Explore the exercises, build your own plan, and log a workout."
-                    : "A clear picture of your training starts here."}
+                    : "Sign in and pick up right where you left off."}
           </p>
           {supabase && (
             <form onSubmit={submit}>
@@ -311,6 +369,7 @@ function Auth({
                 <label>
                   Email
                   <input
+                    ref={emailRef}
                     type="email"
                     autoComplete="email"
                     required
@@ -385,9 +444,6 @@ function Auth({
                       </button>
                     )}
                   </div>
-                  <div className="divider">
-                    <span>OR EXPLORE FIRST</span>
-                  </div>
                 </>
               )}
               <button
@@ -398,9 +454,6 @@ function Auth({
               >
                 Try the demo <ChevronRight size={18} />
               </button>
-              <p className="preview-storage">
-                No account needed. Your workouts save on this device.
-              </p>
             </>
           )}
         </section>
@@ -606,6 +659,15 @@ function Journal({
   useEffect(() => {
     setShowAnatomy(false);
   }, [selected]);
+  useEffect(() => {
+    if (
+      owner === "demo" &&
+      journal.ready &&
+      data.profile &&
+      data.demoSeed === undefined
+    )
+      update({ ...data, demoSeed: Math.floor(Math.random() * 2 ** 31) });
+  }, [owner, journal.ready, data, update]);
   if (!journal.ready)
     return (
       <div className="loading">
@@ -622,7 +684,14 @@ function Journal({
       <Onboarding
         initial={data.profile || undefined}
         onSave={(p) => {
-          update({ ...data, profile: p });
+          update({
+            ...data,
+            profile: p,
+            demoSeed:
+              owner === "demo" && !data.profile
+                ? Math.floor(Math.random() * 2 ** 31)
+                : data.demoSeed,
+          });
           setEditing(false);
         }}
         onBack={() => {
@@ -728,9 +797,6 @@ function Journal({
           <div className="avatar">{p.name[0].toUpperCase()}</div>
           <div>
             <strong>{p.name}</strong>
-            <small>
-              {owner === "demo" ? "Demo journal" : "Your training journal"}
-            </small>
           </div>
           <button aria-label="Sign out" onClick={() => void exit()}>
             <LogOut size={18} />
@@ -794,52 +860,8 @@ function Journal({
                 </button>
               </div>
               <div className="training-week">
-                <div>
-                  <span className="eyebrow">THIS WEEK</span>
-                  <strong>
-                    {String(count).padStart(2, "0")}
-                    <span> / {String(p.days).padStart(2, "0")}</span>
-                  </strong>
-                  <small>sessions completed</small>
-                  <div
-                    className="week-progress"
-                    role="progressbar"
-                    aria-label="Weekly sessions"
-                    aria-valuenow={count}
-                    aria-valuemin={0}
-                    aria-valuemax={Math.max(count, p.days)}
-                  >
-                    {Array.from({ length: p.days }, (_, i) => (
-                      <span key={i} className={i < count ? "filled" : ""} />
-                    ))}
-                  </div>
-                </div>
-                <div className="week-track">
-                  {Array.from({ length: 7 }, (_, i) => {
-                    const d = new Date(weekStart);
-                    d.setDate(d.getDate() + i);
-                    const done = week.some(
-                      (s) =>
-                        new Date(s.finishedAt!).toDateString() ===
-                        d.toDateString(),
-                    );
-                    return (
-                      <div
-                        key={i}
-                        className={
-                          done
-                            ? "trained"
-                            : d.toDateString() === new Date().toDateString()
-                              ? "current"
-                              : ""
-                        }
-                      >
-                        <span>{["M", "T", "W", "T", "F", "S", "S"][i]}</span>
-                        <i>{done ? <Check size={13} /> : null}</i>
-                      </div>
-                    );
-                  })}
-                </div>
+                <Plate done={count} total={p.days} />
+                <strong>This week</strong>
               </div>
               <section className="next-session">
                 <div className="session-poster">
@@ -855,11 +877,9 @@ function Journal({
                     <span className="blue-period">.</span>
                   </h1>
                   <div className="session-facts">
-                    <span>{data.active?.planName || upcoming.planName}</span>
                     <span>{plan.length} movements</span>
                     <span>
                       {plannedEntries.reduce((n, e) => n + e.sets, 0)} sets
-                      total
                     </span>
                   </div>
                   <button className="primary session-start" onClick={start}>
@@ -869,9 +889,6 @@ function Journal({
                 </div>
                 <div className="movement-section-heading">
                   <h2>The lineup</h2>
-                  <span>
-                    Tap to watch a demo <ArrowUpRight size={16} />
-                  </span>
                 </div>
                 <div className="movement-table">
                   {plan.map((e, i) => (
@@ -883,14 +900,15 @@ function Journal({
                         <strong>{e.name}</strong>
                         <small>
                           {e.muscle}
-                          <span className="watch-demo-label">
-                            {" "}
-                            ·{" "}
-                            {demoIds.has(e.id)
-                              ? "▶ Demo + guide"
-                              : "Movement guide"}
-                          </span>
+                          {demoIds.has(e.id) && (
+                            <span className="watch-demo-label"> ▶</span>
+                          )}
                         </small>
+                      </span>
+                      <span className="set-pips" aria-hidden="true">
+                        {Array.from({ length: plannedEntries[i].sets }, (_, k) => (
+                          <i key={k} />
+                        ))}
                       </span>
                       <span className="movement-prescription">
                         {plannedEntries[i].sets}
@@ -918,18 +936,16 @@ function Journal({
               </button>
               <div className="routine-foot">
                 <span>
-                  {activePlan ? activePlan.name : `${p.days}-DAY FOUNDATION`}
-                  <br />
-                  <strong>{p.goal}</strong>
+                  <strong>{activePlan ? activePlan.name : p.goal}</strong>
                 </span>
                 <button className="text-button" onClick={() => setTab("Plans")}>
                   Manage plans
                   <ChevronRight size={15} />
                 </button>
               </div>
-              <section className="recent-line">
-                <span className="eyebrow">LAST SESSION</span>
-                {data.sessions[0] ? (
+              {data.sessions[0] && (
+                <section className="recent-line">
+                  <span className="eyebrow">LAST SESSION</span>
                   <button onClick={() => setTab("History")}>
                     <strong>{data.sessions[0].name}</strong>
                     <span>
@@ -943,10 +959,8 @@ function Journal({
                     </span>
                     <ChevronRight size={16} />
                   </button>
-                ) : (
-                  <p>Your first session goes here.</p>
-                )}
-              </section>
+                </section>
+              )}
             </div>
           )}
           {tab === "Plans" && (
@@ -1192,17 +1206,6 @@ function Journal({
                 <section className="anatomy-panel">
                   <BodyPreview muscles={muscle === "All" ? [] : [muscle]} />
                   <h3>{muscle === "All" ? "A body built to move." : muscle}</h3>
-                  <p>Drag to rotate · muscle groups highlighted</p>
-                  <p className="model-credit">
-                    Z-Anatomy / BodyParts3D ·{" "}
-                    <a
-                      href={import.meta.env.BASE_URL + "models/ATTRIBUTION.md"}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      CC BY-SA · model credits
-                    </a>
-                  </p>
                 </section>
                 <section>
                   <input
@@ -1485,7 +1488,17 @@ function Journal({
         </main>
         <footer className="app-footer">
           <Brand />
-          <span>Kinset preview · General fitness, at your pace.</span>
+          <span className="made-by">
+            Made to make you happy. By Erik Rodriguez.
+          </span>
+          <a
+            className="model-credit"
+            href={import.meta.env.BASE_URL + "models/ATTRIBUTION.md"}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Model credits
+          </a>
         </footer>
       </div>
       <nav className="bottom-nav" aria-label="Main navigation">

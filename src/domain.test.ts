@@ -6,6 +6,8 @@ import {
   finishSession,
   validSet,
   completedSets,
+  shuffledProgram,
+  exercises,
   type Profile,
 } from "./domain";
 const profile: Profile = {
@@ -72,5 +74,22 @@ describe("training journal", () => {
     expect(profileSchema.safeParse({ ...profile, name: "" }).success).toBe(
       false,
     );
+  });
+});
+
+describe("shuffled demo lineup", () => {
+  it("is stable per seed, varied across seeds, and fits the equipment", () => {
+    const a = shuffledProgram(profile, 42).map((e) => e.id);
+    expect(shuffledProgram(profile, 42).map((e) => e.id)).toEqual(a);
+    expect(new Set(a).size).toBe(4);
+    const lineups = new Set(
+      Array.from({ length: 20 }, (_, i) =>
+        shuffledProgram(profile, i).map((e) => e.id).join(),
+      ),
+    );
+    expect(lineups.size).toBeGreaterThan(1);
+    const bodyweight = shuffledProgram({ ...profile, equipment: "Bodyweight" }, 7);
+    for (const e of bodyweight)
+      expect(exercises.find((x) => x.id === e.id)!.equipment).toBe("Bodyweight");
   });
 });

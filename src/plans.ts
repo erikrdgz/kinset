@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { demoIds } from "./motion/catalog";
 import {
   exercises,
   program,
+  shuffledProgram,
   type Profile,
   type Session,
   type State,
@@ -108,7 +110,12 @@ export function nextWorkout(data: State) {
     planName: `${p.days}-day foundation`,
     planId: undefined,
     dayId: undefined,
-    entries: program(p, data.sessions.length).map((e) => ({
+    entries: (data.demoSeed === undefined
+      ? program(p, data.sessions.length)
+      : shuffledProgram(p, data.demoSeed, data.sessions.length, (id) =>
+          demoIds.has(id),
+        )
+    ).map((e) => ({
       ...defaultEntry(e.id),
       sets: p.experience === "New to training" ? 2 : 3,
     })),

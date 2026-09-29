@@ -149,6 +149,8 @@ export type State = {
   activePlanId?: string | null;
   planProgress?: Record<string, number>;
   planDraft?: WorkoutPlan | null;
+  /** Demo journals get a random starter lineup; the seed keeps it stable between renders. */
+  demoSeed?: number;
 };
 export const emptyState: State = { profile: null, sessions: [], active: null };
 export function program(p: Profile, index = 0) {
@@ -163,6 +165,45 @@ export function program(p: Profile, index = 0) {
           ? ["rdl", "press", "row", "bird"]
           : ["goblet", "floor", "row", "bird"];
   return ids.map((id) => exercises.find((e) => e.id === id)!);
+}
+function seededRandom(seed: number) {
+  let t = seed >>> 0;
+  return () => {
+    t = (t + 0x6d2b79f5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+/** A varied full-body lineup: legs, push, pull and core that suit the equipment. */
+export function shuffledProgram(
+  p: Profile,
+  seed: number,
+  index = 0,
+  prefer?: (id: string) => boolean,
+) {
+  const fits = (e: Exercise) =>
+    p.equipment === "Full gym" ||
+    e.equipment === p.equipment ||
+    e.equipment === "Bodyweight";
+  const slots: Muscle[][] = [["Legs"], ["Chest", "Shoulders"], ["Back"], ["Core"]];
+  const random = seededRandom(seed + index * 7919);
+  const fallback = program(p, index);
+  const used = new Set<string>();
+  return slots.map((muscles, i) => {
+    let pool = exercises.filter(
+      (e) => muscles.includes(e.muscle) && fits(e) && !used.has(e.id),
+    );
+    if (prefer) {
+      const preferred = pool.filter((e) => prefer(e.id));
+      if (preferred.length) pool = preferred;
+    }
+    const pick = pool.length
+      ? pool[Math.floor(random() * pool.length)]
+      : fallback[i];
+    used.add(pick.id);
+    return pick;
+  });
 }
 export function startSession(p: Profile, index = 0): Session {
   return {
