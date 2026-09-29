@@ -44,7 +44,7 @@ import {
 import { useJournal } from "./storage";
 import ExerciseInstructions from "./ExerciseInstructions";
 const ExerciseDemo = lazy(() => import("./ExerciseDemo"));
-const demoIds = new Set(["squat", "curl", "press"]);
+import { demoIds } from "./motion/catalog";
 const Body = lazy(() => import("./Body"));
 const demoProfile: Profile = {
   name: "Alex",
@@ -836,7 +836,7 @@ function Journal({
               >
                 <span>
                   <strong>Watch exercise demos</strong>
-                  <small>Squat, curl & shoulder press · interactive 3D</small>
+                  <small>All 12 exercises · interactive 3D</small>
                 </span>
                 <ChevronRight size={20} />
               </button>
@@ -1135,12 +1135,12 @@ function Journal({
                     }}
                   >
                     {demosOnly ? "Showing 3D demos" : "Show 3D demos"}
-                    <span>3 exercises</span>
+                    <span>{demoIds.size} exercises</span>
                   </button>
                   {demosOnly && (
                     <p className="fine">
-                      Open an exercise, then tap Play to watch the movement. Use
-                      Front or Side to change the view.
+                      Open an exercise to watch its movement. Use Overview or
+                      Side to change the view, or pause and slow it down.
                     </p>
                   )}
                   <div className="filters">
@@ -1404,26 +1404,28 @@ function Journal({
             >
               <X />
             </button>
-            {
-              <div
-                className="detail-tabs"
-                role="group"
-                aria-label="Exercise visualization"
+            <span className="eyebrow">
+              {preview.muscle} · {preview.equipment}
+            </span>
+            <h2>{preview.name}</h2>
+            <div
+              className="detail-tabs"
+              role="group"
+              aria-label="Exercise visualization"
+            >
+              <button
+                aria-pressed={!showAnatomy}
+                onClick={() => setShowAnatomy(false)}
               >
-                <button
-                  aria-pressed={!showAnatomy}
-                  onClick={() => setShowAnatomy(false)}
-                >
-                  {demoIds.has(preview.id) ? "Movement" : "Written guide"}
-                </button>
-                <button
-                  aria-pressed={showAnatomy}
-                  onClick={() => setShowAnatomy(true)}
-                >
-                  Muscles
-                </button>
-              </div>
-            }
+                {demoIds.has(preview.id) ? "Movement" : "Written guide"}
+              </button>
+              <button
+                aria-pressed={showAnatomy}
+                onClick={() => setShowAnatomy(true)}
+              >
+                Muscles
+              </button>
+            </div>
             {demoIds.has(preview.id) && !showAnatomy ? (
               <BodyBoundary>
                 <Suspense
@@ -1437,10 +1439,6 @@ function Journal({
             ) : showAnatomy ? (
               <BodyPreview muscles={[preview.muscle]} />
             ) : null}
-            <span className="eyebrow">
-              {preview.muscle} · {preview.equipment}
-            </span>
-            <h2>{preview.name}</h2>
             <p>{preview.cue}</p>
             <ExerciseInstructions exercise={preview} />
             <p className="fine">

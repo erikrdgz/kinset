@@ -54,7 +54,7 @@ The manual `Deploy preview to GitHub Pages` workflow builds for `/kinset/`. Set 
 
 ## Before a public release
 
-- Have a qualified trainer review and correct the three procedural exercise motion previews before presenting them as instructional demonstrations. Character attribution is in `public/motion/CREDITS.md`.
+- Have a qualified trainer review and correct the 12 procedural exercise motion previews before presenting them as instructional demonstrations. Character attribution is in `public/motion/CREDITS.md`.
 - Optimize the anatomy assets further for mobile (currently about 11.5 MB across two lazy-loaded GLBs); review exercise content and muscle mappings with a qualified professional.
 - Run the cloud authentication, row-access, sync conflict and deletion checks above.
 - Add durable offline app-shell caching, service-worker update handling, device cache controls and automated browser regression tests.
@@ -68,4 +68,6 @@ React, TypeScript, Vite, Three.js, React Three Fiber, Drei, Supabase, Zod, idb-k
 
 ## Movement guides
 
-All 12 catalog exercises have written setup, movement, breathing, and form cues, accessible from exercise rows and the workout logger’s **How to** button. Bodyweight squat, dumbbell curl, and dumbbell shoulder press also have illustrative 3D motion previews. Written instructions stay available alongside the preview and when a model cannot load. Review all exercise content with a qualified trainer before launch.
+All 12 catalog exercises open with an animated 3D preview: squat, goblet squat, curl, shoulder press, Romanian deadlift, supported row, floor press, incline push-up, glute bridge, alternating bird dog, lat pulldown, and leg press. Benches, a mat, a cable bar, and a moving leg-press platform give context to supported exercises. Controls include pause/play, half speed, restart, camera views, and a movement scrubber. Playback starts automatically unless reduced motion is requested, and pauses rendering while the tab is hidden.
+
+Written setup, movement, breathing, and form cues remain below each animation and are available if the 3D viewer fails. A shared movement catalog controls availability across the app; future exercises without a supported animation open their written guide. All motion is illustrative, authored procedurally, and requires qualified trainer review before launch. `tests/motion.test.ts` checks the shipped skeleton for animation coverage, continuity, fixed bone lengths, foot contact, and alternating limbs.

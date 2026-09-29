@@ -1599,3 +1599,30 @@ dialog.modal-backdrop::backdrop {
   width: auto;
   min-width: 60px;
 }
+
+.motion-cue {
+  margin: 12px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.motion-scrub {
+  display: block;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.motion-scrub input {
+  display: block;
+  width: 100%;
+  margin: 7px 0 0;
+  padding: 0;
+  height: 24px;
+  accent-color: #ff692b;
+  cursor: pointer;
+}
+
+.exercise-modal > h2 {
+  padding-right: 28px;
+}

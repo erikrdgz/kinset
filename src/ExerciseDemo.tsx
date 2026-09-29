@@ -2,27 +2,40 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useProgress, useGLTF } from "@react-three/drei";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import {
-  Bone,
-  Group,
-  Mesh,
-  MeshStandardMaterial,
-  Quaternion,
-  Vector3,
-} from "three";
+import { Group, Mesh, MeshStandardMaterial, Vector3 } from "three";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import type { Exercise } from "./domain";
-export const demoIds = new Set(["squat", "curl", "press"]);
-type Movement = "squat" | "curl" | "press";
+import {
+  type Movement,
+  floorMovements,
+  sideFirst,
+  motionCue,
+} from "./motion/catalog";
+import { applyPose, prepareRig } from "./motion/pose";
+import {
+  Bench,
+  PulldownMachine,
+  LegPressMachine,
+  FootPlate,
+  ExerciseMat,
+  Beam,
+} from "./motion/Equipment";
 const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
-function Camera({ side }: { side: boolean }) {
+function Camera({ side, movement }: { side: boolean; movement: Movement }) {
   const { camera, invalidate } = useThree();
   useEffect(() => {
-    camera.position.set(side ? 4 : 0, 1.1, side ? 0 : 4);
-    camera.lookAt(0, 1.05, 0);
+    const low = floorMovements.has(movement);
+    const target = movement === "row" ? 0.7 : low ? 0.45 : 1.05;
+    camera.position.set(
+      side ? (low ? 3.2 : 4) : low ? 2.5 : 0.7,
+      low ? 1.6 : 1.55,
+      side ? 0.6 : low ? 3.2 : 4.3,
+    );
+    if (side && movement === "row") camera.position.set(-3.4, 1.4, 0.6);
+    camera.lookAt(0, target, 0);
     camera.updateProjectionMatrix();
     invalidate();
-  }, [camera, side, invalidate]);
+  }, [camera, side, movement, invalidate]);
   return null;
 }
 function Dumbbell({ reference }: { reference: React.RefObject<Group | null> }) {
@@ -51,51 +64,32 @@ function Trainer({
   speed,
   reset,
   hidden,
+  seek,
+  onProgress,
 }: {
   movement: Movement;
   playing: boolean;
   speed: number;
   reset: number;
   hidden: boolean;
+  seek: { time: number };
+  onProgress: (time: number) => void;
 }) {
   const asset = useGLTF(import.meta.env.BASE_URL + "motion/trainer.glb");
   const left = useRef<Group>(null),
     right = useRef<Group>(null),
-    elapsed = useRef(0);
+    goblet = useRef<Group>(null),
+    bar = useRef<Group>(null),
+    plate = useRef<Group>(null),
+    cable = useRef<Mesh>(null),
+    elapsed = useRef(0),
+    reported = useRef(-1);
   const { invalidate } = useThree();
-  const rig = useMemo(() => {
-    const scene = clone(asset.scene);
-    scene.updateMatrixWorld(true);
-    const bones = new Map<
-      string,
-      {
-        bone: Bone;
-        q: Quaternion;
-        p: Vector3;
-        worldQ: Quaternion;
-        worldP: Vector3;
-      }
-    >();
-    scene.traverse((o) => {
-      if (o instanceof Bone)
-        bones.set(o.name, {
-          bone: o,
-          q: o.quaternion.clone(),
-          p: o.position.clone(),
-          worldQ: o.getWorldQuaternion(new Quaternion()),
-          worldP: o.getWorldPosition(new Vector3()),
-        });
-      if (o instanceof Mesh) {
-        o.castShadow = true;
-        o.material = new MeshStandardMaterial({
-          color: "#8a8d8f",
-          roughness: 0.64,
-          metalness: 0.12,
-        });
-      }
-    });
-    return { scene, bones };
-  }, [asset.scene]);
+  const rig = useMemo(() => prepareRig(clone(asset.scene)), [asset.scene]);
+  useEffect(() => {
+    elapsed.current = seek.time;
+    invalidate();
+  }, [seek, invalidate]);
   useEffect(() => {
     elapsed.current = 0;
     invalidate();
@@ -116,124 +110,94 @@ function Trainer({
       elapsed.current += Math.min(delta, 0.08) * speed;
       invalidate();
     }
-    const u = (1 - Math.cos((elapsed.current / 4.8) * Math.PI * 2)) / 2;
-    for (const b of rig.bones.values()) {
-      b.bone.quaternion.copy(b.q);
-      b.bone.position.copy(b.p);
+    const duration = movement === "bird" ? 9.6 : 4.8;
+    const time = elapsed.current % duration;
+    if (Math.abs(time - reported.current) > 0.08) {
+      reported.current = time;
+      onProgress(time);
     }
-    rig.scene.updateMatrixWorld(true);
-    const get = (name: string) => rig.bones.get(name)!;
-    const position = (name: string) =>
-      get(name).bone.getWorldPosition(new Vector3());
-    const aim = (name: string, child: string, direction: Vector3) => {
-      const b = get(name),
-        rest = get(child).worldP.clone().sub(b.worldP).normalize();
-      const desired = new Quaternion()
-        .setFromUnitVectors(rest, direction.normalize())
-        .multiply(b.worldQ);
-      b.bone.quaternion.copy(
-        b.bone
-          .parent!.getWorldQuaternion(new Quaternion())
-          .invert()
-          .multiply(desired),
-      );
-      b.bone.updateWorldMatrix(false, true);
-    };
-    const pelvis = get("pelvis");
-    const hip = pelvis.worldP
-      .clone()
-      .add(
-        v(
-          0,
-          -0.008 - (movement === "squat" ? 0.27 * u : 0),
-          movement === "squat" ? -0.17 * u : 0,
-        ),
-      );
-    pelvis.bone.position.copy(pelvis.bone.parent!.worldToLocal(hip));
-    rig.scene.updateMatrixWorld(true);
-    if (movement === "squat")
-      aim("spine_01", "spine_02", v(0, Math.cos(0.33 * u), Math.sin(0.33 * u)));
-    for (const [suffix, sign] of [
-      ["l", 1],
-      ["r", -1],
-    ] as const) {
-      // Two-link inverse kinematics keeps the foot planted through the squat.
-      const thigh = "thigh_" + suffix,
-        calf = "calf_" + suffix,
-        foot = "foot_" + suffix;
-      const h = position(thigh),
-        ankle = get(foot).worldP.clone();
-      ankle.x = sign * 0.13;
-      const l1 = get(calf).worldP.distanceTo(get(thigh).worldP),
-        l2 = get(foot).worldP.distanceTo(get(calf).worldP);
-      const line = ankle.clone().sub(h),
-        d = Math.min(line.length(), l1 + l2 - 0.00001);
-      line.normalize();
-      const a = (l1 * l1 - l2 * l2 + d * d) / (2 * d),
-        height = Math.sqrt(Math.max(0, l1 * l1 - a * a));
-      const forward = v(0, 0, 1).addScaledVector(line, -line.z).normalize();
-      const knee = h
+    const pose = applyPose(rig, movement, elapsed.current);
+    if (left.current) left.current.position.copy(pose.hands[0]);
+    if (right.current) right.current.position.copy(pose.hands[1]);
+    if (goblet.current) {
+      goblet.current.position
+        .copy(pose.hands[0])
+        .add(pose.hands[1])
+        .multiplyScalar(0.5);
+      goblet.current.position.y -= 0.05;
+      goblet.current.rotation.z = Math.PI / 2;
+    }
+    if (bar.current) {
+      const midpoint = pose.hands[0]
         .clone()
-        .addScaledVector(line, a)
-        .addScaledVector(forward, height);
-      aim(thigh, calf, knee.clone().sub(h));
-      aim(calf, foot, ankle.clone().sub(position(calf)));
-      const f = get(foot);
-      f.bone.quaternion.copy(
-        f.bone
-          .parent!.getWorldQuaternion(new Quaternion())
-          .invert()
-          .multiply(f.worldQ),
-      );
-      f.bone.updateWorldMatrix(false, true);
-      const upper = "upperarm_" + suffix,
-        lower = "lowerarm_" + suffix,
-        hand = "hand_" + suffix;
-      if (movement === "curl") {
-        aim(upper, lower, v(sign * 0.08, -1, 0.04));
-        const angle = 0.12 + 2.05 * u;
-        aim(lower, hand, v(sign * 0.025, -Math.cos(angle), Math.sin(angle)));
-      } else if (movement === "press") {
-        aim(upper, lower, v(sign * (0.95 - 0.82 * u), 0.08 + 0.92 * u, 0.12));
-        aim(lower, hand, v(-sign * 0.06, 1, 0.08));
-      } else {
-        aim(upper, lower, v(sign * 0.12, -0.18, 0.9));
-        aim(lower, hand, v(-sign * 0.05, 0.05, 1));
+        .add(pose.hands[1])
+        .multiplyScalar(0.5);
+      bar.current.position.copy(midpoint);
+      if (cable.current) {
+        cable.current.position.set(0, (2.05 + midpoint.y) / 2, midpoint.z);
+        cable.current.scale.y = 2.05 - midpoint.y;
       }
-      if (movement !== "squat") {
-        for (const b of rig.bones.values())
-          if (
-            new RegExp(
-              "^(index|middle|ring|pinky)_0[123]_" + suffix + "$",
-            ).test(b.bone.name)
-          )
-            b.bone.quaternion
-              .copy(b.q)
-              .multiply(new Quaternion().setFromAxisAngle(v(1, 0, 0), 1.2));
-        get(hand).bone.updateWorldMatrix(false, true);
-      }
-      const weight = suffix === "l" ? left.current : right.current;
-      if (weight)
-        weight.position.copy(get(hand).bone.localToWorld(v(0, 0.075, 0)));
     }
+    if (plate.current)
+      plate.current.position
+        .copy(pose.ankles[0])
+        .add(pose.ankles[1])
+        .multiplyScalar(0.5)
+        .add(v(0, 0.04, 0.17));
   });
+  const pair = ["curl", "press", "rdl", "floor"].includes(movement);
   return (
     <>
       <primitive object={rig.scene} />
-      {movement !== "squat" && (
+      {pair && <Dumbbell reference={left} />}
+      {(pair || movement === "row") && <Dumbbell reference={right} />}
+      {movement === "goblet" && <Dumbbell reference={goblet} />}
+      {movement === "row" && (
+        <group position={[0.36, 0, 0]} scale={[0.53, 1, 1]}>
+          <Bench />
+        </group>
+      )}
+      {movement === "pushup" && <Bench />}
+      {["floor", "bridge", "bird"].includes(movement) && <ExerciseMat />}
+      {movement === "pulldown" && (
         <>
-          <Dumbbell reference={left} />
-          <Dumbbell reference={right} />
+          <PulldownMachine />
+          <group ref={bar}>
+            <Beam
+              from={[-0.49, 0, 0]}
+              to={[0.49, 0, 0]}
+              radius={0.017}
+              color="#e86a35"
+            />
+          </group>
+          <mesh ref={cable}>
+            <cylinderGeometry args={[0.005, 0.005, 1, 8]} />
+            <meshStandardMaterial color="#94999b" />
+          </mesh>
+        </>
+      )}
+      {movement === "legpress" && (
+        <>
+          <LegPressMachine />
+          <group ref={plate}>
+            <FootPlate />
+          </group>
         </>
       )}
     </>
   );
 }
+
 export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
   const { active: loading } = useProgress();
-  const [playing, setPlaying] = useState(false),
+  const movement = exercise.id as Movement;
+  const [seek, setSeek] = useState({ time: 0 });
+  const [progress, setProgress] = useState(0);
+  const [playing, setPlaying] = useState(
+      () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    ),
     [speed, setSpeed] = useState(1),
-    [side, setSide] = useState(false),
+    [side, setSide] = useState(sideFirst.has(movement)),
     [reset, setReset] = useState(0),
     [hidden, setHidden] = useState(document.hidden);
   useEffect(() => {
@@ -246,14 +210,15 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
       className="motion-demo"
       aria-label={`${exercise.name} movement preview`}
     >
-      <div className="motion-stage">{loading && <span className="motion-loading">Loading movement…</span>}
+      <div className="motion-stage">
+        {loading && <span className="motion-loading">Loading movement…</span>}
         <Canvas
           shadows
           frameloop="demand"
           dpr={[1, 1.5]}
           camera={{ position: [0, 1.1, 4], fov: 34 }}
         >
-          <Camera side={side} />
+          <Camera side={side} movement={movement} />
           <ambientLight intensity={1.6} />
           <directionalLight
             castShadow
@@ -268,11 +233,13 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
           />
           <Suspense fallback={null}>
             <Trainer
-              movement={exercise.id as Movement}
+              movement={movement}
               playing={playing}
               speed={speed}
               reset={reset}
               hidden={hidden}
+              seek={seek}
+              onProgress={setProgress}
             />
           </Suspense>
           <mesh
@@ -312,13 +279,31 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
         </button>
         <div className="motion-views" role="group" aria-label="Viewing angle">
           <button aria-pressed={!side} onClick={() => setSide(false)}>
-            Front
+            Overview
           </button>
           <button aria-pressed={side} onClick={() => setSide(true)}>
             Side
           </button>
         </div>
       </div>
+      <label className="motion-scrub">
+        Step through the movement
+        <input
+          type="range"
+          min="0"
+          max={movement === "bird" ? 9.6 : 4.8}
+          step="0.05"
+          value={progress}
+          aria-label="Movement position"
+          onChange={(event) => {
+            const time = Number(event.target.value);
+            setPlaying(false);
+            setProgress(time);
+            setSeek({ time });
+          }}
+        />
+      </label>
+      <p className="motion-cue">{motionCue[movement]}</p>
       <p className="motion-note">
         Illustrative animation · technique review pending
       </p>
