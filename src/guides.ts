@@ -1,3 +1,4 @@
+import { extraGuides } from "./extraExercises";
 export type ExerciseGuide = {
   setup: string;
   steps: string[];
@@ -6,6 +7,7 @@ export type ExerciseGuide = {
   source?: string;
 };
 export const guides: Record<string, ExerciseGuide> = {
+  ...extraGuides,
   goblet: {
     setup:
       "Stand with feet about shoulder-width apart. Hold one dumbbell close to your chest with both hands.",

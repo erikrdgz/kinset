@@ -66,7 +66,11 @@ describe("movement previews", () => {
       }
       expect(
         samples.some((s) =>
-          s.some((n, i) => Math.abs(n - samples[0][i]) > 0.08),
+          s.some(
+            (n, i) =>
+              Math.abs(n - samples[0][i]) >
+              (["calf", "dbcalf"].includes(movement) ? 0.04 : 0.08),
+          ),
         ),
       ).toBe(true);
       for (let i = 1; i < samples.length; i++)
@@ -133,3 +137,19 @@ it("keeps supported wrists at the bench or mat", () => {
     ).toBeLessThan(0.06);
   }
 });
+
+it.each(["calf", "dbcalf"] as const)(
+  "%s keeps the balls of the feet in contact while lifting heels",
+  (movement) => {
+    const rig = rigFromAsset();
+    applyPose(rig, movement, 0);
+    const ball = rig.bones.get("ball_l")!.bone;
+    const start = ball.getWorldPosition(new Vector3());
+    for (const time of [0.6, 1.2, 2.4, 3.6]) {
+      applyPose(rig, movement, time);
+      expect(
+        ball.getWorldPosition(new Vector3()).distanceTo(start),
+      ).toBeLessThan(0.015);
+    }
+  },
+);

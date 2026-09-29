@@ -1,3 +1,5 @@
+import { extraExercises } from "./extraExercises";
+import type { WorkoutPlan } from "./plans";
 import { z } from "zod";
 export const profileSchema = z.object({
   name: z.string().trim().min(1).max(40),
@@ -24,6 +26,7 @@ export type Exercise = {
   reps: string;
 };
 export const exercises: Exercise[] = [
+  ...extraExercises,
   {
     id: "goblet",
     name: "Goblet squat",
@@ -132,13 +135,20 @@ export type Session = {
   name: string;
   startedAt: string;
   finishedAt?: string;
+  planId?: string;
+  dayId?: string;
+  planName?: string;
   unit: "kg" | "lb";
-  entries: { exerciseId: string; sets: SetLog[] }[];
+  entries: { exerciseId: string; targetReps?: string; sets: SetLog[] }[];
 };
 export type State = {
   profile: Profile | null;
   sessions: Session[];
   active: Session | null;
+  plans?: WorkoutPlan[];
+  activePlanId?: string | null;
+  planProgress?: Record<string, number>;
+  planDraft?: WorkoutPlan | null;
 };
 export const emptyState: State = { profile: null, sessions: [], active: null };
 export function program(p: Profile, index = 0) {

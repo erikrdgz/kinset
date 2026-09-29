@@ -7,6 +7,8 @@ import { Pause, Play, RotateCcw } from "lucide-react";
 import type { Exercise } from "./domain";
 import {
   type Movement,
+  baseMovement,
+  motionDuration,
   floorMovements,
   sideFirst,
   motionCue,
@@ -24,7 +26,7 @@ const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
 function Camera({ side, movement }: { side: boolean; movement: Movement }) {
   const { camera, invalidate } = useThree();
   useEffect(() => {
-    const low = floorMovements.has(movement);
+    const low = floorMovements.has(baseMovement(movement));
     const target = movement === "row" ? 0.7 : low ? 0.45 : 1.05;
     camera.position.set(
       side ? (low ? 3.2 : 4) : low ? 2.5 : 0.7,
@@ -110,7 +112,7 @@ function Trainer({
       elapsed.current += Math.min(delta, 0.08) * speed;
       invalidate();
     }
-    const duration = movement === "bird" ? 9.6 : 4.8;
+    const duration = motionDuration(movement);
     const time = elapsed.current % duration;
     if (Math.abs(time - reported.current) > 0.08) {
       reported.current = time;
@@ -119,6 +121,14 @@ function Trainer({
     const pose = applyPose(rig, movement, elapsed.current);
     if (left.current) left.current.position.copy(pose.hands[0]);
     if (right.current) right.current.position.copy(pose.hands[1]);
+    if (left.current)
+      left.current.rotation.y = ["hammer", "closefloor"].includes(movement)
+        ? Math.PI / 2
+        : 0;
+    if (right.current)
+      right.current.rotation.y = ["hammer", "closefloor"].includes(movement)
+        ? Math.PI / 2
+        : 0;
     if (goblet.current) {
       goblet.current.position
         .copy(pose.hands[0])
@@ -145,20 +155,40 @@ function Trainer({
         .multiplyScalar(0.5)
         .add(v(0, 0.04, 0.17));
   });
-  const pair = ["curl", "press", "rdl", "floor"].includes(movement);
+  const base = baseMovement(movement);
+  const pair = [
+    "curl",
+    "press",
+    "rdl",
+    "floor",
+    "bentrow",
+    "reversefly",
+    "lateral",
+    "frontraise",
+    "hammer",
+    "altcurl",
+    "seatedpress",
+    "closefloor",
+    "dbcalf",
+  ].includes(movement);
   return (
     <>
       <primitive object={rig.scene} />
       {pair && <Dumbbell reference={left} />}
       {(pair || movement === "row") && <Dumbbell reference={right} />}
-      {movement === "goblet" && <Dumbbell reference={goblet} />}
+      {base === "goblet" && <Dumbbell reference={goblet} />}
       {movement === "row" && (
         <group position={[0.36, 0, 0]} scale={[0.53, 1, 1]}>
           <Bench />
         </group>
       )}
-      {movement === "pushup" && <Bench />}
-      {["floor", "bridge", "bird"].includes(movement) && <ExerciseMat />}
+      {base === "pushup" && <Bench />}
+      {movement === "seatedpress" && (
+        <group position={[0, -0.125, -0.53]}>
+          <Bench />
+        </group>
+      )}
+      {["floor", "bridge", "bird"].includes(base) && <ExerciseMat />}
       {movement === "pulldown" && (
         <>
           <PulldownMachine />
@@ -197,7 +227,7 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
       () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     ),
     [speed, setSpeed] = useState(1),
-    [side, setSide] = useState(sideFirst.has(movement)),
+    [side, setSide] = useState(sideFirst.has(baseMovement(movement))),
     [reset, setReset] = useState(0),
     [hidden, setHidden] = useState(document.hidden);
   useEffect(() => {
@@ -291,7 +321,7 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
         <input
           type="range"
           min="0"
-          max={movement === "bird" ? 9.6 : 4.8}
+          max={motionDuration(movement)}
           step="0.05"
           value={progress}
           aria-label="Movement position"
@@ -303,7 +333,11 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
           }}
         />
       </label>
-      <p className="motion-cue">{motionCue[movement]}</p>
+      <p className="motion-cue">
+        {movement === baseMovement(movement)
+          ? motionCue[baseMovement(movement)]
+          : exercise.cue}
+      </p>
       <p className="motion-note">
         Illustrative animation · technique review pending
       </p>

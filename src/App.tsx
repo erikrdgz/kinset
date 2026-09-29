@@ -19,6 +19,7 @@ import {
   History,
   House,
   Layers,
+  CalendarDays,
   LogOut,
   Plus,
   Settings,
@@ -42,6 +43,8 @@ import {
   type State,
 } from "./domain";
 import { useJournal } from "./storage";
+import Plans from "./PlanManager";
+import { nextWorkout, startWorkout, advancePlan, targetReps } from "./plans";
 import ExerciseInstructions from "./ExerciseInstructions";
 const ExerciseDemo = lazy(() => import("./ExerciseDemo"));
 import { demoIds } from "./motion/catalog";
@@ -558,6 +561,7 @@ function Journal({
     [restUntil, setRestUntil] = useState<number | null>(null),
     [now, setNow] = useState(Date.now()),
     [confirmDelete, setConfirmDelete] = useState(false),
+    [confirmDiscard, setConfirmDiscard] = useState(false),
     [deleting, setDeleting] = useState(false);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -604,17 +608,40 @@ function Journal({
     ),
     count = week.length;
   const preview = selected ? exercises.find((e) => e.id === selected) : null;
-  const plan = program(p, data.sessions.length);
+  const upcoming = nextWorkout(data);
+  const activePlan = data.plans?.find((plan) => plan.id === data.activePlanId);
+  const plannedEntries = data.active
+    ? data.active.entries.map((e) => ({
+        exerciseId: e.exerciseId,
+        sets: e.sets.length,
+        reps:
+          e.targetReps || exercises.find((x) => x.id === e.exerciseId)!.reps,
+      }))
+    : upcoming.entries.map((e) => ({
+        ...e,
+        reps:
+          targetReps(e) +
+          (exercises.find((x) => x.id === e.exerciseId)!.reps.includes("/ side")
+            ? " / side"
+            : ""),
+      }));
+  const plan = plannedEntries.map((e) =>
+    exercises.find((x) => x.id === e.exerciseId)!,
+  );
   const start = () => {
-    if (!data.active)
-      update({ ...data, active: startSession(p, data.sessions.length) });
+    if (!data.active) update({ ...data, active: startWorkout(p, upcoming) });
     setTab("Train");
   };
   const changeSession = (s: Session) => update({ ...data, active: s });
   const finish = () => {
     try {
       const finished = finishSession(data.active!);
-      update({ ...data, active: null, sessions: [finished, ...data.sessions] });
+      update({
+        ...data,
+        active: null,
+        sessions: [finished, ...data.sessions],
+        planProgress: advancePlan(data, finished),
+      });
       setTab("History");
       setNotice("Session saved.");
       setRestUntil(null);
@@ -648,6 +675,7 @@ function Journal({
             ["Today", House],
             ["Train", Dumbbell],
             ["Explore", Layers],
+            ["Plans", CalendarDays],
             ["History", History],
             ["Settings", Settings],
           ].map(([name, Icon]) => {
@@ -781,15 +809,14 @@ function Journal({
                   </span>
                 </div>
                 <h1>
-                  {data.active?.name ||
-                    `Full body ${data.sessions.length % 2 ? "B" : "A"}`}
+                  {data.active?.name || upcoming.name}
                   <span className="blue-period">.</span>
                 </h1>
                 <div className="session-facts">
-                  <span>{p.equipment}</span>
+                  <span>{data.active?.planName || upcoming.planName}</span>
                   <span>{plan.length} movements</span>
                   <span>
-                    {p.experience === "New to training" ? 2 : 3} sets each
+                    {plannedEntries.reduce((n, e) => n + e.sets, 0)} sets total
                   </span>
                 </div>
                 <div className="movement-table">
@@ -812,9 +839,9 @@ function Journal({
                         </small>
                       </span>
                       <span className="movement-prescription">
-                        {p.experience === "New to training" ? 2 : 3}
+                        {plannedEntries[i].sets}
                         <span> × </span>
-                        {e.reps}
+                        {plannedEntries[i].reps}
                       </span>
                       <ChevronRight size={16} />
                     </button>
@@ -836,21 +863,18 @@ function Journal({
               >
                 <span>
                   <strong>Watch exercise demos</strong>
-                  <small>All 12 exercises · interactive 3D</small>
+                  <small>{demoIds.size} exercises · interactive 3D</small>
                 </span>
                 <ChevronRight size={20} />
               </button>
               <div className="routine-foot">
                 <span>
-                  {p.days}-DAY FOUNDATION
+                  {activePlan ? activePlan.name : `${p.days}-DAY FOUNDATION`}
                   <br />
                   <strong>{p.goal}</strong>
                 </span>
-                <button
-                  className="text-button"
-                  onClick={() => setEditing(true)}
-                >
-                  Edit routine
+                <button className="text-button" onClick={() => setTab("Plans")}>
+                  Manage plans
                   <ChevronRight size={15} />
                 </button>
               </div>
@@ -875,6 +899,31 @@ function Journal({
                 )}
               </section>
             </>
+          )}
+          {tab === "Plans" && (
+            <Plans
+              data={data}
+              update={update}
+              onPreview={setSelected}
+              onStart={(plan, day) => {
+                if (data.active) {
+                  setTab("Train");
+                  return;
+                }
+                update({
+                  ...data,
+                  activePlanId: plan.id,
+                  active: startWorkout(p, {
+                    name: day.name,
+                    planName: plan.name,
+                    planId: plan.id,
+                    dayId: day.id,
+                    entries: day.entries,
+                  }),
+                });
+                setTab("Train");
+              }}
+            />
           )}
           {tab === "Train" && (
             <>
@@ -941,7 +990,8 @@ function Journal({
                         <div className="log-heading">
                           <div>
                             <span className="eyebrow">
-                              {exercise.muscle} · TARGET {exercise.reps} REPS
+                              {exercise.muscle} · TARGET{" "}
+                              {entry.targetReps || exercise.reps} REPS
                             </span>
                             <h2>{exercise.name}</h2>
                           </div>
@@ -1074,16 +1124,7 @@ function Journal({
                     </button>
                     <button
                       className="text-button"
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            "Discard this active workout? This cannot be undone.",
-                          )
-                        ) {
-                          update({ ...data, active: null });
-                          setRestUntil(null);
-                        }
-                      }}
+                      onClick={() => setConfirmDiscard(true)}
                     >
                       Discard workout
                     </button>
@@ -1371,6 +1412,7 @@ function Journal({
           ["Today", House],
           ["Train", Dumbbell],
           ["Explore", Layers],
+          ["Plans", CalendarDays],
           ["History", History],
           ["Settings", Settings],
         ].map(([name, Icon]) => {
@@ -1461,6 +1503,38 @@ function Journal({
             <button className="primary" onClick={() => setSelected(null)}>
               Got it
               <Check size={18} />
+            </button>
+          </section>
+        </Modal>
+      )}
+      {confirmDiscard && (
+        <Modal onClose={() => setConfirmDiscard(false)}>
+          <section
+            className="exercise-modal"
+            role="alertdialog"
+            aria-modal="true"
+            aria-label="Discard active workout"
+          >
+            <h2>Discard this session?</h2>
+            <p>
+              Your plan and completed workout history will stay saved. This
+              session’s unfinished log will be removed.
+            </p>
+            <button
+              className="primary"
+              onClick={() => {
+                update({ ...data, active: null });
+                setRestUntil(null);
+                setConfirmDiscard(false);
+              }}
+            >
+              Discard session
+            </button>
+            <button
+              className="text-button"
+              onClick={() => setConfirmDiscard(false)}
+            >
+              Keep training
             </button>
           </section>
         </Modal>

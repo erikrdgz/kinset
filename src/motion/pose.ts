@@ -6,7 +6,7 @@ import {
   Quaternion,
   Vector3,
 } from "three";
-import type { Movement } from "./catalog";
+import { baseMovement, type Movement } from "./catalog";
 const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
 const xAxis = v(1, 0, 0);
 export type RestBone = {
@@ -59,7 +59,8 @@ export function solveJoint(
   const bend = pole.clone().addScaledVector(line, -pole.dot(line)).normalize();
   return origin.clone().addScaledVector(line, a).addScaledVector(bend, height);
 }
-export function applyPose(rig: Rig, movement: Movement, time: number) {
+export function applyPose(rig: Rig, id: Movement, time: number) {
+  const movement = baseMovement(id);
   const u = (1 - Math.cos((time / 4.8) * Math.PI * 2)) / 2;
   const get = (name: string) => rig.bones.get(name)!;
   const pos = (name: string) => get(name).bone.getWorldPosition(new Vector3());
@@ -139,6 +140,19 @@ export function applyPose(rig: Rig, movement: Movement, time: number) {
     hip.set(0, 0.43, -0.37);
     tilt = -0.7;
   }
+  if (id === "calf" || id === "dbcalf") hip.add(v(0, 0.06 * u, 0.06 * u));
+  if (id === "split") {
+    hip.set(0, 0.82 - 0.23 * u, -0.05);
+    tilt = 0.12;
+  }
+  if (id === "lunge") {
+    hip.set(0, 0.908 - 0.28 * u, -0.05 - 0.08 * u);
+    tilt = 0.12 * u;
+  }
+  if (id === "seatedpress") {
+    hip.set(0, 0.55, 0);
+    tilt = 0;
+  }
   const pelvis = get("pelvis");
   pelvis.bone.position.copy(pelvis.bone.parent!.worldToLocal(hip.clone()));
   orient(
@@ -190,7 +204,50 @@ export function applyPose(rig: Rig, movement: Movement, time: number) {
       pole = v(0, -1, 0);
       footTilt = extending ? -1.25 * u : 0;
     }
-    ik(thigh, calf, foot, ankle, pole);
+    const alternate = Math.floor(time / 4.8) % 2 === 0;
+    if (id === "sumo") {
+      ankle.x = sign * 0.24;
+      pole = v(sign * 0.25, 0, 1);
+    }
+    if (id === "split") {
+      ankle.z = sign === 1 ? 0.28 : -0.5;
+      if (sign === -1) {
+        ankle.y = 0.18;
+        footTilt = 0.5;
+      }
+    }
+    if (id === "lunge" && (suffix === "r") === alternate) {
+      ankle.z -= 0.55 * u;
+      ankle.y += 0.08 * u;
+      footTilt = 0.5 * u;
+    }
+    if (id === "calf" || id === "dbcalf") {
+      ankle.add(v(0, 0.06 * u, 0.06 * u));
+      footTilt = 0.5 * u;
+    }
+    if (id === "seatedpress") ankle.z = 0.48;
+    if (id === "deadbug") {
+      ankle = v(sign * 0.12, 0.5, 0.45);
+      if ((suffix === "r") === alternate)
+        ankle.lerp(v(sign * 0.12, 0.13, 0.84), u);
+      pole = v(0, 1, 0);
+    }
+    if (id === "donkey" || id === "hydrant") {
+      const phase = (suffix === "r") === alternate ? u : 0;
+      const angle = (id === "donkey" ? Math.PI / 2 : 0.8) * phase;
+      aim(
+        thigh,
+        calf,
+        id === "donkey"
+          ? v(0, -Math.cos(angle), -Math.sin(angle))
+          : v(sign * Math.sin(angle), -Math.cos(angle), 0),
+      );
+      aim(
+        calf,
+        foot,
+        id === "donkey" ? v(0, Math.sin(angle), -Math.cos(angle)) : v(0, 0, -1),
+      );
+    } else ik(thigh, calf, foot, ankle, pole);
     orient(
       foot,
       new Quaternion()
@@ -201,9 +258,59 @@ export function applyPose(rig: Rig, movement: Movement, time: number) {
     const upper = "upperarm_" + suffix,
       lower = "lowerarm_" + suffix,
       hand = "hand_" + suffix;
-    if (movement === "curl") {
+    if (["split", "lunge", "calf", "dbcalf"].includes(id)) {
+      aim(upper, lower, v(sign * 0.08, -1, 0));
+      aim(lower, hand, v(0, -1, 0.05));
+    } else if (id === "goodmorning") {
+      ik(
+        upper,
+        lower,
+        hand,
+        pos("spine_03").add(v(-sign * 0.1, 0, 0.12)),
+        v(sign * 0.5, -1, 0),
+      );
+    } else if (["lateral", "frontraise", "reversefly"].includes(id)) {
+      const angle = (id === "frontraise" ? 1.4 : 1.3) * u;
+      const direction =
+        id === "frontraise"
+          ? v(sign * 0.02, -Math.cos(angle), Math.sin(angle))
+          : v(sign * Math.sin(angle), -Math.cos(angle), 0.12);
+      aim(upper, lower, direction);
+      aim(lower, hand, direction.clone().add(v(0, 0.04, 0.08)));
+    } else if (id === "bentrow") {
+      aim(upper, lower, v(sign * 0.04, -Math.cos(1.6 * u), -Math.sin(1.6 * u)));
+      aim(lower, hand, v(0, -1, 0.1));
+    } else if (id === "deadbug") {
+      const phase = (suffix === "l") === alternate ? u : 0;
+      const direction = v(
+        sign * 0.03,
+        Math.cos(1.35 * phase),
+        -Math.sin(1.35 * phase),
+      );
+      aim(upper, lower, direction);
+      aim(lower, hand, direction);
+    } else if (id === "donkey" || id === "hydrant") {
+      ik(upper, lower, hand, v(sign * 0.2, 0.04, 0.34), v(sign * 0.1, -1, 0));
+    } else if (id === "closefloor") {
+      aim(
+        upper,
+        lower,
+        v(sign * 0.2 * (1 - u), 0.02 + 0.98 * u, 0.98 * (1 - u)),
+      );
+      aim(lower, hand, v(0, 1, 0));
+    } else if (id === "narrowpushup") {
+      ik(
+        upper,
+        lower,
+        hand,
+        v(sign * 0.15, 0.63, 0.43),
+        v(sign * 0.2, -0.3, -1),
+      );
+    } else if (movement === "curl") {
       aim(upper, lower, v(sign * 0.08, -1, 0.04));
-      const angle = 0.12 + 2.05 * u;
+      const angle =
+        0.12 +
+        2.05 * (id === "altcurl" && (suffix === "l") !== alternate ? 0 : u);
       aim(lower, hand, v(sign * 0.025, -Math.cos(angle), Math.sin(angle)));
     } else if (movement === "press") {
       aim(upper, lower, v(sign * (0.95 - 0.82 * u), 0.08 + 0.92 * u, 0.12));
@@ -260,14 +367,27 @@ export function applyPose(rig: Rig, movement: Movement, time: number) {
     // Palm extends from the wrist in local +Y; point it down for supported hands.
     if (
       ["pushup", "bird", "bridge"].includes(movement) ||
-      (movement === "row" && suffix === "l")
+      (id === "row" && suffix === "l")
     ) {
       orient(hand, new Quaternion().setFromUnitVectors(v(0, 1, 0), v(0, 0, 1)));
     }
+    if (id === "narrowpushup")
+      orient(hand, new Quaternion().setFromUnitVectors(v(0, 1, 0), v(0, 0, 1)));
+    if (id === "hammer" || id === "closefloor")
+      orient(
+        hand,
+        get(hand)
+          .bone.getWorldQuaternion(new Quaternion())
+          .multiply(
+            new Quaternion().setFromAxisAngle(v(0, 1, 0), (sign * Math.PI) / 2),
+          ),
+      );
     const grips =
       ["curl", "press", "rdl", "row", "floor", "goblet", "pulldown"].includes(
         movement,
-      ) && !(movement === "row" && suffix === "l");
+      ) &&
+      !(id === "row" && suffix === "l") &&
+      id !== "deadbug";
     if (grips)
       for (const b of rig.bones.values())
         if (

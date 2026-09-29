@@ -1,4 +1,4 @@
-export const movements = [
+export const baseMovements = [
   "squat",
   "goblet",
   "curl",
@@ -12,7 +12,44 @@ export const movements = [
   "pulldown",
   "legpress",
 ] as const;
-export type Movement = (typeof movements)[number];
+export type BaseMovement = (typeof baseMovements)[number];
+export const variants = {
+  sumo: "goblet",
+  split: "squat",
+  lunge: "squat",
+  calf: "curl",
+  dbcalf: "curl",
+  goodmorning: "rdl",
+  bentrow: "row",
+  reversefly: "row",
+  lateral: "curl",
+  frontraise: "curl",
+  hammer: "curl",
+  altcurl: "curl",
+  seatedpress: "press",
+  closefloor: "floor",
+  deadbug: "floor",
+  donkey: "bird",
+  hydrant: "bird",
+  narrowpushup: "pushup",
+} as const;
+export type Movement = BaseMovement | keyof typeof variants;
+export const movements: Movement[] = [
+  ...baseMovements,
+  ...(Object.keys(variants) as (keyof typeof variants)[]),
+];
+export function baseMovement(id: Movement): BaseMovement {
+  return id in variants
+    ? variants[id as keyof typeof variants]
+    : (id as BaseMovement);
+}
+export function motionDuration(id: Movement) {
+  return ["bird", "deadbug", "donkey", "hydrant", "lunge", "altcurl"].includes(
+    id,
+  )
+    ? 9.6
+    : 4.8;
+}
 export const demoIds: ReadonlySet<string> = new Set(movements);
 export const floorMovements = new Set<Movement>([
   "floor",
@@ -30,7 +67,7 @@ export const sideFirst = new Set<Movement>([
   "bird",
   "legpress",
 ]);
-export const motionCue: Record<Movement, string> = {
+export const motionCue: Record<BaseMovement, string> = {
   squat: "Lower with control · stand tall",
   goblet: "Keep the weight at your chest · sit down and stand",
   curl: "Keep elbows close · curl and lower",

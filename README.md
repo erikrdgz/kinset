@@ -54,7 +54,7 @@ The manual `Deploy preview to GitHub Pages` workflow builds for `/kinset/`. Set 
 
 ## Before a public release
 
-- Have a qualified trainer review and correct the 12 procedural exercise motion previews before presenting them as instructional demonstrations. Character attribution is in `public/motion/CREDITS.md`.
+- Have a qualified trainer review and correct the 30 procedural exercise motion previews before presenting them as instructional demonstrations. Character attribution is in `public/motion/CREDITS.md`.
 - Optimize the anatomy assets further for mobile (currently about 11.5 MB across two lazy-loaded GLBs); review exercise content and muscle mappings with a qualified professional.
 - Run the cloud authentication, row-access, sync conflict and deletion checks above.
 - Add durable offline app-shell caching, service-worker update handling, device cache controls and automated browser regression tests.
@@ -68,6 +68,12 @@ React, TypeScript, Vite, Three.js, React Three Fiber, Drei, Supabase, Zod, idb-k
 
 ## Movement guides
 
-All 12 catalog exercises open with an animated 3D preview: squat, goblet squat, curl, shoulder press, Romanian deadlift, supported row, floor press, incline push-up, glute bridge, alternating bird dog, lat pulldown, and leg press. Benches, a mat, a cable bar, and a moving leg-press platform give context to supported exercises. Controls include pause/play, half speed, restart, camera views, and a movement scrubber. Playback starts automatically unless reduced motion is requested, and pauses rendering while the tab is hidden.
+All 30 catalog exercises open with an animated 3D preview: squat, goblet squat, curl, shoulder press, Romanian deadlift, supported row, floor press, incline push-up, glute bridge, alternating bird dog, lat pulldown, and leg press, plus 18 additional movements and variations including lunges, split squats, calf raises, raises, rows, neutral-grip curls, dead bugs, and quadruped hip exercises. Benches, a mat, a cable bar, and a moving leg-press platform give context to supported exercises. Controls include pause/play, half speed, restart, camera views, and a movement scrubber. Playback starts automatically unless reduced motion is requested, and pauses rendering while the tab is hidden.
 
 Written setup, movement, breathing, and form cues remain below each animation and are available if the 3D viewer fails. A shared movement catalog controls availability across the app; future exercises without a supported animation open their written guide. All motion is illustrative, authored procedurally, and requires qualified trainer review before launch. `tests/motion.test.ts` checks the shipped skeleton for animation coverage, continuity, fixed bone lengths, foot contact, and alternating limbs.
+
+## Custom workout plans
+
+Open **Plans** to create a routine from scratch or customize the foundation program. A plan supports 1–7 workout days with up to 20 distinct exercises per day, 1–10 sets, and rep ranges of 1–100. Days and exercises can be reordered. Drafts autosave with the journal; saving a plan is separate from selecting **Use plan**. Plans can be edited, duplicated, deleted, or started from any day.
+
+The Today screen follows the active plan’s rotation. Completing a session advances that plan’s next day; discarding a session does not. Each session snapshots its day name, exercises, set count, and rep targets, so later plan edits/deletion do not change an active log or workout history. Plans, draft edits, and rotation position share the existing IndexedDB persistence, versioned Supabase journal, offline queue, conflict handling, and JSON export. Older journals without plan fields retain their foundation routine. Live Supabase accounts still require project configuration.
