@@ -22,6 +22,8 @@ import {
   ExerciseMat,
   Beam,
 } from "./motion/Equipment";
+/** Demos play 25% faster than the base pose timing; 1× and 0.5× stay relative to this. */
+const MOTION_RATE = 1.25;
 const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
 function Camera({ side, movement }: { side: boolean; movement: Movement }) {
   const { camera, invalidate } = useThree();
@@ -109,7 +111,7 @@ function Trainer({
   );
   useFrame((_, delta) => {
     if (playing && !hidden) {
-      elapsed.current += Math.min(delta, 0.08) * speed;
+      elapsed.current += Math.min(delta, 0.08) * speed * MOTION_RATE;
       invalidate();
     }
     const duration = motionDuration(movement);
