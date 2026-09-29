@@ -1,3 +1,4 @@
+import { Select } from "./Select";
 import {
   Component,
   lazy,
@@ -106,8 +107,13 @@ function Modal({
 function Brand() {
   return (
     <span className="brand">
-      <span className="brand-mark">k</span>kinset
-      <span className="brand-dot">.</span>
+      <img
+        className="brand-icon"
+        src={`${import.meta.env.BASE_URL}icon.svg`}
+        alt=""
+        aria-hidden="true"
+      />
+      kinset
     </span>
   );
 }
@@ -422,69 +428,64 @@ function Onboarding({
         </label>
         <label>
           Your main goal
-          <select
+          <Select
+            label="Your main goal"
             value={p.goal}
-            onChange={(e) => field("goal", e.target.value as Profile["goal"])}
-          >
-            {[
+            onValueChange={(value) => field("goal", value as Profile["goal"])}
+            options={[
               "Build consistency",
               "Build strength",
               "Support getting leaner",
-            ].map((x) => (
-              <option key={x}>{x}</option>
-            ))}
-          </select>
+            ]}
+          />
         </label>
         <div className="form-grid">
           <label>
             Sessions per week
-            <select
-              value={p.days}
-              onChange={(e) => field("days", Number(e.target.value))}
-            >
-              {[2, 3, 4].map((x) => (
-                <option key={x} value={x}>
-                  {x} days
-                </option>
-              ))}
-            </select>
+            <Select
+              label="Sessions per week"
+              value={String(p.days)}
+              onValueChange={(value) => field("days", Number(value))}
+              options={[2, 3, 4].map((value) => ({
+                value: String(value),
+                label: `${value} days`,
+              }))}
+            />
           </label>
           <label>
             Training experience
-            <select
+            <Select
+              label="Training experience"
               value={p.experience}
-              onChange={(e) =>
-                field("experience", e.target.value as Profile["experience"])
+              onValueChange={(value) =>
+                field("experience", value as Profile["experience"])
               }
-            >
-              {["New to training", "Returning", "Consistent"].map((x) => (
-                <option key={x}>{x}</option>
-              ))}
-            </select>
+              options={["New to training", "Returning", "Consistent"]}
+            />
           </label>
         </div>
         <label>
           Available equipment
-          <select
+          <Select
+            label="Available equipment"
             value={p.equipment}
-            onChange={(e) =>
-              field("equipment", e.target.value as Profile["equipment"])
+            onValueChange={(value) =>
+              field("equipment", value as Profile["equipment"])
             }
-          >
-            {["Dumbbells", "Full gym", "Bodyweight"].map((x) => (
-              <option key={x}>{x}</option>
-            ))}
-          </select>
+            options={["Dumbbells", "Full gym", "Bodyweight"]}
+          />
         </label>
         <label>
           Weight units
-          <select
+          <Select
+            label="Weight units"
             value={p.unit}
-            onChange={(e) => field("unit", e.target.value as Profile["unit"])}
-          >
-            <option value="kg">Kilograms (kg)</option>
-            <option value="lb">Pounds (lb)</option>
-          </select>
+            onValueChange={(value) => field("unit", value as Profile["unit"])}
+            options={[
+              { value: "kg", label: "Kilograms (kg)" },
+              { value: "lb", label: "Pounds (lb)" },
+            ]}
+          />
         </label>
         <details>
           <summary>Body measurements · optional</summary>

@@ -1,3 +1,4 @@
+import { Select } from "./Select";
 import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2, ChevronRight } from "lucide-react";
 import { exercises, type State } from "./domain";
@@ -286,14 +287,12 @@ export default function Plans({
             </label>
             <label className="plan-label">
               Equipment
-              <select
+              <Select
+                label="Equipment"
                 value={equipment}
-                onChange={(e) => setEquipment(e.target.value)}
-              >
-                {["All", "Bodyweight", "Dumbbells", "Full gym"].map((e) => (
-                  <option key={e}>{e}</option>
-                ))}
-              </select>
+                onValueChange={setEquipment}
+                options={["All", "Bodyweight", "Dumbbells", "Full gym"]}
+              />
             </label>
           </div>
           <div className="plan-picker-list">
