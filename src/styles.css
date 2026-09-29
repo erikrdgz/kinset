@@ -2761,10 +2761,10 @@ input::placeholder {
 .kinset-terminal { position: relative; display: inline-block; }
 .kinset-overlap-arrow {
   position: absolute;
-  width: .18em;
-  height: .18em;
+  width: .13em;
+  height: .13em;
   right: 50%;
-  bottom: .075em;
+  bottom: .1em;
   color: #fff;
   transform: translateX(50%) scaleY(.625);
   transform-origin: bottom center;
