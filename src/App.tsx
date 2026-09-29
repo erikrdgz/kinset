@@ -553,6 +553,7 @@ function Journal({
     [notice, setNotice] = useState(""),
     [muscle, setMuscle] = useState<Muscle | "All">("All"),
     [query, setQuery] = useState(""),
+    [demosOnly, setDemosOnly] = useState(false),
     [restUntil, setRestUntil] = useState<number | null>(null),
     [now, setNow] = useState(Date.now()),
     [confirmDelete, setConfirmDelete] = useState(false),
@@ -798,7 +799,7 @@ function Journal({
                       </span>
                       <span className="movement-name">
                         <strong>{e.name}</strong>
-                        <small>{e.muscle}</small>
+                        <small>{e.muscle}{demoIds.has(e.id) && <span className="watch-demo-label"> · ▶ Watch demo</span>}</small>
                       </span>
                       <span className="movement-prescription">
                         {p.experience === "New to training" ? 2 : 3}
@@ -814,6 +815,7 @@ function Journal({
                   <ArrowUpRight size={20} />
                 </button>
               </section>
+              <button className="demo-discovery" onClick={()=>{setDemosOnly(true);setMuscle("All");setQuery("");setTab("Explore")}}><span><strong>Watch exercise demos</strong><small>Squat, curl & shoulder press · interactive 3D</small></span><ChevronRight size={20}/></button>
               <div className="routine-foot">
                 <span>
                   {p.days}-DAY FOUNDATION
@@ -1099,6 +1101,8 @@ function Journal({
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                   />
+                  <button className="demo-filter" aria-pressed={demosOnly} onClick={()=>{setDemosOnly(!demosOnly);setMuscle("All");setQuery("")}}>{demosOnly?"Showing 3D demos":"Show 3D demos"}<span>3 exercises</span></button>
+                  {demosOnly&&<p className="fine">Open an exercise, then tap Play to watch the movement. Use Front or Side to change the view.</p>}
                   <div className="filters">
                     {(
                       [
@@ -1124,7 +1128,7 @@ function Journal({
                     {exercises
                       .filter(
                         (e) =>
-                          (muscle === "All" || e.muscle === muscle) &&
+                          (!demosOnly || demoIds.has(e.id)) && (muscle === "All" || e.muscle === muscle) &&
                           e.name.toLowerCase().includes(query.toLowerCase()),
                       )
                       .map((e) => (
@@ -1136,14 +1140,14 @@ function Journal({
                             <strong>{e.name}</strong>
                             <small>
                               {e.muscle} · {e.equipment}
-                            </small>
+                            </small>{demoIds.has(e.id)&&<span className="watch-demo-label">▶ Watch demo</span>}
                           </span>
                           <ChevronRight size={18} />
                         </button>
                       ))}
                     {!exercises.some(
                       (e) =>
-                        (muscle === "All" || e.muscle === muscle) &&
+                        (!demosOnly || demoIds.has(e.id)) && (muscle === "All" || e.muscle === muscle) &&
                         e.name.toLowerCase().includes(query.toLowerCase()),
                     ) && <p>No matching exercises. Try another search.</p>}
                   </div>

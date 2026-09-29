@@ -1490,3 +1490,5 @@ dialog.modal-backdrop::backdrop {
 }
 
 .motion-loading{position:absolute;inset:0;display:grid;place-items:center;font-size:.85rem;color:#a7998c;z-index:1;pointer-events:none}
+
+.demo-discovery{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:20px 0;border-bottom:1px solid var(--line);color:var(--orange)}.demo-discovery strong{font-weight:500;font-size:1rem}.demo-discovery small{font-size:.8rem;color:var(--muted)}.demo-filter{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 14px;margin:15px 0;border:1px solid #6b4631;color:#ff9a69;text-align:left}.demo-filter[aria-pressed=true]{background:#39251b;border-color:var(--orange)}.demo-filter>span{font-size:.75rem;color:#b59b89}.watch-demo-label{display:inline-block;color:#ff9a69;font-size:.75rem;margin-top:6px}.movement-name .watch-demo-label{margin-top:0}
