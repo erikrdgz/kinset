@@ -1489,6 +1489,113 @@ dialog.modal-backdrop::backdrop {
   color: #ff692b;
 }
 
-.motion-loading{position:absolute;inset:0;display:grid;place-items:center;font-size:.85rem;color:#a7998c;z-index:1;pointer-events:none}
+.motion-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+  color: #a7998c;
+  z-index: 1;
+  pointer-events: none;
+}
 
-.demo-discovery{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:20px 0;border-bottom:1px solid var(--line);color:var(--orange)}.demo-discovery strong{font-weight:500;font-size:1rem}.demo-discovery small{font-size:.8rem;color:var(--muted)}.demo-filter{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 14px;margin:15px 0;border:1px solid #6b4631;color:#ff9a69;text-align:left}.demo-filter[aria-pressed=true]{background:#39251b;border-color:var(--orange)}.demo-filter>span{font-size:.75rem;color:#b59b89}.watch-demo-label{display:inline-block;color:#ff9a69;font-size:.75rem;margin-top:6px}.movement-name .watch-demo-label{margin-top:0}
+.demo-discovery {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--orange);
+}
+.demo-discovery strong {
+  font-weight: 500;
+  font-size: 1rem;
+}
+.demo-discovery small {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.demo-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  margin: 15px 0;
+  border: 1px solid #6b4631;
+  color: #ff9a69;
+  text-align: left;
+}
+.demo-filter[aria-pressed="true"] {
+  background: #39251b;
+  border-color: var(--orange);
+}
+.demo-filter > span {
+  font-size: 0.75rem;
+  color: #b59b89;
+}
+.watch-demo-label {
+  display: inline-block;
+  color: #ff9a69;
+  font-size: 0.75rem;
+  margin-top: 6px;
+}
+.movement-name .watch-demo-label {
+  margin-top: 0;
+}
+
+.exercise-guide {
+  margin: 22px 0;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.exercise-guide h3 {
+  font-family: "IBM Plex Mono", monospace;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 0.7rem;
+  letter-spacing: 0.07em;
+  color: #ff9a69;
+  margin: 0 0 10px;
+}
+.exercise-guide p {
+  font-size: 0.95rem;
+  color: #d0c6bd;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+.exercise-guide ol {
+  padding-left: 24px;
+  margin: 0 0 24px;
+}
+.exercise-guide li {
+  padding-left: 7px;
+  margin-bottom: 14px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  color: #d0c6bd;
+}
+.exercise-guide li::marker {
+  color: #ff9a69;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+}
+.guide-cues {
+  border-left: 2px solid #6b4631;
+  padding-left: 15px;
+}
+.guide-source {
+  font-size: 0.8rem;
+  color: #a99a8d;
+}
+.howto-label {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.log-heading .icon-button {
+  width: auto;
+  min-width: 60px;
+}

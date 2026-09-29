@@ -42,6 +42,7 @@ import {
   type State,
 } from "./domain";
 import { useJournal } from "./storage";
+import ExerciseInstructions from "./ExerciseInstructions";
 const ExerciseDemo = lazy(() => import("./ExerciseDemo"));
 const demoIds = new Set(["squat", "curl", "press"]);
 const Body = lazy(() => import("./Body"));
@@ -799,7 +800,16 @@ function Journal({
                       </span>
                       <span className="movement-name">
                         <strong>{e.name}</strong>
-                        <small>{e.muscle}{demoIds.has(e.id) && <span className="watch-demo-label"> · ▶ Watch demo</span>}</small>
+                        <small>
+                          {e.muscle}
+                          <span className="watch-demo-label">
+                            {" "}
+                            ·{" "}
+                            {demoIds.has(e.id)
+                              ? "▶ Demo + guide"
+                              : "Movement guide"}
+                          </span>
+                        </small>
                       </span>
                       <span className="movement-prescription">
                         {p.experience === "New to training" ? 2 : 3}
@@ -815,7 +825,21 @@ function Journal({
                   <ArrowUpRight size={20} />
                 </button>
               </section>
-              <button className="demo-discovery" onClick={()=>{setDemosOnly(true);setMuscle("All");setQuery("");setTab("Explore")}}><span><strong>Watch exercise demos</strong><small>Squat, curl & shoulder press · interactive 3D</small></span><ChevronRight size={20}/></button>
+              <button
+                className="demo-discovery"
+                onClick={() => {
+                  setDemosOnly(true);
+                  setMuscle("All");
+                  setQuery("");
+                  setTab("Explore");
+                }}
+              >
+                <span>
+                  <strong>Watch exercise demos</strong>
+                  <small>Squat, curl & shoulder press · interactive 3D</small>
+                </span>
+                <ChevronRight size={20} />
+              </button>
               <div className="routine-foot">
                 <span>
                   {p.days}-DAY FOUNDATION
@@ -923,10 +947,10 @@ function Journal({
                           </div>
                           <button
                             className="icon-button"
-                            aria-label={`About ${exercise.name}`}
+                            aria-label={`Movement guide for ${exercise.name}`}
                             onClick={() => setSelected(exercise.id)}
                           >
-                            <Layers size={20} />
+                            <span className="howto-label">How to</span>
                           </button>
                         </div>
                         <div className="set-row set-labels">
@@ -1101,8 +1125,24 @@ function Journal({
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                   />
-                  <button className="demo-filter" aria-pressed={demosOnly} onClick={()=>{setDemosOnly(!demosOnly);setMuscle("All");setQuery("")}}>{demosOnly?"Showing 3D demos":"Show 3D demos"}<span>3 exercises</span></button>
-                  {demosOnly&&<p className="fine">Open an exercise, then tap Play to watch the movement. Use Front or Side to change the view.</p>}
+                  <button
+                    className="demo-filter"
+                    aria-pressed={demosOnly}
+                    onClick={() => {
+                      setDemosOnly(!demosOnly);
+                      setMuscle("All");
+                      setQuery("");
+                    }}
+                  >
+                    {demosOnly ? "Showing 3D demos" : "Show 3D demos"}
+                    <span>3 exercises</span>
+                  </button>
+                  {demosOnly && (
+                    <p className="fine">
+                      Open an exercise, then tap Play to watch the movement. Use
+                      Front or Side to change the view.
+                    </p>
+                  )}
                   <div className="filters">
                     {(
                       [
@@ -1128,7 +1168,8 @@ function Journal({
                     {exercises
                       .filter(
                         (e) =>
-                          (!demosOnly || demoIds.has(e.id)) && (muscle === "All" || e.muscle === muscle) &&
+                          (!demosOnly || demoIds.has(e.id)) &&
+                          (muscle === "All" || e.muscle === muscle) &&
                           e.name.toLowerCase().includes(query.toLowerCase()),
                       )
                       .map((e) => (
@@ -1140,14 +1181,20 @@ function Journal({
                             <strong>{e.name}</strong>
                             <small>
                               {e.muscle} · {e.equipment}
-                            </small>{demoIds.has(e.id)&&<span className="watch-demo-label">▶ Watch demo</span>}
+                            </small>
+                            <span className="watch-demo-label">
+                              {demoIds.has(e.id)
+                                ? "▶ Watch demo · Read guide"
+                                : "Read movement guide"}
+                            </span>
                           </span>
                           <ChevronRight size={18} />
                         </button>
                       ))}
                     {!exercises.some(
                       (e) =>
-                        (!demosOnly || demoIds.has(e.id)) && (muscle === "All" || e.muscle === muscle) &&
+                        (!demosOnly || demoIds.has(e.id)) &&
+                        (muscle === "All" || e.muscle === muscle) &&
                         e.name.toLowerCase().includes(query.toLowerCase()),
                     ) && <p>No matching exercises. Try another search.</p>}
                   </div>
@@ -1357,7 +1404,7 @@ function Journal({
             >
               <X />
             </button>
-            {demoIds.has(preview.id) && (
+            {
               <div
                 className="detail-tabs"
                 role="group"
@@ -1367,7 +1414,7 @@ function Journal({
                   aria-pressed={!showAnatomy}
                   onClick={() => setShowAnatomy(false)}
                 >
-                  Movement
+                  {demoIds.has(preview.id) ? "Movement" : "Written guide"}
                 </button>
                 <button
                   aria-pressed={showAnatomy}
@@ -1376,7 +1423,7 @@ function Journal({
                   Muscles
                 </button>
               </div>
-            )}
+            }
             {demoIds.has(preview.id) && !showAnatomy ? (
               <BodyBoundary>
                 <Suspense
@@ -1387,20 +1434,21 @@ function Journal({
                   <ExerciseDemo key={preview.id} exercise={preview} />
                 </Suspense>
               </BodyBoundary>
-            ) : (
+            ) : showAnatomy ? (
               <BodyPreview muscles={[preview.muscle]} />
-            )}
+            ) : null}
             <span className="eyebrow">
               {preview.muscle} · {preview.equipment}
             </span>
             <h2>{preview.name}</h2>
             <p>{preview.cue}</p>
+            <ExerciseInstructions exercise={preview} />
             <p className="fine">
               Anatomy highlights selected muscles; movement previews illustrate
               the exercise. Choose a comfortable range and stop if a movement
               causes pain.
             </p>
-            {(!demoIds.has(preview.id) || showAnatomy) && (
+            {showAnatomy && (
               <p className="model-credit">
                 Z-Anatomy / BodyParts3D ·{" "}
                 <a

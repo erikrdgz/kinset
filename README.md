@@ -65,3 +65,7 @@ The manual `Deploy preview to GitHub Pages` workflow builds for `/kinset/`. Set 
 ## Implementation
 
 React, TypeScript, Vite, Three.js, React Three Fiber, Drei, Supabase, Zod, idb-keyval, Lucide, and Vitest. Dependency versions are recorded in the lockfile. The viewer is in `src/Body.tsx`. Anatomy files and their adaptations retain the CC BY-SA license described in `public/models/ATTRIBUTION.md`. The viewer removes exported label meshes and fascia overlays at runtime; the original GLBs are unchanged.
+
+## Movement guides
+
+All 12 catalog exercises have written setup, movement, breathing, and form cues, accessible from exercise rows and the workout logger’s **How to** button. Bodyweight squat, dumbbell curl, and dumbbell shoulder press also have illustrative 3D motion previews. Written instructions stay available alongside the preview and when a model cannot load. Review all exercise content with a qualified trainer before launch.
