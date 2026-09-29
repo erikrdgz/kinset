@@ -60,6 +60,9 @@ const demoProfile: Profile = {
   weight: "",
   height: "",
 };
+// Password reset needs outgoing email (SMTP). Enable once it is configured.
+const PASSWORD_RESET_ENABLED = false;
+
 function download(data: State) {
   const url = URL.createObjectURL(
     new Blob(
@@ -229,7 +232,7 @@ function Auth({
             : await supabase.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
       if (recovery) onRecovered?.();
-      else if (mode === "signup")
+      else if (mode === "signup" && !("session" in result.data && result.data.session))
         setMessage("Check your email to confirm your account.");
       else if (mode === "reset")
         setMessage("If an account exists, a reset link is on its way.");
@@ -246,12 +249,23 @@ function Auth({
       <header>
         <Brand />
       </header>
-      <main className="auth-grid">
+      <main className="auth-grid page-enter">
         <section className="auth-story">
           <div className="auth-edition">
             <span>STRENGTH, ON YOUR TERMS.</span>
           </div>
-          <h1 className="kinset-display" aria-label="Kinset">KINSE<span className="kinset-terminal">T<svg className="kinset-overlap-arrow" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M10 54L54 10M15 10H54V49" stroke="currentColor" strokeWidth="6" strokeLinecap="square" strokeLinejoin="miter" /></svg></span></h1>
+          <div className="auth-mast">
+          <h1 className="kinset-display">KINSET</h1>
+          <svg
+            className="auth-arrow"
+            viewBox="0 0 100 100"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M4 96 L86 14" />
+            <path d="M30 8 H92 V70" />
+          </svg>
+          </div>
           <div className="auth-manifesto">
             <h2>
               Make every
@@ -358,16 +372,18 @@ function Auth({
                         ? "Already have an account? Sign in"
                         : "Create an account"}
                     </button>
-                    <button
-                      onClick={() => {
-                        setMode(mode === "reset" ? "login" : "reset");
-                        setMessage("");
-                      }}
-                    >
-                      {mode === "reset"
-                        ? "Back to sign in"
-                        : "Forgot password?"}
-                    </button>
+                    {PASSWORD_RESET_ENABLED && (
+                      <button
+                        onClick={() => {
+                          setMode(mode === "reset" ? "login" : "reset");
+                          setMessage("");
+                        }}
+                      >
+                        {mode === "reset"
+                          ? "Back to sign in"
+                          : "Forgot password?"}
+                      </button>
+                    )}
                   </div>
                   <div className="divider">
                     <span>OR EXPLORE FIRST</span>
@@ -417,13 +433,12 @@ function Onboarding({
     onSave(result.data);
   }
   return (
-    <main className="onboarding">
+    <main className="onboarding page-enter">
       <button className="text-button" onClick={onBack}>
         <ChevronLeft size={18} />
         Back
       </button>
       <Brand />
-      <span className="eyebrow">BUILT AROUND YOUR WEEK</span>
       <h1>{initial ? "Make it yours." : "Start where you are."}</h1>
       <p className="muted">
         A few details help us choose your starting routine. You can change these
@@ -686,7 +701,6 @@ function Journal({
     <div className="app-shell">
       <aside className="sidebar">
         <Brand />
-        <p className="eyebrow">YOUR SPACE TO GET STRONGER</p>
         <nav>
           {[
             ["Today", House],
@@ -728,9 +742,6 @@ function Journal({
           <div className="mobile-brand">
             <Brand />
           </div>
-          <span className="breadcrumb">
-            YOUR JOURNAL <span>/</span> {tab.toUpperCase()}
-          </span>
           <div className="sync-status">
             <span
               className={journal.status === "Synced" ? "synced" : "local"}
@@ -738,7 +749,7 @@ function Journal({
             {journal.status}
           </div>
         </header>
-        <main className="workspace">
+        <main key={tab} className="workspace page-enter" aria-label={tab}>
           {journal.conflict && (
             <section className="notice" role="alert">
               <strong>Another device has newer changes.</strong>
@@ -902,7 +913,6 @@ function Journal({
               >
                 <span>
                   <strong>Watch exercise demos</strong>
-                  <small>{demoIds.size} exercises · interactive 3D</small>
                 </span>
                 <ChevronRight size={20} />
               </button>
@@ -968,7 +978,6 @@ function Journal({
             <>
               <div className="page-heading">
                 <div>
-                  <span className="eyebrow">SESSION LOG</span>
                   <h1>{data.active?.name || "Training"}</h1>
                   <p className="muted">
                     {data.active
@@ -1175,7 +1184,6 @@ function Journal({
             <>
               <div className="page-heading">
                 <div>
-                  <span className="eyebrow">EXERCISES / ANATOMY</span>
                   <h1>Movement library</h1>
                   <p className="muted">Find an exercise. See where it fits.</p>
                 </div>
@@ -1285,7 +1293,6 @@ function Journal({
             <>
               <div className="page-heading">
                 <div>
-                  <span className="eyebrow">TRAINING LOG</span>
                   <h1>History</h1>
                   <p className="muted">
                     {data.sessions.length} sessions ·{" "}
@@ -1398,7 +1405,6 @@ function Journal({
             <>
               <div className="page-heading">
                 <div>
-                  <span className="eyebrow">ON YOUR TERMS</span>
                   <h1>Your account</h1>
                 </div>
               </div>
@@ -1479,7 +1485,6 @@ function Journal({
         </main>
         <footer className="app-footer">
           <Brand />
-          <span>TRAIN. LOG. REPEAT.</span>
           <span>Kinset preview · General fitness, at your pace.</span>
         </footer>
       </div>

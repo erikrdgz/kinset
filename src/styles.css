@@ -2117,7 +2117,7 @@ input::placeholder {
   padding-bottom: 18px;
 }
 .auth-story .kinset-display {
-  font-size: clamp(100px, 16.5vw, 256px);
+  font-size: clamp(90px, 15.3vw, 236px);
   font-family: "Barlow Condensed", sans-serif;
   font-weight: 800;
   letter-spacing: -0.065em;
@@ -2465,7 +2465,7 @@ input::placeholder {
     padding-bottom: 12px;
   }
   .auth-story .kinset-display {
-    font-size: clamp(82px, 26vw, 185px);
+    font-size: clamp(70px, 22.4vw, 185px);
     margin: 40px 0 50px;
     transform: scaleY(1.6);
   }
@@ -2616,22 +2616,6 @@ input::placeholder {
     font-size: 3.6rem;
   }
 }
-@media (prefers-reduced-motion: no-preference) {
-  .auth-story,
-  .session-poster {
-    animation: kinset-arrive 0.5s ease-out both;
-  }
-  @keyframes kinset-arrive {
-    from {
-      opacity: 0;
-      transform: translateY(14px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
 
 .auth-story .kinset-display {
   letter-spacing: -0.035em;
@@ -2757,17 +2741,132 @@ input::placeholder {
   }
 }
 
-/* A white directional mark cuts across the final letter, not the full word. */
-.kinset-terminal { position: relative; display: inline-block; }
-.kinset-overlap-arrow {
+/* White carries meaning; warm color carries emphasis and secondary copy. */
+:is(
+  .eyebrow,
+  .movement-name strong,
+  .movement-prescription,
+  .training-week strong,
+  .training-week strong > span,
+  .routine-foot strong,
+  .log-heading h2,
+  .set-labels,
+  .previous,
+  .history-sets thead th,
+  .history-sets tbody th,
+  .history-sets td,
+  .history-card summary strong,
+  .plan-label,
+  .plan-prescription label,
+  .plan-day-order,
+  .exercise-guide h3,
+  .motion-cue,
+  .demo-discovery strong
+) {
+  color: #fff7f0;
+  background-image: none;
+  -webkit-text-fill-color: currentColor;
+}
+/* The solid orange poster retains its high-contrast dark typography. */
+.session-poster .session-kicker,
+.session-poster .session-facts > span {
+  color: #151515;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter {
+    animation: page-cut-in 170ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes page-cut-in {
+    from {
+      transform: translateX(12px);
+      clip-path: inset(0 0 0 12px);
+    }
+    to {
+      transform: translateX(0);
+      clip-path: inset(0);
+    }
+  }
+  .sidebar nav button,
+  .bottom-nav button {
+    transition:
+      color 100ms ease,
+      background-color 100ms ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
+
+/* Oversized white arrow cutting across the masthead. */
+.auth-mast {
+  position: relative;
+}
+.auth-arrow {
   position: absolute;
-  width: .13em;
-  height: .13em;
-  right: 50%;
-  bottom: .1em;
-  color: #fff;
-  transform: translateX(50%) scaleY(.625);
-  transform-origin: bottom center;
-  overflow: visible;
+  right: 2%;
+  top: -14%;
+  height: 122%;
+  aspect-ratio: 1;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 7;
+  stroke-linejoin: miter;
+  stroke-linecap: butt;
+  stroke-miterlimit: 10;
   pointer-events: none;
+  z-index: 2;
+}
+.auth-arrow path:first-child {
+  stroke-linecap: square;
+}
+@media (max-width: 760px) {
+  .auth-arrow {
+    height: 108%;
+    top: -6%;
+  }
+}
+
+/* Final type pass: labels and numbers are white, at a readable size. */
+body .eyebrow,
+body .movement-number,
+body .routine-foot > span,
+body .training-week .eyebrow,
+body .recent-line .eyebrow,
+body .plan-label {
+  color: #fff !important;
+  background-image: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-family: "Barlow", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+body .topbar {
+  justify-content: flex-end;
+}
+body .topbar .sync-status {
+  margin-left: auto;
+}
+body .routine-foot {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px !important;
+}
+body .routine-foot strong {
+  color: #fff !important;
+  font-size: 1.15rem;
+}
+body .app-footer {
+  justify-content: space-between;
+}
+body .week-days span,
+body .training-week .days span {
+  color: #fff;
+}
+.main-wrap,
+.auth-page {
+  overflow-x: clip;
 }

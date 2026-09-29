@@ -75,7 +75,6 @@ export default function Plans({
       <section className="plan-builder">
         <div className="page-heading">
           <div>
-            <span className="eyebrow">YOUR ROUTINE / PLAN BUILDER</span>
             <h1>Make it yours.</h1>
             <p className="muted">
               Your draft saves as you go. Save the plan when it’s ready to
@@ -361,7 +360,6 @@ export default function Plans({
     <section>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">YOUR TRAINING / YOUR WAY</span>
           <h1>Workout plans.</h1>
           <p className="muted">
             Build your own rotation. Completed workouts advance to the next day.
