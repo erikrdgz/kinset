@@ -203,14 +203,6 @@ small {
   color: var(--muted);
   font-size: 1.1rem;
 }
-.auth-register {
-  display: flex;
-  gap: 24px;
-  margin-top: 50px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.65rem;
-  color: #8b8783;
-}
 .auth-card {
   padding: 28px 0;
   border-top: 2px solid var(--orange);
@@ -1836,4 +1828,14 @@ dialog.modal-backdrop::backdrop {
   .plan-save {
     bottom: calc(65px + env(safe-area-inset-bottom));
   }
+}
+
+.auth-card > .muted,
+.preview-storage {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.preview-storage {
+  margin: 20px 0 0;
+  color: var(--ink);
 }

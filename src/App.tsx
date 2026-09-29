@@ -239,27 +239,17 @@ function Auth({
     <div className="auth-page">
       <header>
         <Brand />
-        <span className="eyebrow">YOUR TRAINING, IN FOCUS</span>
       </header>
       <main className="auth-grid">
         <section className="auth-story">
-          <span className="eyebrow">STRENGTH / TRAINING JOURNAL</span>
           <h1>
             Put in
             <br />
             the work<span className="blue-period">.</span>
           </h1>
           <p>Your sessions. Your numbers. Your next rep.</p>
-          <div className="auth-register">
-            <span>01 — PLAN</span>
-            <span>02 — TRAIN</span>
-            <span>03 — REPEAT</span>
-          </div>
         </section>
         <section className="auth-card">
-          <span className="eyebrow">
-            {supabase ? "LET’S GET MOVING" : "INTERACTIVE PREVIEW"}
-          </span>
           <h2>
             {recovery
               ? "Set a new password"
@@ -371,14 +361,13 @@ function Auth({
               >
                 Try the demo <ChevronRight size={18} />
               </button>
-              <p className="fine">
-                No account needed. Demo workouts stay on this device.
+              <p className="preview-storage">
+                No account needed. Your workouts save on this device.
               </p>
             </>
           )}
         </section>
       </main>
-      <footer>Made for progress, at your pace.</footer>
     </div>
   );
 }
