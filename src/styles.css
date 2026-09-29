@@ -276,11 +276,8 @@ input::placeholder {
   margin-top: 15px;
   margin-bottom: 0;
 }
-.setup-note {
-  font-size: 0.9rem;
-  border-left: 2px solid #8a7b71;
-  padding-left: 12px;
-  color: var(--muted);
+.preview-start {
+  margin-top: 28px;
 }
 .message:empty {
   display: none;

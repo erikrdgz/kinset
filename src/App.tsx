@@ -257,7 +257,9 @@ function Auth({
           </div>
         </section>
         <section className="auth-card">
-          <span className="eyebrow">LET’S GET MOVING</span>
+          <span className="eyebrow">
+            {supabase ? "LET’S GET MOVING" : "INTERACTIVE PREVIEW"}
+          </span>
           <h2>
             {recovery
               ? "Set a new password"
@@ -274,89 +276,99 @@ function Auth({
                 ? "Create an account to keep your training with you."
                 : mode === "reset"
                   ? "We’ll send a link to your email."
-                  : "A clear picture of your training starts here."}
+                  : !supabase
+                    ? "Explore the exercises, build your own plan, and log a workout."
+                    : "A clear picture of your training starts here."}
           </p>
-          <form onSubmit={submit}>
-            {!recovery && (
-              <label>
-                Email
-                <input
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  disabled={!supabase}
-                />
-              </label>
-            )}
-            {(mode !== "reset" || recovery) && (
-              <label>
-                Password
-                <input
-                  type="password"
-                  minLength={8}
-                  autoComplete={
-                    mode === "signup" || recovery
-                      ? "new-password"
-                      : "current-password"
-                  }
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 8 characters"
-                  disabled={!supabase}
-                />
-              </label>
-            )}
-            <button className="primary" disabled={busy || !supabase}>
-              {busy
-                ? "Please wait…"
-                : recovery
-                  ? "Save password"
-                  : mode === "signup"
-                    ? "Create account"
-                    : mode === "reset"
-                      ? "Send reset link"
-                      : "Sign in"}
-              <ArrowUpRight size={18} />
-            </button>
-            <p role="status" className="message">
-              {message}
-            </p>
-          </form>
-          {!supabase && (
-            <p className="setup-note">
-              Accounts are coming soon. You can explore the working demo below.
-            </p>
+          {supabase && (
+            <form onSubmit={submit}>
+              {!recovery && (
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    disabled={!supabase}
+                  />
+                </label>
+              )}
+              {(mode !== "reset" || recovery) && (
+                <label>
+                  Password
+                  <input
+                    type="password"
+                    minLength={8}
+                    autoComplete={
+                      mode === "signup" || recovery
+                        ? "new-password"
+                        : "current-password"
+                    }
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                    disabled={!supabase}
+                  />
+                </label>
+              )}
+              <button className="primary" disabled={busy || !supabase}>
+                {busy
+                  ? "Please wait…"
+                  : recovery
+                    ? "Save password"
+                    : mode === "signup"
+                      ? "Create account"
+                      : mode === "reset"
+                        ? "Send reset link"
+                        : "Sign in"}
+                <ArrowUpRight size={18} />
+              </button>
+              <p role="status" className="message">
+                {message}
+              </p>
+            </form>
           )}
           {!recovery && (
             <>
-              <div className="auth-links">
-                <button
-                  onClick={() => {
-                    setMode(mode === "signup" ? "login" : "signup");
-                    setMessage("");
-                  }}
-                >
-                  {mode === "signup"
-                    ? "Already have an account? Sign in"
-                    : "Create an account"}
-                </button>
-                <button
-                  onClick={() => {
-                    setMode(mode === "reset" ? "login" : "reset");
-                    setMessage("");
-                  }}
-                >
-                  {mode === "reset" ? "Back to sign in" : "Forgot password?"}
-                </button>
-              </div>
-              <div className="divider">
-                <span>OR EXPLORE FIRST</span>
-              </div>
-              <button className="secondary full" onClick={onDemo}>
+              {supabase && (
+                <>
+                  <div className="auth-links">
+                    <button
+                      onClick={() => {
+                        setMode(mode === "signup" ? "login" : "signup");
+                        setMessage("");
+                      }}
+                    >
+                      {mode === "signup"
+                        ? "Already have an account? Sign in"
+                        : "Create an account"}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMode(mode === "reset" ? "login" : "reset");
+                        setMessage("");
+                      }}
+                    >
+                      {mode === "reset"
+                        ? "Back to sign in"
+                        : "Forgot password?"}
+                    </button>
+                  </div>
+                  <div className="divider">
+                    <span>OR EXPLORE FIRST</span>
+                  </div>
+                </>
+              )}
+              <button
+                className={
+                  supabase ? "secondary full" : "primary full preview-start"
+                }
+                onClick={onDemo}
+              >
                 Try the demo <ChevronRight size={18} />
               </button>
               <p className="fine">
