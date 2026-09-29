@@ -248,12 +248,28 @@ function Auth({
       </header>
       <main className="auth-grid">
         <section className="auth-story">
-          <h1>
-            Put in
+          <div className="auth-edition">
+            <span>STRENGTH, ON YOUR TERMS.</span>
+          </div>
+          <h1 className="kinset-display">KINSET</h1>
+          <div className="auth-manifesto">
+            <h2>
+              Make every
+              <br />
+              rep count.
+            </h2>
+            <ArrowUpRight size={72} strokeWidth={1.3} aria-hidden="true" />
+          </div>
+          <p>
+            Build your plan. Learn the movement.
             <br />
-            the work<span className="blue-period">.</span>
-          </h1>
-          <p>Your sessions. Your numbers. Your next rep.</p>
+            Leave a record of the work.
+          </p>
+          <div className="auth-capabilities">
+            <span>PLAN</span>
+            <span>TRAIN</span>
+            <span>PROGRESS</span>
+          </div>
         </section>
         <section className="auth-card">
           <h2>
@@ -754,7 +770,7 @@ function Journal({
             </div>
           )}
           {tab === "Today" && (
-            <>
+            <div className="training-home">
               <div className="session-date">
                 <span>
                   {new Date().toLocaleDateString(undefined, {
@@ -774,7 +790,19 @@ function Journal({
                     {String(count).padStart(2, "0")}
                     <span> / {String(p.days).padStart(2, "0")}</span>
                   </strong>
-                  <small>sessions</small>
+                  <small>sessions completed</small>
+                  <div
+                    className="week-progress"
+                    role="progressbar"
+                    aria-label="Weekly sessions"
+                    aria-valuenow={count}
+                    aria-valuemin={0}
+                    aria-valuemax={Math.max(count, p.days)}
+                  >
+                    {Array.from({ length: p.days }, (_, i) => (
+                      <span key={i} className={i < count ? "filled" : ""} />
+                    ))}
+                  </div>
                 </div>
                 <div className="week-track">
                   {Array.from({ length: 7 }, (_, i) => {
@@ -804,21 +832,35 @@ function Journal({
                 </div>
               </div>
               <section className="next-session">
-                <div className="session-kicker">
-                  <span>{data.active ? "IN PROGRESS" : "UP NEXT"}</span>
-                  <span>
-                    SESSION {String(data.sessions.length + 1).padStart(2, "0")}
-                  </span>
+                <div className="session-poster">
+                  <div className="session-kicker">
+                    <span>{data.active ? "IN PROGRESS" : "UP NEXT"}</span>
+                    <span>
+                      SESSION{" "}
+                      {String(data.sessions.length + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <h1>
+                    {data.active?.name || upcoming.name}
+                    <span className="blue-period">.</span>
+                  </h1>
+                  <div className="session-facts">
+                    <span>{data.active?.planName || upcoming.planName}</span>
+                    <span>{plan.length} movements</span>
+                    <span>
+                      {plannedEntries.reduce((n, e) => n + e.sets, 0)} sets
+                      total
+                    </span>
+                  </div>
+                  <button className="primary session-start" onClick={start}>
+                    {data.active ? "Resume session" : "Start session"}
+                    <ArrowUpRight size={20} />
+                  </button>
                 </div>
-                <h1>
-                  {data.active?.name || upcoming.name}
-                  <span className="blue-period">.</span>
-                </h1>
-                <div className="session-facts">
-                  <span>{data.active?.planName || upcoming.planName}</span>
-                  <span>{plan.length} movements</span>
+                <div className="movement-section-heading">
+                  <h2>The lineup</h2>
                   <span>
-                    {plannedEntries.reduce((n, e) => n + e.sets, 0)} sets total
+                    Tap to watch a demo <ArrowUpRight size={16} />
                   </span>
                 </div>
                 <div className="movement-table">
@@ -849,10 +891,6 @@ function Journal({
                     </button>
                   ))}
                 </div>
-                <button className="primary session-start" onClick={start}>
-                  {data.active ? "Resume session" : "Start session"}
-                  <ArrowUpRight size={20} />
-                </button>
               </section>
               <button
                 className="demo-discovery"
@@ -900,7 +938,7 @@ function Journal({
                   <p>Your first session goes here.</p>
                 )}
               </section>
-            </>
+            </div>
           )}
           {tab === "Plans" && (
             <Plans
@@ -1057,7 +1095,6 @@ function Journal({
                                 type="number"
                                 inputMode="numeric"
                                 min="1"
-                                max="999"
                                 step="1"
                                 value={s.reps || ""}
                                 placeholder="0"
@@ -1073,7 +1110,7 @@ function Journal({
                                 onClick={() => {
                                   if (!s.done && !validSet(s)) {
                                     setNotice(
-                                      "Enter reps from 1–999 and a weight from 0–2000. Use 0 for bodyweight.",
+                                      "Enter a positive whole-number rep count and a weight from 0–2000. Use 0 for bodyweight.",
                                     );
                                     return;
                                   }
@@ -1292,11 +1329,49 @@ function Journal({
                           <strong>
                             {exercises.find((x) => x.id === e.exerciseId)?.name}
                           </strong>
-                          <p>
-                            {e.sets
-                              .map((x) => `${x.weight} ${s.unit} × ${x.reps}`)
-                              .join(" · ")}
-                          </p>
+                          <table className="history-sets">
+                            <caption className="sr-only">
+                              Recorded sets for{" "}
+                              {
+                                exercises.find((x) => x.id === e.exerciseId)
+                                  ?.name
+                              }
+                            </caption>
+                            <thead>
+                              <tr>
+                                <th scope="col">Set</th>
+                                <th scope="col">Weight</th>
+                                <th scope="col">Reps</th>
+                                <th scope="col">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {e.sets.map((set, index) => (
+                                <tr
+                                  key={set.id}
+                                  className={set.done ? "recorded" : "unlogged"}
+                                >
+                                  <th scope="row">
+                                    {String(index + 1).padStart(2, "0")}
+                                  </th>
+                                  <td>
+                                    {set.done ? `${set.weight} ${s.unit}` : "—"}
+                                  </td>
+                                  <td>{set.done ? set.reps : "—"}</td>
+                                  <td>
+                                    {set.done ? (
+                                      <span className="history-set-status">
+                                        <Check size={14} aria-hidden="true" />{" "}
+                                        Done
+                                      </span>
+                                    ) : (
+                                      "Not logged"
+                                    )}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       ))}
                       <button

@@ -213,7 +213,7 @@ export default function Plans({
                         type="number"
                         inputMode="numeric"
                         min={1}
-                        max={field === "sets" ? 10 : 100}
+                        max={field === "sets" ? 10 : undefined}
                         value={entry[field] || ""}
                         onChange={(e) =>
                           changeDay({

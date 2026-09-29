@@ -50,6 +50,22 @@ describe("custom workout plans", () => {
       ).toBe(false);
     }
   });
+  it("accepts targets above 100 reps and keeps them in session snapshots", () => {
+    const plan = makePlan();
+    plan.days[0].entries[0].repsMin = 120;
+    plan.days[0].entries[0].repsMax = 150;
+    expect(planSchema.safeParse(plan).success).toBe(true);
+    const session = startWorkout(
+      profile,
+      nextWorkout({
+        ...emptyState,
+        profile,
+        plans: [plan],
+        activePlanId: plan.id,
+      }),
+    );
+    expect(session.entries[0].targetReps).toBe("120–150");
+  });
   it("snapshots custom targets and preserves a workout when its plan changes", () => {
     const plan = makePlan();
     const data: State = {

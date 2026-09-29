@@ -74,6 +74,14 @@ Written setup, movement, breathing, and form cues remain below each animation an
 
 ## Custom workout plans
 
-Open **Plans** to create a routine from scratch or customize the foundation program. A plan supports 1–7 workout days with up to 20 distinct exercises per day, 1–10 sets, and rep ranges of 1–100. Days and exercises can be reordered. Drafts autosave with the journal; saving a plan is separate from selecting **Use plan**. Plans can be edited, duplicated, deleted, or started from any day.
+Open **Plans** to create a routine from scratch or customize the foundation program. A plan supports 1–7 workout days with up to 20 distinct exercises per day, 1–10 sets, and positive whole-number rep ranges without a 100-rep cap. Days and exercises can be reordered. Drafts autosave with the journal; saving a plan is separate from selecting **Use plan**. Plans can be edited, duplicated, deleted, or started from any day.
 
 The Today screen follows the active plan’s rotation. Completing a session advances that plan’s next day; discarding a session does not. Each session snapshots its day name, exercises, set count, and rep targets, so later plan edits/deletion do not change an active log or workout history. Plans, draft edits, and rotation position share the existing IndexedDB persistence, versioned Supabase journal, offline queue, conflict handling, and JSON export. Older journals without plan fields retain their foundation routine. Live Supabase accounts still require project configuration.
+
+## Connected preview — September 29, 2026
+
+The local preview and GitHub Pages build are configured for the Kinset Supabase project. The journal schema and RLS are deployed, email/password signup with confirmation is enabled, and authentication callbacks include the live `/kinset/` URL and both localhost preview URLs. The `delete-account` function is deployed with user verification inside the handler. Only the browser-safe publishable key is passed to the client; server keys remain in Supabase.
+
+Verified against the live database in a rolled-back transaction: owner reads, revision updates, stale-write rejection, and cross-account read isolation. Unauthenticated API requests to journal reads, writes, and account deletion are rejected. Local database tests also cover deletion cascade and direct-write denial. Actual signup email delivery, password recovery, and the full browser account lifecycle still require an inbox test; custom production SMTP has not been configured.
+
+The visual system uses a stretched Kinset masthead, an orange session poster with the primary action first, a separate exercise lineup, and a weekly progress rail. Workout history uses set-by-set tables with explicit logged status. Rep counts have no arbitrary 100/999 upper cap; only positive safe integers are accepted.

@@ -1,0 +1,4 @@
+# User JWTs are verified by auth.getUser inside the function.
+# The legacy gateway verifier does not support the project's newer JWT keys.
+[functions.delete-account]
+verify_jwt = false

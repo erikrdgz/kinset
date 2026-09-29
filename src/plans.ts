@@ -15,8 +15,8 @@ const entrySchema = z
         "Choose an exercise from the library.",
       ),
     sets: z.number().int().min(1).max(10),
-    repsMin: z.number().int().min(1).max(100),
-    repsMax: z.number().int().min(1).max(100),
+    repsMin: z.number().int().min(1),
+    repsMax: z.number().int().min(1),
   })
   .refine(
     (e) => e.repsMax >= e.repsMin,

@@ -195,9 +195,8 @@ export function finishSession(s: Session): Session {
 }
 export function validSet(s: SetLog) {
   return (
-    Number.isInteger(s.reps) &&
+    Number.isSafeInteger(s.reps) &&
     s.reps > 0 &&
-    s.reps <= 999 &&
     Number.isFinite(s.weight) &&
     s.weight >= 0 &&
     s.weight <= 2000

@@ -57,6 +57,8 @@ describe("training journal", () => {
   it("rejects invalid logging values but allows bodyweight", () => {
     const s = { id: "a", done: false, reps: 8, weight: 0 };
     expect(validSet(s)).toBe(true);
+    expect(validSet({ ...s, reps: 1200 })).toBe(true);
+    expect(validSet({ ...s, reps: Infinity })).toBe(false);
     expect(validSet({ ...s, reps: 0 })).toBe(false);
     expect(validSet({ ...s, reps: 1.5 })).toBe(false);
     expect(validSet({ ...s, weight: -1 })).toBe(false);
