@@ -2916,3 +2916,51 @@ body .routine-foot .text-button {
   flex: none;
   white-space: nowrap;
 }
+
+/* Split masthead: orange block ends at the middle of KINSET; the lower half flips. */
+.auth-story {
+  --story-pad: 38px;
+  background: #141414;
+  isolation: isolate;
+  color: #fff;
+}
+.auth-mast::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--story-pad) * -1);
+  right: calc(var(--story-pad) * -1);
+  bottom: 50%;
+  height: 4000px;
+  background: var(--orange);
+  z-index: -1;
+}
+.auth-story .kinset-display {
+  margin: 81px 0;
+  color: transparent;
+  background: linear-gradient(to bottom, #141414 50%, var(--orange) 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.auth-manifesto {
+  border-top-color: var(--orange);
+  color: #fff;
+}
+.auth-manifesto h2 {
+  color: #fff;
+}
+.auth-story > p {
+  color: #fff;
+}
+.auth-capabilities {
+  border-top-color: var(--orange);
+  color: #fff;
+}
+@media (max-width: 760px) {
+  .auth-story {
+    --story-pad: 20px;
+  }
+  .auth-story .kinset-display {
+    margin: 45px 0;
+  }
+}
