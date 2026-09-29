@@ -251,14 +251,13 @@ function Auth({
           <div className="auth-edition">
             <span>STRENGTH, ON YOUR TERMS.</span>
           </div>
-          <h1 className="kinset-display">KINSET</h1>
+          <h1 className="kinset-display" aria-label="Kinset">KINSE<span className="kinset-terminal">T<svg className="kinset-overlap-arrow" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M10 54L54 10M15 10H54V49" stroke="currentColor" strokeWidth="6" strokeLinecap="square" strokeLinejoin="miter" /></svg></span></h1>
           <div className="auth-manifesto">
             <h2>
               Make every
               <br />
               rep count.
             </h2>
-            <ArrowUpRight size={72} strokeWidth={1.3} aria-hidden="true" />
           </div>
           <p>
             Build your plan. Learn the movement.

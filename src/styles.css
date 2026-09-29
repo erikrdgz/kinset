@@ -2756,3 +2756,18 @@ input::placeholder {
     font-size: 0.85rem;
   }
 }
+
+/* A white directional mark cuts across the final letter, not the full word. */
+.kinset-terminal { position: relative; display: inline-block; }
+.kinset-overlap-arrow {
+  position: absolute;
+  width: .48em;
+  height: .48em;
+  right: -.17em;
+  bottom: .045em;
+  color: #fff;
+  transform: scaleY(.625);
+  transform-origin: bottom right;
+  overflow: visible;
+  pointer-events: none;
+}
