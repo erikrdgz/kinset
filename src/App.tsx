@@ -13,6 +13,7 @@ import type { Session as AuthSession } from "@supabase/supabase-js";
 import {
   ArrowUpRight,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Dumbbell,
@@ -40,6 +41,7 @@ import {
   program,
   startSession,
   validSet,
+  type Exercise,
   type Muscle,
   type Profile,
   type Session,
@@ -184,6 +186,87 @@ class BodyBoundary extends Component<
       this.props.children
     );
   }
+}
+/** One stage, two states: the muscles this movement trains, or the movement. */
+function ExerciseStage({
+  exercise,
+  showDemo,
+  onSwap,
+}: {
+  exercise: Exercise;
+  showDemo: boolean;
+  onSwap: (next: boolean) => void;
+}) {
+  const hasDemo = demoIds.has(exercise.id);
+  const playing = showDemo && hasDemo;
+  return (
+    <>
+      <div className="stage-head">
+        <span className="stage-label" aria-live="polite">
+          {playing ? "Movement preview" : `Muscles worked · ${exercise.muscle}`}
+        </span>
+        {hasDemo && (
+          <button
+            className="stage-swap"
+            data-active={playing ? "demo" : "anatomy"}
+            onClick={() => onSwap(!showDemo)}
+          >
+            {playing ? (
+              <>
+                <PersonStanding size={16} />
+                Show muscles
+              </>
+            ) : (
+              <>
+                <Play size={15} />
+                Watch the movement
+              </>
+            )}
+          </button>
+        )}
+      </div>
+      {playing ? (
+        <BodyBoundary>
+          <Suspense
+            fallback={<div className="body-loading">Loading demonstration…</div>}
+          >
+            <ExerciseDemo key={exercise.id} exercise={exercise} />
+          </Suspense>
+        </BodyBoundary>
+      ) : (
+        <BodyPreview muscles={[exercise.muscle]} />
+      )}
+      <p className="fine">
+        Anatomy highlights the muscle group this movement trains; the preview
+        illustrates the exercise. Choose a comfortable range and stop if a
+        movement causes pain.
+      </p>
+      {!playing && (
+        <p className="model-credit">
+          Z-Anatomy / BodyParts3D ·{" "}
+          <a
+            href={import.meta.env.BASE_URL + "models/credits.html"}
+            target="_blank"
+            rel="noreferrer"
+          >
+            3D anatomy credits · CC BY-SA
+          </a>
+        </p>
+      )}
+    </>
+  );
+}
+/** Wide enough for the library to show a movement beside the list. */
+function useWideViewport() {
+  const query = "(min-width: 761px)";
+  const [wide, setWide] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const update = () => setWide(mq.matches);
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return wide;
 }
 function BodyPreview({ muscles }: { muscles: Muscle[] }) {
   return (
@@ -632,6 +715,7 @@ function Journal({
     [confirmDelete, setConfirmDelete] = useState(false),
     [confirmDiscard, setConfirmDiscard] = useState(false),
     [deleting, setDeleting] = useState(false);
+  const wide = useWideViewport();
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [tab, editing, journal.ready]);
@@ -707,6 +791,10 @@ function Journal({
       e.name.toLowerCase().includes(query.toLowerCase()),
   );
   const withDemos = browsing.filter((e) => demoIds.has(e.id)).length;
+  /* On a wide screen the library shows a movement beside the list and expands
+     the guide in place. The drawer still covers mobile, and every entry point
+     outside the library. */
+  const inlineViewer = wide && tab === "Explore";
   const filtered = muscle !== "All" || query.trim() !== "";
   const upcoming = nextWorkout(data);
   const activePlan = data.plans?.find((plan) => plan.id === data.activePlanId);
@@ -1194,8 +1282,7 @@ function Journal({
           )}
           {tab === "Explore" && (
             <>
-              <div className="explore-layout">
-                <header className="library-rail">
+              <header className="library-head">
                   <p className="eyebrow">Movement library</p>
                   <h1>
                     {query.trim()
@@ -1220,18 +1307,19 @@ function Journal({
                       ? `In ${muscle}. ${railNote[muscle]}`
                       : railNote[muscle]}
                   </p>
-                  {filtered && (
-                    <button
-                      className="rail-clear"
-                      onClick={() => {
-                        setMuscle("All");
-                        setQuery("");
-                      }}
-                    >
-                      Clear filters
-                    </button>
-                  )}
-                </header>
+                {filtered && (
+                  <button
+                    className="rail-clear"
+                    onClick={() => {
+                      setMuscle("All");
+                      setQuery("");
+                    }}
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </header>
+              <div className="explore-layout">
                 <section className="exercise-browser">
                   <input
                     className="search"
@@ -1262,30 +1350,83 @@ function Journal({
                     ))}
                   </div>
                   <div className="exercise-list" role="region" aria-label="Exercises" tabIndex={0}>
-                    {browsing.map((e) => (
-                      <button key={e.id} onClick={() => setSelected(e.id)}>
-                        <span className="list-icon">
-                          <Dumbbell size={20} />
-                        </span>
-                        <span>
-                          <strong>{e.name}</strong>
-                          <small>
-                            {e.muscle} · {e.equipment}
-                          </small>
-                          <span className="watch-demo-label">
-                            {demoIds.has(e.id)
-                              ? "▶ Watch demo · Read guide"
-                              : "Read movement guide"}
-                          </span>
-                        </span>
-                        <ChevronRight size={18} />
-                      </button>
-                    ))}
+                    {browsing.map((e) => {
+                      const open = inlineViewer && selected === e.id;
+                      return (
+                        <div
+                          className="exercise-row"
+                          data-open={open || undefined}
+                          key={e.id}
+                        >
+                          <button
+                            aria-expanded={inlineViewer ? open : undefined}
+                            onClick={() =>
+                              setSelected(
+                                inlineViewer && selected === e.id ? null : e.id,
+                              )
+                            }
+                          >
+                            <span className="list-icon">
+                              <Dumbbell size={20} />
+                            </span>
+                            <span>
+                              <strong>{e.name}</strong>
+                              <small>
+                                {e.muscle} · {e.equipment}
+                              </small>
+                              <span className="watch-demo-label">
+                                {demoIds.has(e.id)
+                                  ? "▶ Watch demo · Read guide"
+                                  : "Read movement guide"}
+                              </span>
+                            </span>
+                            {inlineViewer ? (
+                              <ChevronDown size={18} />
+                            ) : (
+                              <ChevronRight size={18} />
+                            )}
+                          </button>
+                          {open && (
+                            <div className="exercise-detail">
+                              <p className="detail-cue">{e.cue}</p>
+                              <ExerciseInstructions exercise={e} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                     {!browsing.length && (
                       <p>No matching exercises. Try another search.</p>
                     )}
                   </div>
                 </section>
+                {inlineViewer && (
+                  <aside className="exercise-viewer" aria-label="Movement viewer">
+                    {preview ? (
+                      <>
+                        <div className="viewer-head">
+                          <span className="eyebrow">
+                            {preview.muscle} · {preview.equipment}
+                          </span>
+                          <h2>{preview.name}</h2>
+                        </div>
+                        <ExerciseStage
+                          exercise={preview}
+                          showDemo={showDemo}
+                          onSwap={setShowDemo}
+                        />
+                      </>
+                    ) : (
+                      <div className="viewer-empty">
+                        <PersonStanding size={30} />
+                        <p>
+                          Pick a movement to see the muscles it trains and watch
+                          it run.
+                        </p>
+                      </div>
+                    )}
+                  </aside>
+                )}
               </div>
             </>
           )}
@@ -1520,7 +1661,7 @@ function Journal({
           );
         })}
       </nav>
-      {preview && (
+      {preview && !inlineViewer && (
         <Modal onClose={() => setSelected(null)}>
           <section
             className="exercise-modal"
@@ -1545,65 +1686,14 @@ function Journal({
                 <X />
               </button>
             </header>
-            <div className="stage-head">
-              <span className="stage-label" aria-live="polite">
-                {showDemo
-                  ? "Movement preview"
-                  : `Muscles worked · ${preview.muscle}`}
-              </span>
-              {demoIds.has(preview.id) && (
-                <button
-                  className="stage-swap"
-                  data-active={showDemo ? "demo" : "anatomy"}
-                  onClick={() => setShowDemo(!showDemo)}
-                >
-                  {showDemo ? (
-                    <>
-                      <PersonStanding size={16} />
-                      Show muscles
-                    </>
-                  ) : (
-                    <>
-                      <Play size={15} />
-                      Watch the movement
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-            {showDemo && demoIds.has(preview.id) ? (
-              <BodyBoundary>
-                <Suspense
-                  fallback={
-                    <div className="body-loading">Loading demonstration…</div>
-                  }
-                >
-                  <ExerciseDemo key={preview.id} exercise={preview} />
-                </Suspense>
-              </BodyBoundary>
-            ) : (
-              <BodyPreview muscles={[preview.muscle]} />
-            )}
+            <ExerciseStage
+              exercise={preview}
+              showDemo={showDemo}
+              onSwap={setShowDemo}
+            />
             {/* The demo prints its own cue beneath the animation. */}
             {!showDemo && <p>{preview.cue}</p>}
             <ExerciseInstructions exercise={preview} />
-            <p className="fine">
-              Anatomy highlights the muscle group this movement trains; the
-              preview illustrates the exercise. Choose a comfortable range and
-              stop if a movement causes pain.
-            </p>
-            {!showDemo && (
-              <p className="model-credit">
-                Z-Anatomy / BodyParts3D ·{" "}
-                <a
-                  href={import.meta.env.BASE_URL + "models/credits.html"}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  3D anatomy credits · CC BY-SA
-                </a>
-              </p>
-            )}
             <button className="primary" onClick={() => setSelected(null)}>
               Got it
               <Check size={18} />

@@ -796,11 +796,14 @@ details summary {
   grid-template-columns: 1fr 1.5fr;
   gap: 30px;
 }
-.library-rail {
-  border-right: 1px solid var(--line);
-  padding: 4px 24px 0 0;
+.library-head {
+  padding: 4px 0 22px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 4px;
 }
-.library-rail h1 {
+.library-head h1 {
   font-weight: 800;
   font-size: clamp(2.4rem, 3.6vw, 3.4rem);
   line-height: 0.95;
@@ -808,18 +811,16 @@ details summary {
   margin: 14px 0 18px;
   overflow-wrap: anywhere;
 }
-.library-rail .eyebrow {
+.library-head .eyebrow {
   margin: 0;
 }
 .rail-count {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: baseline;
+  gap: 10px;
   font-size: 0.8rem;
   color: var(--muted);
-  margin: 0 0 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
+  margin: 0;
 }
 .rail-count strong {
   font-family: "Barlow Condensed", sans-serif;
@@ -839,11 +840,82 @@ details summary {
   margin: 0;
 }
 .rail-clear {
-  margin-top: 16px;
+  margin-top: 10px;
+  justify-self: start;
   padding: 0;
   font-size: 0.75rem;
   color: #ff9a69;
   border-bottom: 1px solid #6b4631;
+}
+/* Accordion rows: the guide opens under the movement it belongs to, so the
+   list keeps its place instead of handing over to a dialog. */
+.exercise-row {
+  border-bottom: 1px solid var(--line);
+}
+.exercise-row > button {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-align: left;
+  padding: 18px 0;
+  width: 100%;
+}
+.exercise-row > button > svg {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #85766a;
+  transition: transform 220ms var(--ease-out);
+}
+.exercise-row[data-open] {
+  border-bottom-color: #5c4a3b;
+}
+.exercise-row[data-open] > button > svg {
+  transform: rotate(180deg);
+  color: var(--orange);
+}
+.exercise-row[data-open] > button strong {
+  color: var(--orange);
+}
+.exercise-detail {
+  padding: 0 0 20px 47px;
+}
+.detail-cue {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 4px;
+}
+.exercise-viewer {
+  display: flex;
+  flex-direction: column;
+}
+.viewer-head {
+  margin-bottom: 14px;
+}
+.viewer-head .eyebrow {
+  display: block;
+  color: #b0957e;
+}
+.viewer-head h2 {
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+}
+.exercise-viewer .body-canvas {
+  height: 320px;
+}
+.viewer-empty {
+  flex: 1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  color: #7d7168;
+  padding: 30px 20px;
+}
+.viewer-empty p {
+  font-size: 0.9rem;
+  max-width: 24ch;
+  margin: 0;
 }
 .search {
   margin-top: 0;
@@ -866,19 +938,6 @@ details summary {
 }
 .exercise-list {
   border-top: 1px solid var(--line);
-}
-.exercise-list > button {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  text-align: left;
-  padding: 20px 0;
-  width: 100%;
-  border-bottom: 1px solid var(--line);
-}
-.exercise-list > button > svg {
-  margin-left: auto;
-  color: #85766a;
 }
 .exercise-list strong {
   font-size: 0.95rem;
@@ -1367,24 +1426,16 @@ dialog.modal-backdrop::backdrop {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  .library-rail {
+  .library-head {
     padding: 0 0 16px;
-    border: 0;
-    border-bottom: 1px solid var(--line);
+    margin-bottom: 16px;
   }
-  .library-rail h1 {
+  .library-head h1 {
     font-size: 2.3rem;
-    margin: 8px 0 12px;
+    margin: 6px 0 10px;
   }
   .rail-count {
-    flex-direction: row;
-    align-items: baseline;
     gap: 9px;
-    padding-top: 12px;
-    margin-bottom: 8px;
-  }
-  .rail-clear {
-    margin-top: 12px;
   }
   .filters {
     gap: 3px;
@@ -1393,9 +1444,12 @@ dialog.modal-backdrop::backdrop {
     font-size: 0.8rem;
     padding: 7px 10px;
   }
-  .exercise-list > button {
-    padding: 18px 0;
+  .exercise-row > button {
+    padding: 16px 0;
     gap: 10px;
+  }
+  .exercise-detail {
+    padding-left: 42px;
   }
   .exercise-list strong {
     font-size: 0.95rem;
@@ -3865,13 +3919,22 @@ body .kinset-select-menu {
 /* Desktop exercise browsing stays beside the model; only results scroll. */
 @media (min-width: 761px) {
   .explore-layout {
-    height: clamp(440px, calc(100dvh - 190px), 720px);
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.6fr);
+    height: clamp(460px, calc(100dvh - 300px), 700px);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   }
-  .explore-layout .library-rail {
+  /* Seven muscle groups share a narrower column now; keep them on one line. */
+  .explore-layout .filters button {
+    padding: 7px 8px;
+    font-size: 0.8rem;
+  }
+  .explore-layout .exercise-viewer {
     min-height: 0;
-    overflow: auto;
-    scrollbar-width: none;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #655b54 transparent;
+    border-left: 1px solid var(--line);
+    padding-left: 26px;
   }
   .explore-layout .exercise-browser {
     display: flex;
