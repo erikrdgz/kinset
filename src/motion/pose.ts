@@ -147,18 +147,28 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
   };
   /**
    * Point a hand deliberately: `along` runs wrist to fingertips, `face` is the
-   * way the palm looks. `aim` only matches a direction and leaves the roll to
-   * the shortest arc, so a palm set that way faces wherever it lands.
-   * The bind pose is anatomical, so the hand's local +Y is the fingers and its
-   * local +Z is the palm normal.
+   * way the palm looks, `sign` is +1 for the left hand and -1 for the right.
+   * `aim` only matches a direction and leaves the roll to the shortest arc, so
+   * a palm set that way faces wherever it happens to land.
+   *
+   * Local +Y runs wrist to fingertips. The palm normal is local +X on the left
+   * and local -X on the right: the hands mirror, and in the bind pose both
+   * palms face the floor. Taking local +Z for the palm instead points a hand
+   * sideways, standing it on its edge with the thumb rolled under.
    */
-  const setHand = (name: string, along: Vector3, face: Vector3) => {
+  const setHand = (
+    name: string,
+    along: Vector3,
+    face: Vector3,
+    sign: number,
+  ) => {
     const y = along.clone().normalize();
-    const z = face.clone().addScaledVector(y, -face.dot(y)).normalize();
+    const x = face.clone().multiplyScalar(sign);
+    x.addScaledVector(y, -x.dot(y)).normalize();
     orient(
       name,
       new Quaternion().setFromRotationMatrix(
-        new Matrix4().makeBasis(new Vector3().crossVectors(y, z), y, z),
+        new Matrix4().makeBasis(x, y, new Vector3().crossVectors(x, y)),
       ),
     );
   };
@@ -457,7 +467,7 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
       aim(upper, lower, direction);
       const forearm = direction.clone().add(v(0, 0.04, 0.08));
       aim(lower, hand, forearm);
-      setHand(hand, forearm, v(0, -1, 0));
+      setHand(hand, forearm, v(0, -1, 0), sign);
     } else if (id === "bentrow") {
       aim(upper, lower, v(sign * 0.04, -Math.cos(1.6 * u), -Math.sin(1.6 * u)));
       aim(lower, hand, v(0, -1, 0.1));
@@ -498,13 +508,21 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
       const angle =
         0.12 +
         2.4 * (id === "altcurl" && (suffix === "l") !== alternate ? 0 : u);
-      aim(lower, hand, v(sign * 0.025, -Math.cos(angle), Math.sin(angle)));
+      const forearm = v(sign * 0.025, -Math.cos(angle), Math.sin(angle));
+      aim(lower, hand, forearm);
+      // Supinated: the palm turns with the forearm, facing forward from the
+      // hang and round to the shoulder at the top.
+      setHand(hand, forearm, v(0, forearm.z, -forearm.y), sign);
     } else if (movement === "press") {
       aim(upper, lower, v(sign * (0.95 - 0.82 * u), 0.08 + 0.92 * u, 0.12));
-      aim(lower, hand, v(-sign * 0.06, 1, 0.08));
+      const forearm = v(-sign * 0.06, 1, 0.08);
+      aim(lower, hand, forearm);
+      setHand(hand, forearm, v(0, 0, 1), sign);
     } else if (movement === "goblet") {
       const target = pos("spine_03").add(v(sign * 0.065, -0.03, 0.2));
       ik(upper, lower, hand, target, v(sign * 0.55, -1, 0));
+      // Both hands cup the end of an upright dumbbell, so the palms face up.
+      setHand(hand, target.clone().sub(pos(lower)), v(0, 1, 0), sign);
     } else if (movement === "rdl") {
       aim(upper, lower, v(sign * 0.04, -1, 0.06));
       aim(lower, hand, v(0, -1, 0.05));
@@ -521,7 +539,10 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         lower,
         v(sign * (0.88 - 0.78 * u), 0.02 + 0.98 * u, 0.45 * (1 - u)),
       );
-      aim(lower, hand, v(-sign * 0.05, 1, 0));
+      const forearm = v(-sign * 0.05, 1, 0);
+      aim(lower, hand, forearm);
+      // Lying down, so forward is toward the feet: a pronated press.
+      setHand(hand, forearm, v(0, 0, 1), sign);
     } else if (movement === "bridge") {
       ik(
         upper,
@@ -553,7 +574,7 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
       );
       // The bar runs across the body, so the palm has to look down onto it
       // rather than along it.
-      setHand(hand, v(0, -0.25, 0.97), v(0, -1, 0));
+      setHand(hand, v(0, -0.25, 0.97), v(0, -1, 0), sign);
     } else if (movement === "legpress") {
       ik(upper, lower, hand, v(sign * 0.27, 0.34, -0.28), v(sign * 1, -1, 0));
     } else {
@@ -561,20 +582,19 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
       aim(lower, hand, v(-sign * 0.05, 0.05, 1));
     }
     // Palm extends from the wrist in local +Y; point it down for supported hands.
+    // A hand taking weight lies flat: fingers along the surface, palm on it.
     if (
       ["pushup", "bird", "bridge"].includes(movement) ||
       (id === "row" && suffix === "l")
-    ) {
-      orient(hand, new Quaternion().setFromUnitVectors(v(0, 1, 0), v(0, 0, 1)));
-    }
-    if (id === "narrowpushup")
-      orient(hand, new Quaternion().setFromUnitVectors(v(0, 1, 0), v(0, 0, 1)));
+    )
+      setHand(hand, v(0, 0, 1), v(0, -1, 0), sign);
     // Neutral grips face the body's midline: the palms look at each other.
     if (id === "hammer" || id === "closefloor")
       setHand(
         hand,
         get(hand).bone.localToWorld(v(0, 1, 0)).sub(pos(hand)),
         v(-sign, 0, 0),
+        sign,
       );
     const grips =
       ["curl", "press", "rdl", "row", "floor", "goblet", "pulldown"].includes(

@@ -25,21 +25,26 @@ wrist height, and how far the arm is extended (1.00 is straight). Reading the
 numbers beats reading a screenshot; the preview cameras sit at an angle, so a
 limb's direction is easy to misjudge by eye.
 
-## `orient.ts` — hand and foot rotation
+## `palm.ts` — hand and foot rotation
 
 ```
-npx vite-node qa/orient.ts [movement ...]
+npx vite-node qa/palm.ts [movement ...]
 ```
 
-Position checks pass happily while a palm faces backwards or a toe points
-behind the ankle, so this reads the bones' own axes. The bind pose is
-anatomical (arms out, palms forward), which makes the hand's local +Y the
-fingers and its local +Z the palm normal; the foot is flat at rest, so its
-local +Y is the toe. The sole is better taken as world-down carried through
-the bone's rotation, since the foot's local +Z sits 31 degrees off it.
+Position checks pass happily while a palm faces sideways, so this reads
+rotation. It takes the palm frame from the finger bones rather than assuming
+which local axis is which: fingers run wrist to middle knuckle, `across` runs
+index knuckle to pinky knuckle, and their cross product is the palm normal,
+negated on the right because the hands mirror.
 
-Prints the convention from the rest pose first, then a row per movement and
-side.
+Worth knowing, because getting it wrong is silent: the hand's local +Y is the
+fingers, but the palm normal is local **+X on the left and -X on the right**,
+not local +Z. In the bind pose both palms face the floor. Taking +Z instead
+stands every planted hand on its edge with the thumb rolled under, which is
+what shipped until someone noticed the push-up.
+
+Prints the rest pose and each hand's local axes first, then a row per movement
+and side.
 
 ## `qa.html` + `qa.ts` — visual harness
 

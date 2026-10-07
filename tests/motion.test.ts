@@ -285,14 +285,40 @@ describe("joint limits and contact", () => {
 /* Orientation, not position. A hand can sit exactly where it belongs with the
    palm facing backwards, and a foot can stand on the right spot with the toes
    pointing behind it, so these read the bones' own axes.
-   The bind pose is anatomical: arms out, palms forward. So the hand's local +Y
-   runs wrist to fingertips and its local +Z is the palm normal. The foot is
-   flat at rest, so its sole is world-down carried through the bone's rotation. */
+
+   The hand's local +Y runs wrist to fingertips. The palm normal is local +X on
+   the left and local -X on the right: the hands mirror, and in the bind pose
+   both palms face the floor. This is checked against the finger bones in the
+   test below, because taking the wrong axis here passes happily while every
+   planted hand stands on its edge. The foot is flat at rest, so its sole is
+   world-down carried through the bone's rotation. */
 describe("hand and foot orientation", () => {
   const palm = (rig: ReturnType<typeof prepareRig>, side: string) =>
-    new Vector3(0, 0, 1).applyQuaternion(
+    new Vector3(side === "l" ? 1 : -1, 0, 0).applyQuaternion(
       rig.bones.get("hand_" + side)!.bone.getWorldQuaternion(new Quaternion()),
     );
+
+  it("takes the palm normal from the axis the finger bones agree with", () => {
+    const rig = rigFromAsset();
+    for (const movement of ["pushup", "hammer", "lateral"] as const) {
+      applyPose(rig, movement, REP * 0.45);
+      for (const side of ["l", "r"]) {
+        const place = (name: string) =>
+          rig.bones.get(name)!.bone.getWorldPosition(new Vector3());
+        const fingers = place(`middle_01_${side}`)
+          .sub(place(`hand_${side}`))
+          .normalize();
+        const across = place(`pinky_01_${side}`)
+          .sub(place(`index_01_${side}`))
+          .normalize();
+        const fromBones = new Vector3()
+          .crossVectors(across, fingers)
+          .multiplyScalar(side === "l" ? 1 : -1)
+          .normalize();
+        expect(palm(rig, side).dot(fromBones)).toBeGreaterThan(0.99);
+      }
+    }
+  });
   const sole = (rig: ReturnType<typeof prepareRig>, side: string) => {
     const foot = rig.bones.get("foot_" + side)!;
     return new Vector3(0, -1, 0).applyQuaternion(
@@ -304,7 +330,7 @@ describe("hand and foot orientation", () => {
   const place = (rig: ReturnType<typeof prepareRig>, name: string) =>
     rig.bones.get(name)!.bone.getWorldPosition(new Vector3());
 
-  it.each(["pushup", "narrowpushup", "bridge", "bird", "donkey", "hydrant"] as const)(
+  it.each(["pushup", "narrowpushup", "bridge", "bird", "donkey", "hydrant", "row"] as const)(
     "%s rests its supporting palms on the surface, not on their edge",
     (movement) => {
       const rig = rigFromAsset();
@@ -326,6 +352,39 @@ describe("hand and foot orientation", () => {
       applyPose(rig, movement, REP * 0.45);
       expect(palm(rig, "l").x).toBeLessThan(-0.9);
       expect(palm(rig, "r").x).toBeGreaterThan(0.9);
+    },
+  );
+
+  it.each(["curl", "altcurl"] as const)(
+    "%s finishes supinated, with the palm turned toward the shoulder",
+    (movement) => {
+      const rig = rigFromAsset();
+      applyPose(rig, movement, REP * 0.45);
+      // The left arm is the working one at this point in an alternating curl.
+      expect(palm(rig, "l").y).toBeGreaterThan(0.4);
+      expect(palm(rig, "l").z).toBeLessThan(-0.5);
+    },
+  );
+
+  it.each(["press", "seatedpress", "floor"] as const)(
+    "%s presses with a pronated grip rather than palms turned outward",
+    (movement) => {
+      const rig = rigFromAsset();
+      applyPose(rig, movement, REP * 0.45);
+      for (const side of ["l", "r"]) {
+        expect(palm(rig, side).z).toBeGreaterThan(0.9);
+        expect(Math.abs(palm(rig, side).x)).toBeLessThan(0.3);
+      }
+    },
+  );
+
+  it.each(["goblet", "sumo"] as const)(
+    "%s cups the upright dumbbell from below",
+    (movement) => {
+      const rig = rigFromAsset();
+      applyPose(rig, movement, REP * 0.45);
+      for (const side of ["l", "r"])
+        expect(palm(rig, side).y).toBeGreaterThan(0.8);
     },
   );
 
