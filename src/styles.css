@@ -3431,6 +3431,12 @@ body .app-footer a:hover {
   text-decoration-thickness: 2px;
   text-underline-offset: 5px;
 }
+/* Bleed the nav rows into the sidebar gutter so the hover bar sits on the
+   sidebar edge instead of against the icon. Icons keep their alignment. */
+body .sidebar nav button {
+  margin-inline: -22px;
+  padding-inline: 22px;
+}
 body .sidebar nav button:hover {
   color: #fff;
   background: #1f1c1a;
