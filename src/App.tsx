@@ -22,6 +22,8 @@ import {
   Layers,
   CalendarDays,
   LogOut,
+  PersonStanding,
+  Play,
   Plus,
   Settings,
   Timer,
@@ -50,6 +52,17 @@ import ExerciseInstructions from "./ExerciseInstructions";
 const ExerciseDemo = lazy(() => import("./ExerciseDemo"));
 import { demoIds } from "./motion/catalog";
 const Body = lazy(() => import("./Body"));
+/* One line per filter so the library header says what you are looking at
+   instead of only how many results came back. */
+const railNote: Record<Muscle | "All", string> = {
+  All: "Filter by muscle group, or search by name.",
+  Chest: "Pressing. Flat, incline and floor work.",
+  Back: "Pulling. Rows, pulldowns and hinges.",
+  Shoulders: "Overhead presses and raises.",
+  Arms: "Curls, extensions and grip.",
+  Core: "Bracing, anti-rotation and carries.",
+  Legs: "Squat, hinge, lunge and calf.",
+};
 const demoProfile: Profile = {
   name: "Alex",
   goal: "Build consistency",
@@ -610,11 +623,10 @@ function Journal({
   const [tab, setTab] = useState("Today"),
     [editing, setEditing] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
-    [showAnatomy, setShowAnatomy] = useState(false),
+    [showDemo, setShowDemo] = useState(false),
     [notice, setNotice] = useState(""),
     [muscle, setMuscle] = useState<Muscle | "All">("All"),
     [query, setQuery] = useState(""),
-    [demosOnly, setDemosOnly] = useState(false),
     [restUntil, setRestUntil] = useState<number | null>(null),
     [now, setNow] = useState(Date.now()),
     [confirmDelete, setConfirmDelete] = useState(false),
@@ -628,9 +640,15 @@ function Journal({
     const id = setInterval(() => setNow(Date.now()), 500);
     return () => clearInterval(id);
   }, [restUntil]);
+  /* Every exercise opens on its own anatomy. The demo is a deliberate swap. */
   useEffect(() => {
-    setShowAnatomy(false);
+    setShowDemo(false);
   }, [selected]);
+  /* Explore is the only route into the anatomy model, and the meshes are large.
+     Warming the chunk on arrival means the card opens on a drawn body. */
+  useEffect(() => {
+    if (tab === "Explore") import("./Body");
+  }, [tab]);
   useEffect(() => {
     if (
       owner === "demo" &&
@@ -681,6 +699,15 @@ function Journal({
     ),
     count = week.length;
   const preview = selected ? exercises.find((e) => e.id === selected) : null;
+  /* The library header reports on the same list the browser renders, so the
+     count and the results can never disagree. */
+  const browsing = exercises.filter(
+    (e) =>
+      (muscle === "All" || e.muscle === muscle) &&
+      e.name.toLowerCase().includes(query.toLowerCase()),
+  );
+  const withDemos = browsing.filter((e) => demoIds.has(e.id)).length;
+  const filtered = muscle !== "All" || query.trim() !== "";
   const upcoming = nextWorkout(data);
   const activePlan = data.plans?.find((plan) => plan.id === data.activePlanId);
   const plannedEntries = data.active
@@ -895,7 +922,6 @@ function Journal({
               <button
                 className="demo-discovery"
                 onClick={() => {
-                  setDemosOnly(true);
                   setMuscle("All");
                   setQuery("");
                   setTab("Explore");
@@ -1168,17 +1194,44 @@ function Journal({
           )}
           {tab === "Explore" && (
             <>
-              <div className="page-heading">
-                <div>
-                  <h1>Movement library</h1>
-                  <p className="muted">Find an exercise. See where it fits.</p>
-                </div>
-              </div>
               <div className="explore-layout">
-                <section className="anatomy-panel">
-                  <BodyPreview muscles={muscle === "All" ? [] : [muscle]} />
-                  <h3>{muscle === "All" ? "A body built to move." : muscle}</h3>
-                </section>
+                <header className="library-rail">
+                  <p className="eyebrow">Movement library</p>
+                  <h1>
+                    {query.trim()
+                      ? `\u201C${query.trim()}\u201D`
+                      : muscle === "All"
+                        ? "Every movement"
+                        : muscle}
+                  </h1>
+                  <p className="rail-count">
+                    <strong>{browsing.length}</strong>
+                    {browsing.length === 1 ? " movement" : " movements"}
+                    {withDemos > 0 && (
+                      <span>
+                        {withDemos === browsing.length
+                          ? "all with a 3D demo"
+                          : `${withDemos} with a 3D demo`}
+                      </span>
+                    )}
+                  </p>
+                  <p className="rail-note">
+                    {query.trim() && muscle !== "All"
+                      ? `In ${muscle}. ${railNote[muscle]}`
+                      : railNote[muscle]}
+                  </p>
+                  {filtered && (
+                    <button
+                      className="rail-clear"
+                      onClick={() => {
+                        setMuscle("All");
+                        setQuery("");
+                      }}
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </header>
                 <section className="exercise-browser">
                   <input
                     className="search"
@@ -1187,24 +1240,6 @@ function Journal({
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                   />
-                  <button
-                    className="demo-filter"
-                    aria-pressed={demosOnly}
-                    onClick={() => {
-                      setDemosOnly(!demosOnly);
-                      setMuscle("All");
-                      setQuery("");
-                    }}
-                  >
-                    {demosOnly ? "Showing 3D demos" : "Show 3D demos"}
-                    <span>{demoIds.size} exercises</span>
-                  </button>
-                  {demosOnly && (
-                    <p className="fine">
-                      Open an exercise to watch its movement. Use Overview or
-                      Side to change the view, or pause and slow it down.
-                    </p>
-                  )}
                   <div className="filters">
                     {(
                       [
@@ -1227,38 +1262,28 @@ function Journal({
                     ))}
                   </div>
                   <div className="exercise-list" role="region" aria-label="Exercises" tabIndex={0}>
-                    {exercises
-                      .filter(
-                        (e) =>
-                          (!demosOnly || demoIds.has(e.id)) &&
-                          (muscle === "All" || e.muscle === muscle) &&
-                          e.name.toLowerCase().includes(query.toLowerCase()),
-                      )
-                      .map((e) => (
-                        <button key={e.id} onClick={() => setSelected(e.id)}>
-                          <span className="list-icon">
-                            <Dumbbell size={20} />
+                    {browsing.map((e) => (
+                      <button key={e.id} onClick={() => setSelected(e.id)}>
+                        <span className="list-icon">
+                          <Dumbbell size={20} />
+                        </span>
+                        <span>
+                          <strong>{e.name}</strong>
+                          <small>
+                            {e.muscle} · {e.equipment}
+                          </small>
+                          <span className="watch-demo-label">
+                            {demoIds.has(e.id)
+                              ? "▶ Watch demo · Read guide"
+                              : "Read movement guide"}
                           </span>
-                          <span>
-                            <strong>{e.name}</strong>
-                            <small>
-                              {e.muscle} · {e.equipment}
-                            </small>
-                            <span className="watch-demo-label">
-                              {demoIds.has(e.id)
-                                ? "▶ Watch demo · Read guide"
-                                : "Read movement guide"}
-                            </span>
-                          </span>
-                          <ChevronRight size={18} />
-                        </button>
-                      ))}
-                    {!exercises.some(
-                      (e) =>
-                        (!demosOnly || demoIds.has(e.id)) &&
-                        (muscle === "All" || e.muscle === muscle) &&
-                        e.name.toLowerCase().includes(query.toLowerCase()),
-                    ) && <p>No matching exercises. Try another search.</p>}
+                        </span>
+                        <ChevronRight size={18} />
+                      </button>
+                    ))}
+                    {!browsing.length && (
+                      <p>No matching exercises. Try another search.</p>
+                    )}
                   </div>
                 </section>
               </div>
@@ -1504,37 +1529,49 @@ function Journal({
             aria-label={preview.name}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              className="modal-close"
-              autoFocus
-              aria-label="Close exercise details"
-              onClick={() => setSelected(null)}
-            >
-              <X />
-            </button>
-            <span className="eyebrow">
-              {preview.muscle} · {preview.equipment}
-            </span>
-            <h2>{preview.name}</h2>
-            <div
-              className="detail-tabs"
-              role="group"
-              aria-label="Exercise visualization"
-            >
+            <header className="modal-header">
+              <div>
+                <span className="eyebrow">
+                  {preview.muscle} · {preview.equipment}
+                </span>
+                <h2>{preview.name}</h2>
+              </div>
               <button
-                aria-pressed={!showAnatomy}
-                onClick={() => setShowAnatomy(false)}
+                className="modal-close"
+                autoFocus
+                aria-label="Close exercise details"
+                onClick={() => setSelected(null)}
               >
-                {demoIds.has(preview.id) ? "Movement" : "Written guide"}
+                <X />
               </button>
-              <button
-                aria-pressed={showAnatomy}
-                onClick={() => setShowAnatomy(true)}
-              >
-                Muscles
-              </button>
+            </header>
+            <div className="stage-head">
+              <span className="stage-label" aria-live="polite">
+                {showDemo
+                  ? "Movement preview"
+                  : `Muscles worked · ${preview.muscle}`}
+              </span>
+              {demoIds.has(preview.id) && (
+                <button
+                  className="stage-swap"
+                  data-active={showDemo ? "demo" : "anatomy"}
+                  onClick={() => setShowDemo(!showDemo)}
+                >
+                  {showDemo ? (
+                    <>
+                      <PersonStanding size={16} />
+                      Show muscles
+                    </>
+                  ) : (
+                    <>
+                      <Play size={15} />
+                      Watch the movement
+                    </>
+                  )}
+                </button>
+              )}
             </div>
-            {demoIds.has(preview.id) && !showAnatomy ? (
+            {showDemo && demoIds.has(preview.id) ? (
               <BodyBoundary>
                 <Suspense
                   fallback={
@@ -1544,17 +1581,18 @@ function Journal({
                   <ExerciseDemo key={preview.id} exercise={preview} />
                 </Suspense>
               </BodyBoundary>
-            ) : showAnatomy ? (
+            ) : (
               <BodyPreview muscles={[preview.muscle]} />
-            ) : null}
-            <p>{preview.cue}</p>
+            )}
+            {/* The demo prints its own cue beneath the animation. */}
+            {!showDemo && <p>{preview.cue}</p>}
             <ExerciseInstructions exercise={preview} />
             <p className="fine">
-              Anatomy highlights selected muscles; movement previews illustrate
-              the exercise. Choose a comfortable range and stop if a movement
-              causes pain.
+              Anatomy highlights the muscle group this movement trains; the
+              preview illustrates the exercise. Choose a comfortable range and
+              stop if a movement causes pain.
             </p>
-            {showAnatomy && (
+            {!showDemo && (
               <p className="model-credit">
                 Z-Anatomy / BodyParts3D ·{" "}
                 <a

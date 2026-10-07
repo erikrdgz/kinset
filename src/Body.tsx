@@ -3,6 +3,13 @@ import { Canvas } from "@react-three/fiber";
 import { Bounds, OrbitControls, useGLTF } from "@react-three/drei";
 import { Mesh, MeshStandardMaterial } from "three";
 import type { Muscle } from "./domain";
+const MUSCLE_URL = import.meta.env.BASE_URL + "models/muscular.glb";
+const SKELETON_URL = import.meta.env.BASE_URL + "models/skeleton.glb";
+const DRACO_PATH = import.meta.env.BASE_URL + "draco/";
+/* The meshes are the heaviest assets in the app. Loading this chunk starts the
+   download, so entering Explore pays for the body before a card asks for it. */
+useGLTF.preload(MUSCLE_URL, DRACO_PATH);
+useGLTF.preload(SKELETON_URL, DRACO_PATH);
 const groups: Record<Muscle, RegExp> = {
   Chest: /pectoralis/i,
   Back: /latissimus|trapezius|rhomboid|erector|infraspinatus|teres_major/i,
@@ -12,14 +19,8 @@ const groups: Record<Muscle, RegExp> = {
   Legs: /quadriceps|rectus_femoris|vastus|biceps_femoris|semitendinosus|semimembranosus|gluteus|gastrocnemius|soleus|tibialis_anterior/i,
 };
 function Anatomy({ muscles }: { muscles: Muscle[] }) {
-  const muscleAsset = useGLTF(
-    import.meta.env.BASE_URL + "models/muscular.glb",
-    import.meta.env.BASE_URL + "draco/",
-  );
-  const skeletonAsset = useGLTF(
-    import.meta.env.BASE_URL + "models/skeleton.glb",
-    import.meta.env.BASE_URL + "draco/",
-  );
+  const muscleAsset = useGLTF(MUSCLE_URL, DRACO_PATH);
+  const skeletonAsset = useGLTF(SKELETON_URL, DRACO_PATH);
   const model = useMemo(() => {
     const muscleScene = muscleAsset.scene.clone(true),
       skeletonScene = skeletonAsset.scene.clone(true);

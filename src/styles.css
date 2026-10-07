@@ -796,20 +796,54 @@ details summary {
   grid-template-columns: 1fr 1.5fr;
   gap: 30px;
 }
-.anatomy-panel {
+.library-rail {
   border-right: 1px solid var(--line);
-  text-align: center;
-  padding: 0 20px 0 0;
+  padding: 4px 24px 0 0;
 }
-.anatomy-panel .body-canvas {
-  height: 420px;
+.library-rail h1 {
+  font-weight: 800;
+  font-size: clamp(2.4rem, 3.6vw, 3.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin: 14px 0 18px;
+  overflow-wrap: anywhere;
 }
-.anatomy-panel h3 {
-  margin-top: 12px;
+.library-rail .eyebrow {
+  margin: 0;
 }
-.anatomy-panel p {
+.rail-count {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-size: 0.8rem;
   color: var(--muted);
+  margin: 0 0 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.rail-count strong {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  line-height: 1;
+}
+.rail-count span {
+  color: #ff9a69;
+  font-size: 0.75rem;
+}
+.rail-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+.rail-clear {
+  margin-top: 16px;
+  padding: 0;
+  font-size: 0.75rem;
+  color: #ff9a69;
+  border-bottom: 1px solid #6b4631;
 }
 .search {
   margin-top: 0;
@@ -978,19 +1012,42 @@ dialog.modal-backdrop::backdrop {
   width: 100%;
   background: #202020;
   border: 1px solid #4b4138;
-  padding: 28px;
+  padding: 0 28px 28px;
   max-height: 90dvh;
   overflow: auto;
+}
+/* The guide runs long. The name stays put so a scrolled card still says
+   which movement you are reading about. */
+.modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #202020;
+  padding: 24px 0 18px;
+}
+.modal-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  border-bottom: 1px solid #3b332c;
+}
+.modal-header > div {
+  min-width: 0;
 }
 .exercise-modal .body-canvas {
   height: 300px;
 }
 .exercise-modal .eyebrow {
-  margin-top: 10px;
+  display: block;
   color: #b0957e;
 }
 .exercise-modal h2 {
-  margin: 14px 0;
+  margin: 8px 0 0;
 }
 .exercise-modal > p {
   font-size: 1rem;
@@ -1009,6 +1066,11 @@ dialog.modal-backdrop::backdrop {
   top: 15px;
   width: 44px;
   z-index: 1;
+}
+.modal-header .modal-close {
+  position: static;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 .destructive {
   background: #d5482f;
@@ -1305,19 +1367,24 @@ dialog.modal-backdrop::backdrop {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  .anatomy-panel {
-    padding: 0;
+  .library-rail {
+    padding: 0 0 16px;
     border: 0;
     border-bottom: 1px solid var(--line);
   }
-  .anatomy-panel .body-canvas {
-    height: 330px;
+  .library-rail h1 {
+    font-size: 2.3rem;
+    margin: 8px 0 12px;
   }
-  .anatomy-panel h3 {
-    display: none;
+  .rail-count {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 9px;
+    padding-top: 12px;
+    margin-bottom: 8px;
   }
-  .anatomy-panel p {
-    font-size: 0.75rem;
+  .rail-clear {
+    margin-top: 12px;
   }
   .filters {
     gap: 3px;
@@ -1375,11 +1442,26 @@ dialog.modal-backdrop::backdrop {
     border: 0;
     border-top: 1px solid #655244;
     max-width: 100%;
-    padding: 25px 25px max(25px, env(safe-area-inset-bottom));
+    padding: 0 22px max(25px, env(safe-area-inset-bottom));
     max-height: 92dvh;
+  }
+  .modal-header {
+    padding: 20px 0 14px;
+  }
+  .modal-header::after {
+    bottom: 14px;
   }
   .exercise-modal .body-canvas {
     height: 280px;
+  }
+  .stage-head {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stage-swap {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 14px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1395,16 +1477,6 @@ dialog.modal-backdrop::backdrop {
   position: relative;
   background: radial-gradient(ellipse at 50% 80%, #302b27 0%, #202020 65%);
   margin: 0 -12px;
-}
-.motion-badge {
-  position: absolute;
-  top: 10px;
-  left: 12px;
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
-  color: #a89b8d;
-  pointer-events: none;
 }
 .motion-controls {
   display: flex;
@@ -1468,20 +1540,45 @@ dialog.modal-backdrop::backdrop {
   }
 }
 
-.detail-tabs {
+/* One stage, two states. The label says what is on it; the button swaps it. */
+.stage-head {
   display: flex;
-  gap: 18px;
-  margin-bottom: 8px;
-  margin-right: 40px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
 }
-.detail-tabs button {
+.stage-label {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a89b8d;
+}
+.stage-swap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 9px 14px;
   font-size: 0.8rem;
-  border-bottom: 2px solid transparent;
-  color: #9e9084;
+  color: #ff9a69;
+  border: 1px solid #6b4631;
 }
-.detail-tabs button[aria-pressed="true"] {
-  border-color: #ff692b;
-  color: #ff692b;
+.stage-swap:hover {
+  background: #2d1f17;
+  border-color: var(--orange);
+}
+.stage-swap[data-active="demo"] {
+  color: #b7a89b;
+  border-color: #4b4138;
+}
+.stage-swap[data-active="demo"]:hover {
+  background: #2a2724;
+  border-color: #6d6158;
+}
+.stage-swap > svg {
+  flex-shrink: 0;
 }
 
 .motion-loading {
@@ -1512,25 +1609,6 @@ dialog.modal-backdrop::backdrop {
 .demo-discovery small {
   font-size: 0.8rem;
   color: var(--muted);
-}
-.demo-filter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 12px 14px;
-  margin: 15px 0;
-  border: 1px solid #6b4631;
-  color: #ff9a69;
-  text-align: left;
-}
-.demo-filter[aria-pressed="true"] {
-  background: #39251b;
-  border-color: var(--orange);
-}
-.demo-filter > span {
-  font-size: 0.75rem;
-  color: #b59b89;
 }
 .watch-demo-label {
   display: inline-block;
@@ -1618,8 +1696,8 @@ dialog.modal-backdrop::backdrop {
   cursor: pointer;
 }
 
-.exercise-modal > h2 {
-  padding-right: 28px;
+.modal-header h2 {
+  overflow-wrap: anywhere;
 }
 
 .plan-actions,
@@ -1946,14 +2024,14 @@ dialog.modal-backdrop::backdrop {
   .app-footer > span,
   .motion-note,
   .motion-cue,
-  .motion-badge,
+  .stage-label,
   .guide-source,
   .model-credit,
   .saved-plan p,
   .plan-empty,
   .plan-day-order,
   .empty-card p,
-  .anatomy-panel p,
+  .rail-note,
   .history-details p,
   .exercise-modal > p
 ) {
@@ -1976,14 +2054,14 @@ dialog.modal-backdrop::backdrop {
     .app-footer > span,
     .motion-note,
     .motion-cue,
-    .motion-badge,
+    .stage-label,
     .guide-source,
     .model-credit,
     .saved-plan p,
     .plan-empty,
     .plan-day-order,
     .empty-card p,
-    .anatomy-panel p,
+    .rail-note,
     .history-details p,
     .exercise-modal > p
   ) {
@@ -2043,14 +2121,14 @@ input::placeholder {
     .app-footer > span,
     .motion-note,
     .motion-cue,
-    .motion-badge,
+    .stage-label,
     .guide-source,
     .model-credit,
     .saved-plan p,
     .plan-empty,
     .plan-day-order,
     .empty-card p,
-    .anatomy-panel p,
+    .rail-note,
     .history-details p,
     .exercise-modal > p
   ) {
@@ -3787,18 +3865,13 @@ body .kinset-select-menu {
 /* Desktop exercise browsing stays beside the model; only results scroll. */
 @media (min-width: 761px) {
   .explore-layout {
-    height: clamp(440px, calc(100dvh - 260px), 680px);
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    height: clamp(440px, calc(100dvh - 190px), 720px);
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.6fr);
   }
-  .explore-layout .anatomy-panel {
-    display: flex;
-    flex-direction: column;
+  .explore-layout .library-rail {
     min-height: 0;
-  }
-  .explore-layout .anatomy-panel .body-canvas {
-    flex: 1;
-    height: auto;
-    min-height: 0;
+    overflow: auto;
+    scrollbar-width: none;
   }
   .explore-layout .exercise-browser {
     display: flex;

@@ -284,7 +284,6 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
             <shadowMaterial transparent opacity={0.25} />
           </mesh>
         </Canvas>
-        <span className="motion-badge">MOVEMENT PREVIEW</span>
       </div>
       <div className="motion-controls">
         <button
