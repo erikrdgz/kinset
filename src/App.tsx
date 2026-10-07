@@ -1134,7 +1134,12 @@ function Journal({
                 </section>
               ) : (
                 <>
-                  <div className="workout-toolbar">
+                  <div
+                    className="workout-toolbar"
+                    data-resting={
+                      (restUntil && restUntil > now) || undefined
+                    }
+                  >
                     <span>
                       <strong>{completedSets(data.active)}</strong> sets
                       completed
