@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 270" preserveAspectRatio="none" fill="#141414">
+  <title>Kinset — custom split-cut wordmark</title>
+  <g transform="translate(95 43) skewX(-10)">
+    <path d="M0 0h40v103L120 0h52L64 144c-22 27-45 38-64 29Z"/>
+    <path d="m77 151 30-34 59 67h-53Z"/>
+    <path d="M190 0h42v184h-42Z"/>
+    <path d="M250 0h40l44 106V0h40v184h-40L290 78v106h-40Z"/>
+    <path d="M421 0h97l-25 40h-57v29h57l25 25v65l-25 25h-97l25-40h57v-35h-57l-25-25V25Z"/>
+    <path d="M536 0h114l-25 40h-49v30h65l-25 39h-40v35h74l-25 40h-89Z"/>
+    <path d="M695 0h136l-25 40h-42v144h-42V40h-52Z"/>
+  </g>
+</svg>

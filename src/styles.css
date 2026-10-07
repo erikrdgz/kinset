@@ -3674,3 +3674,145 @@ input:focus-visible {
     transition: transform 260ms var(--ease-spring);
   }
 }
+
+
+/* The custom split-cut lettering is shared with the portfolio identity. */
+.brand-wordmark {
+  display: block;
+  width: 156px;
+  max-width: 100%;
+  height: auto;
+  filter: brightness(0) invert(1);
+}
+.app-footer .brand-wordmark { width: 104px; }
+.auth-story .kinset-brand-display {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  font-size: inherit;
+  line-height: 1;
+  transform: none;
+}
+.kinset-brand-display > .kinset-mast-wordmark {
+  display: block;
+  min-width: 0;
+  flex: 1;
+  width: 0;
+  aspect-ratio: 980 / 390;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  background: linear-gradient(to bottom, #141414 69%, #fff 69%);
+}
+.auth-story .kinset-brand-display .kinset-launch {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  transform: none;
+  color: #fff;
+  align-self: flex-end;
+  margin-bottom: 8%;
+}
+.auth-story .kinset-brand-display .kinset-launch:focus-visible {
+  outline-color: #fff;
+}
+.auth-story .auth-mast { margin: 42px 0 52px; }
+.auth-mast::before { bottom: 31%; }
+@media (max-width: 760px) {
+  .brand-wordmark { width: 132px; }
+  .auth-story .kinset-brand-display { gap: 10px; }
+  .auth-story .kinset-brand-display .kinset-launch {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+  }
+  .auth-story .auth-mast { margin: 30px 0 46px; }
+}
+
+.auth-page .auth-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  border-top: 1px solid #ffffff18;
+  margin-top: 32px;
+  padding: 24px 0;
+}
+.auth-footer .made-by { margin-left: auto; }
+@media (max-width: 760px) {
+  .auth-page .auth-footer { flex-direction: column; align-items: flex-start; }
+  .auth-footer .made-by { margin-left: 0; }
+}
+
+/* Quiet form fields: focus lives on the underline rather than a boxed halo. */
+body input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+body .kinset-select {
+  border: 0;
+  border-bottom: 1px solid #655b54;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):focus,
+body .kinset-select:focus-visible,
+body .kinset-select[data-state="open"] {
+  outline: none;
+  border-bottom-color: #ff9b6b;
+  box-shadow: 0 1px 0 #ff9b6b, 0 5px 8px -6px #ff692b;
+}
+body .kinset-select-menu {
+  border: 1px solid #655b54;
+  box-shadow: 0 12px 28px #0006;
+}
+@media (forced-colors: active) {
+  body input:not([type="range"]):focus-visible,
+  body .kinset-select:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 3px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body input, body .kinset-select { transition: none; }
+}
+
+/* Desktop exercise browsing stays beside the model; only results scroll. */
+@media (min-width: 761px) {
+  .explore-layout {
+    height: clamp(440px, calc(100dvh - 260px), 680px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  }
+  .explore-layout .anatomy-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .explore-layout .anatomy-panel .body-canvas {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+  }
+  .explore-layout .exercise-browser {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+  }
+  .exercise-browser > :not(.exercise-list) { flex-shrink: 0; }
+  .exercise-browser .exercise-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #655b54 transparent;
+    padding-right: 12px;
+  }
+  .exercise-browser .exercise-list:focus-visible {
+    outline: 1px solid #ff9b6b;
+    outline-offset: 3px;
+  }
+}

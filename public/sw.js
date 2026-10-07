@@ -1,5 +1,5 @@
-const CACHE = "kinset-shell-v1";
-const SHELL = ["./", "./icon.svg", "./manifest.webmanifest"];
+const CACHE = "kinset-shell-v3";
+const SHELL = ["./", "./icon.svg", "./kinset-wordmark.svg", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./manifest.webmanifest"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
   self.skipWaiting();

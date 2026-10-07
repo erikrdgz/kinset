@@ -150,13 +150,7 @@ function Plate({ done, total }: { done: number; total: number }) {
 function Brand() {
   return (
     <span className="brand">
-      <img
-        className="brand-icon"
-        src={`${import.meta.env.BASE_URL}icon.svg`}
-        alt=""
-        aria-hidden="true"
-      />
-      kinset
+      <img className="brand-wordmark" src={`${import.meta.env.BASE_URL}kinset-wordmark.svg`} alt="Kinset" width="980" height="270" />
     </span>
   );
 }
@@ -251,15 +245,6 @@ function Auth({
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
-  function launchCreate() {
-    if (!supabase) return onDemo();
-    setMode("signup");
-    setMessage("");
-    const field = emailRef.current;
-    if (!field) return;
-    field.scrollIntoView({ block: "center", behavior: "smooth" });
-    field.focus({ preventScroll: true });
-  }
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!supabase) return;
@@ -312,24 +297,8 @@ function Auth({
             <span>STRENGTH, ON YOUR TERMS.</span>
           </div>
           <div className="auth-mast">
-            <h1 className="kinset-display">
-              KINSET
-              <button
-                type="button"
-                className="kinset-launch"
-                aria-label="Create an account"
-                onClick={launchCreate}
-              >
-                <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-                  <path
-                    d="M6 58L58 6M16 6H58V48"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                  />
-                </svg>
-              </button>
+            <h1 className="kinset-brand-display">
+              <span className="kinset-mast-wordmark" role="img" aria-label="Kinset" style={{ maskImage: `url(${import.meta.env.BASE_URL}kinset-wordmark.svg)`, WebkitMaskImage: `url(${import.meta.env.BASE_URL}kinset-wordmark.svg)` }} />
             </h1>
           </div>
           <div className="auth-manifesto">
@@ -340,7 +309,6 @@ function Auth({
             </h2>
           </div>
           <p className="auth-pillars">Plan. Train. Progress.</p>
-          <p className="made-by">Made to make you happy. By Erik Rodriguez.</p>
         </section>
         <section className="auth-card">
           <h2>
@@ -458,6 +426,10 @@ function Auth({
           )}
         </section>
       </main>
+      <footer className="app-footer auth-footer">
+        <Brand />
+        <span className="made-by">Made to make you healthy. By Erik Rodriguez.</span>
+      </footer>
     </div>
   );
 }
@@ -1207,7 +1179,7 @@ function Journal({
                   <BodyPreview muscles={muscle === "All" ? [] : [muscle]} />
                   <h3>{muscle === "All" ? "A body built to move." : muscle}</h3>
                 </section>
-                <section>
+                <section className="exercise-browser">
                   <input
                     className="search"
                     aria-label="Search exercises"
@@ -1254,7 +1226,7 @@ function Journal({
                       </button>
                     ))}
                   </div>
-                  <div className="exercise-list">
+                  <div className="exercise-list" role="region" aria-label="Exercises" tabIndex={0}>
                     {exercises
                       .filter(
                         (e) =>
@@ -1489,7 +1461,7 @@ function Journal({
         <footer className="app-footer">
           <Brand />
           <span className="made-by">
-            Made to make you happy. By Erik Rodriguez.
+            Made to make you healthy. By Erik Rodriguez.
           </span>
           <a
             className="model-credit"
