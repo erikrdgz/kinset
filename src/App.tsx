@@ -122,6 +122,40 @@ function Modal({
     </dialog>
   );
 }
+/** A rest is one plate's worth of time. */
+const REST_SECONDS = 90;
+const REST_MS = REST_SECONDS * 1000;
+/**
+ * The rest timer as a weight plate unloading, which is the motif the week dial
+ * already uses and the shape a timer wants anyway. The sweep is a dash offset
+ * with a linear transition, so it glides between the half-second ticks instead
+ * of stepping.
+ */
+function RestPlate({ left }: { left: number }) {
+  const radius = 44;
+  const circumference = 2 * Math.PI * radius;
+  const remaining = Math.max(0, Math.min(1, left / REST_SECONDS));
+  return (
+    <div className="rest-plate" data-urgent={left <= 10 || undefined}>
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle className="plate-rim" cx="60" cy="60" r="57" />
+        <circle className="rest-groove" cx="60" cy="60" r={radius} />
+        <circle
+          className="rest-sweep"
+          cx="60"
+          cy="60"
+          r={radius}
+          style={{
+            strokeDasharray: circumference,
+            strokeDashoffset: circumference * (1 - remaining),
+          }}
+        />
+        <circle className="plate-hole" cx="60" cy="60" r="21" />
+      </svg>
+      <b>{left}</b>
+    </div>
+  );
+}
 function Plate({ done, total }: { done: number; total: number }) {
   const n = Math.max(total, 1);
   const gap = 5;
@@ -1106,19 +1140,34 @@ function Journal({
                       completed
                     </span>
                     {restUntil && restUntil > now ? (
-                      <button onClick={() => setRestUntil(null)}>
-                        <Timer size={18} />
-                        Rest {Math.ceil((restUntil - now) / 1000)}s · Skip
-                      </button>
+                      <div
+                        className="rest-strip"
+                        role="timer"
+                        aria-label={`Rest, ${Math.ceil((restUntil - now) / 1000)} seconds left`}
+                      >
+                        <RestPlate
+                          left={Math.ceil((restUntil - now) / 1000)}
+                        />
+                        <span className="rest-copy">
+                          <span className="rest-kicker">Resting</span>
+                          <strong>{REST_SECONDS}s between sets</strong>
+                        </span>
+                        <button
+                          className="rest-skip"
+                          onClick={() => setRestUntil(null)}
+                        >
+                          Skip
+                        </button>
+                      </div>
                     ) : (
                       <button
                         onClick={() => {
                           setNow(Date.now());
-                          setRestUntil(Date.now() + 90000);
+                          setRestUntil(Date.now() + REST_MS);
                         }}
                       >
                         <Timer size={18} />
-                        90s rest timer
+                        {REST_SECONDS}s rest timer
                       </button>
                     )}
                   </div>
@@ -1227,7 +1276,7 @@ function Journal({
                                   edit({ done: !s.done });
                                   if (!s.done) {
                                     setNow(Date.now());
-                                    setRestUntil(Date.now() + 90000);
+                                    setRestUntil(Date.now() + REST_MS);
                                   }
                                 }}
                               >
