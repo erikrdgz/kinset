@@ -1746,18 +1746,88 @@ dialog.modal-backdrop::backdrop {
 
 .motion-scrub {
   display: block;
-  margin-top: 12px;
-  font-size: 11px;
-  color: var(--muted);
+  margin-top: 14px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a89b8d;
 }
+/* Rep position as a loaded bar with plate ticks, rather than the platform
+   slider with an accent colour on it. The same vocabulary as the rest plate:
+   orange for what is loaded, a dark groove for what is not. */
 .motion-scrub input {
+  --pos: 0%;
   display: block;
   width: 100%;
-  margin: 7px 0 0;
+  margin: 10px 0 0;
   padding: 0;
-  height: 24px;
-  accent-color: #ff692b;
+  height: 26px;
+  background: none;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* A collar on the bar: orange with a dark core, like the plate's hole. */
+.motion-scrub input::-webkit-slider-runnable-track {
+  height: 10px;
+  background:
+    repeating-linear-gradient(
+        90deg,
+        transparent 0 calc(12.5% - 2px),
+        #19140f calc(12.5% - 2px) 12.5%
+      ),
+    linear-gradient(
+      90deg,
+      var(--orange) 0 var(--pos),
+      #3a332d var(--pos) 100%
+    );
+  box-shadow: inset 0 0 0 1px #4b4138;
+}
+.motion-scrub input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 26px;
+  margin-top: -8px;
+  border: 0;
+  border-radius: 0;
+  background: var(--orange);
+  box-shadow:
+    inset 0 0 0 3px #19140f,
+    0 0 0 1px #19140f;
+}
+.motion-scrub input::-moz-range-track {
+  height: 10px;
+  background:
+    repeating-linear-gradient(
+        90deg,
+        transparent 0 calc(12.5% - 2px),
+        #19140f calc(12.5% - 2px) 12.5%
+      ),
+    #3a332d;
+  box-shadow: inset 0 0 0 1px #4b4138;
+}
+.motion-scrub input::-moz-range-progress {
+  height: 10px;
+  background: var(--orange);
+}
+.motion-scrub input::-moz-range-thumb {
+  width: 14px;
+  height: 26px;
+  border: 0;
+  border-radius: 0;
+  background: var(--orange);
+  box-shadow:
+    inset 0 0 0 3px #19140f,
+    0 0 0 1px #19140f;
+}
+/* Condensed caps on the playback row, so it matches the rest strip. */
+.motion-controls .motion-play,
+.motion-views button {
+  font-family: "Barlow Condensed", sans-serif;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 .modal-header h2 {

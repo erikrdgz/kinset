@@ -1,4 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import type React from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useProgress, useGLTF } from "@react-three/drei";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
@@ -333,6 +334,13 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
           step="0.05"
           value={progress}
           aria-label="Movement position"
+          /* Drives the loaded part of the track; WebKit gives no progress
+             pseudo-element, so the fill is a gradient stop. */
+          style={
+            {
+              "--pos": `${(progress / motionDuration(movement)) * 100}%`,
+            } as React.CSSProperties
+          }
           onChange={(event) => {
             const time = Number(event.target.value);
             setPlaying(false);
