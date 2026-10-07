@@ -780,12 +780,12 @@ function Journal({
           <div className="mobile-brand">
             <Brand />
           </div>
-          <div className="sync-status">
+          {owner !== "demo" && <div className="sync-status">
             <span
               className={journal.status === "Synced" ? "synced" : "local"}
             />
             {journal.status}
-          </div>
+          </div>}
         </header>
         <main key={tab} className="workspace page-enter" aria-label={tab}>
           {journal.conflict && (
@@ -1469,7 +1469,7 @@ function Journal({
             target="_blank"
             rel="noreferrer"
           >
-            Model credits
+            3D anatomy credits
           </a>
         </footer>
       </div>
@@ -1562,7 +1562,7 @@ function Journal({
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Model credits · CC BY-SA
+                  3D anatomy credits · CC BY-SA
                 </a>
               </p>
             )}

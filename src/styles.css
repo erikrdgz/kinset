@@ -1627,7 +1627,7 @@ dialog.modal-backdrop::backdrop {
 .plan-save,
 .plan-day-order {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   flex-wrap: wrap;
   gap: 14px;
   margin: 22px 0;
@@ -3815,4 +3815,41 @@ body .kinset-select-menu {
     outline: 1px solid #ff9b6b;
     outline-offset: 3px;
   }
+}
+
+/* Plan actions keep their proportions when labels wrap or space gets tight. */
+.plan-actions > button,
+.plan-save > button,
+.saved-plan-heading > button {
+  min-height: 52px;
+  line-height: 1.25;
+  gap: 10px;
+}
+.plan-actions > button > svg,
+.plan-save > button > svg { flex-shrink: 0; }
+.saved-plan-heading > div,
+.saved-plan-days > div > div,
+.plan-exercise-heading > div { min-width: 0; overflow-wrap: anywhere; }
+.saved-plan-heading > button,
+.saved-plan-days > div > button,
+.plan-picker-list > div > .text-button {
+  flex-shrink: 0;
+  align-self: center;
+  white-space: nowrap;
+}
+.plan-reorder button { width: 44px; flex: 0 0 44px; }
+.plan-pick-name { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .plan-save { bottom: calc(65px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 600px) {
+  .plan-actions { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .plan-actions > button { width: 100%; }
+  .plan-save { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .plan-save > button { justify-content: center; }
+  .saved-plan-heading { flex-wrap: wrap; }
+}
+
+@media (max-width: 760px) {
+  body .topbar { justify-content: space-between; }
 }
