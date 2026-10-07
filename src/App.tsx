@@ -1465,7 +1465,7 @@ function Journal({
           </span>
           <a
             className="model-credit"
-            href={import.meta.env.BASE_URL + "models/ATTRIBUTION.md"}
+            href={import.meta.env.BASE_URL + "models/credits.html"}
             target="_blank"
             rel="noreferrer"
           >
@@ -1558,7 +1558,7 @@ function Journal({
               <p className="model-credit">
                 Z-Anatomy / BodyParts3D ·{" "}
                 <a
-                  href={import.meta.env.BASE_URL + "models/ATTRIBUTION.md"}
+                  href={import.meta.env.BASE_URL + "models/credits.html"}
                   target="_blank"
                   rel="noreferrer"
                 >
