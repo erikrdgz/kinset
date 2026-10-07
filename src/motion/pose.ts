@@ -47,8 +47,11 @@ const QUAD_BALL_Z = -0.7;
 const QUAD_HAND_Y = 0.108;
 const PUSH_BALL_Z = -0.78;
 const PUSH_ANKLE = -0.2;
-const PUSH_DEPTH = 0.18;
+/** Plank angle at the top of the rep, and how far the body tips into the bottom. */
+const PUSH_TOP = 0.806;
+const PUSH_DEPTH = 0.108;
 const PUSH_HAND_Y = 0.715;
+const PUSH_HAND_Z = 0.43;
 const BRIDGE_HAND_Y = 0.108;
 const FLOOR_FEET_Z = 0.56;
 const CALF_RAISE = 0.7;
@@ -236,7 +239,7 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
   }
   if (movement === "pushup") {
     // Straight line from the balls of the feet; the body pivots over the toes.
-    tilt = 0.9 + PUSH_DEPTH * u;
+    tilt = PUSH_TOP + PUSH_DEPTH * u;
     hip
       .copy(ankleOver(v(0, 0.0152, PUSH_BALL_Z), tilt + PUSH_ANKLE))
       .add(v(0, 0.805, -0.014).applyQuaternion(rx(tilt)));
@@ -408,15 +411,20 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
       aim(upper, lower, v(sign * 0.08, -1, 0));
       aim(lower, hand, v(0, -1, 0.05));
     } else if (id === "goodmorning") {
+      // Forearms crossed over the chest, as the guide describes. Both offsets
+      // ride the torso's hinge; in world space they slid off the chest and ended
+      // up in front of the face at the bottom of the rep.
+      const lean = rx(tilt);
       ik(
         upper,
         lower,
         hand,
-        pos("spine_03").add(v(-sign * 0.1, 0, 0.12)),
-        v(sign * 0.5, -1, 0),
+        pos("spine_03").add(v(-sign * 0.14, -0.02, 0.085).applyQuaternion(lean)),
+        v(sign * 0.7, -1, 0.15).applyQuaternion(lean),
       );
     } else if (["lateral", "frontraise", "reversefly"].includes(id)) {
-      const angle = (id === "frontraise" ? 1.4 : 1.3) * u;
+      // Finish level with the shoulder; both used to stop short of horizontal.
+      const angle = (id === "frontraise" ? 1.52 : 1.5) * u;
       const direction =
         id === "frontraise"
           ? v(sign * 0.02, -Math.cos(angle), Math.sin(angle))
@@ -455,14 +463,14 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         upper,
         lower,
         hand,
-        v(sign * 0.15, PUSH_HAND_Y, 0.43),
+        v(sign * 0.15, PUSH_HAND_Y, PUSH_HAND_Z),
         v(sign * 0.2, -0.3, -1),
       );
     } else if (movement === "curl") {
       aim(upper, lower, v(sign * 0.08, -1, 0.04));
       const angle =
         0.12 +
-        2.05 * (id === "altcurl" && (suffix === "l") !== alternate ? 0 : u);
+        2.4 * (id === "altcurl" && (suffix === "l") !== alternate ? 0 : u);
       aim(lower, hand, v(sign * 0.025, -Math.cos(angle), Math.sin(angle)));
     } else if (movement === "press") {
       aim(upper, lower, v(sign * (0.95 - 0.82 * u), 0.08 + 0.92 * u, 0.12));
@@ -500,7 +508,7 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         upper,
         lower,
         hand,
-        v(sign * 0.26, PUSH_HAND_Y, 0.43),
+        v(sign * 0.26, PUSH_HAND_Y, PUSH_HAND_Z),
         v(sign * 0.7, -0.3, -0.5),
       );
     } else if (movement === "bird") {
@@ -545,7 +553,9 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         movement,
       ) &&
       !(id === "row" && suffix === "l") &&
-      id !== "deadbug";
+      id !== "deadbug" &&
+      // Nothing to hold: the hands rest flat on the chest.
+      id !== "goodmorning";
     if (grips)
       for (const b of rig.bones.values())
         if (

@@ -10,7 +10,7 @@ import {
   baseMovement,
   motionDuration,
   floorMovements,
-  sideFirst,
+  opensFromSide,
   motionCue,
 } from "./motion/catalog";
 import { applyPose, prepareRig } from "./motion/pose";
@@ -230,7 +230,7 @@ export default function ExerciseDemo({ exercise }: { exercise: Exercise }) {
       () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     ),
     [speed, setSpeed] = useState(1),
-    [side, setSide] = useState(sideFirst.has(baseMovement(movement))),
+    [side, setSide] = useState(opensFromSide(movement)),
     [reset, setReset] = useState(0),
     [hidden, setHidden] = useState(document.hidden);
   useEffect(() => {

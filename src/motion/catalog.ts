@@ -72,6 +72,8 @@ export const floorMovements = new Set<Movement>([
   "pushup",
   "legpress",
 ]);
+/** Movements whose shape only reads from the side. A front view foreshortens a
+    front raise into hanging arms and folds a split squat into one leg. */
 export const sideFirst = new Set<Movement>([
   "rdl",
   "row",
@@ -80,7 +82,19 @@ export const sideFirst = new Set<Movement>([
   "bridge",
   "bird",
   "legpress",
+  "frontraise",
+  "split",
+  "lunge",
+  "calf",
+  "dbcalf",
 ]);
+/** Variants that need the opposite of the movement they are built on: both of
+    these travel sideways, which the side camera hides. */
+const frontFirst = new Set<Movement>(["reversefly", "hydrant"]);
+export function opensFromSide(id: Movement) {
+  if (frontFirst.has(id)) return false;
+  return sideFirst.has(id) || sideFirst.has(baseMovement(id));
+}
 export const motionCue: Record<BaseMovement, string> = {
   squat: "Lower with control · stand tall",
   goblet: "Keep the weight at your chest · sit down and stand",

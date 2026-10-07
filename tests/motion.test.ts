@@ -58,12 +58,13 @@ describe("movement previews", () => {
         samples.push([
           ...pose.hands.flatMap((h) => h.toArray()),
           ...pose.ankles.flatMap((a) => a.toArray()),
-          ...rig.bones
-            .get("pelvis")!
-            .bone.getWorldPosition(new Vector3())
-            .toArray(),
+          ...["pelvis", "spine_03"].flatMap((bone) =>
+            rig.bones.get(bone)!.bone.getWorldPosition(new Vector3()).toArray(),
+          ),
         ]);
       }
+      // A press with planted hands moves the chest, not the hands, ankles or
+      // pelvis, so the torso has to be in the sample for this to mean anything.
       expect(
         samples.some((s) =>
           s.some(
