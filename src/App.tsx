@@ -988,7 +988,9 @@ function Journal({
                         <small>
                           {e.muscle}
                           {demoIds.has(e.id) && (
-                            <span className="watch-demo-label"> ▶</span>
+                            <span className="watch-demo-label">
+                              <Play size={11} aria-label="Has a 3D demo" />
+                            </span>
                           )}
                         </small>
                       </span>
@@ -1375,9 +1377,14 @@ function Journal({
                                 {e.muscle} · {e.equipment}
                               </small>
                               <span className="watch-demo-label">
-                                {demoIds.has(e.id)
-                                  ? "▶ Watch demo · Read guide"
-                                  : "Read movement guide"}
+                                {demoIds.has(e.id) ? (
+                                  <>
+                                    <Play size={11} aria-hidden="true" />
+                                    Watch demo · Read guide
+                                  </>
+                                ) : (
+                                  "Read movement guide"
+                                )}
                               </span>
                             </span>
                             {inlineViewer ? (

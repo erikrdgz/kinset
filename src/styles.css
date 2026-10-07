@@ -1665,10 +1665,19 @@ dialog.modal-backdrop::backdrop {
   color: var(--muted);
 }
 .watch-demo-label {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   color: #ff9a69;
   font-size: 0.75rem;
   margin-top: 6px;
+}
+/* The play mark is a drawn triangle, so it fills and aligns with the text
+   instead of relying on whatever the font has at U+25B6. */
+.watch-demo-label > svg {
+  flex-shrink: 0;
+  fill: currentColor;
+  stroke-width: 1;
 }
 .movement-name .watch-demo-label {
   margin-top: 0;
