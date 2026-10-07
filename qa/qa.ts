@@ -5,6 +5,8 @@
 import {
   AmbientLight,
   BoxGeometry,
+  CylinderGeometry,
+  Quaternion,
   Color,
   DirectionalLight,
   GridHelper,
@@ -43,6 +45,7 @@ const PHASES = MS
   ? MS.map(() => PHASE)
   : (params.get("phases") ?? "0,0.2,0.45,0.62,0.8").split(",").map(Number);
 const SIDE = params.get("view") === "side";
+const WEIGHTS = params.get("weights") !== "0";
 const LOW = floorMovements.has(baseMovement(MOVEMENT));
 const GAP = Number(params.get("gap") ?? (LOW ? "2.2" : "1.5"));
 const span = (PHASES.length - 1) * GAP;
@@ -106,7 +109,39 @@ if (MOVEMENT === "seatedpress") {
 }
 if (["floor", "bridge", "bird"].includes(base)) props.push(...equipment.mat());
 
-const rigs: { rig: Rig; group: Group; x: number; props?: Mesh[] }[] = [];
+/* A dumbbell, so a grip can be judged against the thing it is holding. Its bar
+   lies along x, matching the app's, and the hand carries it round. */
+const BAR_IN_HAND = new Quaternion().setFromUnitVectors(
+  new Vector3(1, 0, 0),
+  new Vector3(0, 0, 1),
+);
+function dumbbell() {
+  const g = new Group();
+  const bar = new Mesh(
+    new CylinderGeometry(0.017, 0.017, 0.23, 16),
+    new MeshStandardMaterial({ color: "#9d9fa0", metalness: 0.7, roughness: 0.3 }),
+  );
+  bar.rotation.z = Math.PI / 2;
+  g.add(bar);
+  for (const side of [-1, 1]) {
+    const plate = new Mesh(
+      new CylinderGeometry(0.075, 0.075, 0.07, 6),
+      new MeshStandardMaterial({ color: "#e55d28", roughness: 0.6 }),
+    );
+    plate.position.x = side * 0.11;
+    plate.rotation.z = Math.PI / 2;
+    g.add(plate);
+  }
+  return g;
+}
+
+const rigs: {
+  rig: Rig;
+  group: Group;
+  x: number;
+  props?: Mesh[];
+  weights?: Group[];
+}[] = [];
 
 new GLTFLoader().load("/motion/trainer.glb", (gltf) => {
   PHASES.forEach((_, i) => {
@@ -146,8 +181,8 @@ function render() {
     const mv = MS?.[i] ?? MOVEMENT;
     // In sweep mode a phase means a position within one rep, so alternating
     // movements (two reps per cycle) line up with the rest.
-    const span = MS ? REP : motionDuration(mv);
-    applyPose(r.rig, mv, span * (PHASES[i] ?? 0));
+    const repSpan = MS ? REP : motionDuration(mv);
+    const pose = applyPose(r.rig, mv, repSpan * (PHASES[i] ?? 0));
     r.group.position.copy(right.clone().multiplyScalar(r.x));
     // One copy of each prop per rig, so every pose has its own to touch.
     if (!r.props) {
@@ -155,6 +190,16 @@ function render() {
         const c = m.clone();
         r.group.add(c);
         return c;
+      });
+    }
+    if (WEIGHTS) {
+      if (!r.weights) {
+        r.weights = [dumbbell(), dumbbell()];
+        r.weights.forEach((w) => r.group.add(w));
+      }
+      r.weights.forEach((w, slot) => {
+        w.position.copy(pose.hands[slot]);
+        w.quaternion.copy(pose.holds[slot]).multiply(BAR_IN_HAND);
       });
     }
   });

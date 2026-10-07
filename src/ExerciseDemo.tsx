@@ -2,7 +2,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useProgress, useGLTF } from "@react-three/drei";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { Group, Mesh, MeshStandardMaterial } from "three";
+import { Group, Mesh, MeshStandardMaterial, Quaternion, Vector3 } from "three";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import type { Exercise } from "./domain";
 import {
@@ -24,6 +24,12 @@ import {
 } from "./motion/Equipment";
 /** Demos play 25% faster than the base pose timing (a 3.2 s rep); 1× and 0.5× stay relative to this. */
 const MOTION_RATE = 1.25;
+/* A dumbbell's bar lies along its own x, and runs across the palm from the
+   index knuckle to the pinky, which is the hand bone's local z. */
+const BAR_IN_HAND = new Quaternion().setFromUnitVectors(
+  new Vector3(1, 0, 0),
+  new Vector3(0, 0, 1),
+);
 function Camera({ side, movement }: { side: boolean; movement: Movement }) {
   const { camera, invalidate } = useThree();
   useEffect(() => {
@@ -127,16 +133,16 @@ function Trainer({
       onProgress(time);
     }
     const pose = applyPose(rig, movement, elapsed.current);
-    if (left.current) left.current.position.copy(pose.hands[0]);
-    if (right.current) right.current.position.copy(pose.hands[1]);
-    if (left.current)
-      left.current.rotation.y = ["hammer", "closefloor"].includes(movement)
-        ? Math.PI / 2
-        : 0;
-    if (right.current)
-      right.current.rotation.y = ["hammer", "closefloor"].includes(movement)
-        ? Math.PI / 2
-        : 0;
+    // The weight turns with the grip, so a neutral hold or a supinating curl
+    // carries the dumbbell round with it.
+    for (const [slot, held] of [
+      [0, left],
+      [1, right],
+    ] as const) {
+      if (!held.current) continue;
+      held.current.position.copy(pose.hands[slot]);
+      held.current.quaternion.copy(pose.holds[slot]).multiply(BAR_IN_HAND);
+    }
     if (goblet.current) {
       goblet.current.position
         .copy(pose.hands[0])

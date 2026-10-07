@@ -317,6 +317,8 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         .multiply(get("neck_01").worldQ),
     );
   const hands: Vector3[] = [];
+  /** Hand rotations, so a held weight can turn with the grip. */
+  const holds: Quaternion[] = [];
   const ankles: Vector3[] = [];
   for (const [index, suffix, sign] of [
     [0, "l", 1],
@@ -616,6 +618,7 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
             .multiply(new Quaternion().setFromAxisAngle(xAxis, 1.2));
     get(hand).bone.updateWorldMatrix(false, true);
     hands[index] = get(hand).bone.localToWorld(v(0, 0.075, 0));
+    holds[index] = get(hand).bone.getWorldQuaternion(new Quaternion());
   }
   // Leg press plate face sits flush under both soles.
   const plate =
@@ -627,5 +630,5 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
           .add(soleCentre.clone().applyQuaternion(rx(pressTilt)))
           .addScaledVector(sled, 0.025)
       : null;
-  return { u, hands, ankles, plate };
+  return { u, hands, holds, ankles, plate };
 }
