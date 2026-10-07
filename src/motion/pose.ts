@@ -1,5 +1,6 @@
 import {
   Bone,
+  Matrix4,
   Mesh,
   MeshStandardMaterial,
   Object3D,
@@ -55,10 +56,13 @@ const PUSH_HAND_Z = 0.43;
 const BRIDGE_HAND_Y = 0.108;
 const FLOOR_FEET_Z = 0.56;
 const CALF_RAISE = 0.7;
-const SPLIT_DROP = 0.26;
-const SPLIT_BALL_Z = -0.62;
-const LUNGE_DROP = 0.3;
-const LUNGE_BALL_Z = -0.6;
+/** Plantarflexion ceiling for a rear foot up on its ball, in radians. Past
+    roughly 0.6 the ball swings behind the ankle and the toes face backwards. */
+const REAR_FOOT_MAX = 0.6;
+const SPLIT_DROP = 0.22;
+const SPLIT_BALL_Z = -0.52;
+const LUNGE_DROP = 0.26;
+const LUNGE_BALL_Z = -0.50;
 const PRESS_HIP = [0.43, -0.37] as const;
 const PRESS_RECLINE = -1.05;
 const PRESS_REACH = [0.436, 0.393] as const;
@@ -141,6 +145,23 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         .multiply(b.worldQ),
     );
   };
+  /**
+   * Point a hand deliberately: `along` runs wrist to fingertips, `face` is the
+   * way the palm looks. `aim` only matches a direction and leaves the roll to
+   * the shortest arc, so a palm set that way faces wherever it lands.
+   * The bind pose is anatomical, so the hand's local +Y is the fingers and its
+   * local +Z is the palm normal.
+   */
+  const setHand = (name: string, along: Vector3, face: Vector3) => {
+    const y = along.clone().normalize();
+    const z = face.clone().addScaledVector(y, -face.dot(y)).normalize();
+    orient(
+      name,
+      new Quaternion().setFromRotationMatrix(
+        new Matrix4().makeBasis(new Vector3().crossVectors(y, z), y, z),
+      ),
+    );
+  };
   const ik = (
     a: string,
     b: string,
@@ -172,6 +193,9 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
   /**
    * Stands a foot on its ball with the toes flat. `rel` holds the ankle relative to the shin
    * (+ points the toes); `weight` blends from a flat foot (0) to the ball stance (1).
+   * `limit` caps plantarflexion: the foot follows the shin, and a shin that pitches
+   * far enough will otherwise swing the ball behind the ankle, which points the
+   * toes backwards.
    */
   const plant = (
     s: string,
@@ -179,11 +203,12 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
     rel: number,
     pole: Vector3,
     weight = 1,
+    limit = Infinity,
   ) => {
     let tilt = 0;
     for (let i = 0; i < 4; i++) {
       ik("thigh_" + s, "calf_" + s, "foot_" + s, ankleOver(ball, tilt), pole);
-      tilt = weight * (shinPitch(s) + rel);
+      tilt = Math.min(limit, weight * (shinPitch(s) + rel));
     }
     ik("thigh_" + s, "calf_" + s, "foot_" + s, ankleOver(ball, tilt), pole);
     return tilt;
@@ -396,7 +421,7 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         toesFlat(suffix, 1);
       }
     } else if (ball) {
-      footTilt = plant(suffix, ball, ballAnkle, pole, ballWeight);
+      footTilt = plant(suffix, ball, ballAnkle, pole, ballWeight, REAR_FOOT_MAX);
     } else ik(thigh, calf, foot, ankle, pole);
     if (movement === "floor" && id === "deadbug") footFollows(suffix, 0.15);
     else if (movement !== "bird") {
@@ -430,7 +455,9 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
           ? v(sign * 0.02, -Math.cos(angle), Math.sin(angle))
           : v(sign * Math.sin(angle), -Math.cos(angle), 0.12);
       aim(upper, lower, direction);
-      aim(lower, hand, direction.clone().add(v(0, 0.04, 0.08)));
+      const forearm = direction.clone().add(v(0, 0.04, 0.08));
+      aim(lower, hand, forearm);
+      setHand(hand, forearm, v(0, -1, 0));
     } else if (id === "bentrow") {
       aim(upper, lower, v(sign * 0.04, -Math.cos(1.6 * u), -Math.sin(1.6 * u)));
       aim(lower, hand, v(0, -1, 0.1));
@@ -524,6 +551,9 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         v(sign * 0.4, 1.53 - 0.48 * u, 0.13),
         v(sign * 1, -0.2, 0),
       );
+      // The bar runs across the body, so the palm has to look down onto it
+      // rather than along it.
+      setHand(hand, v(0, -0.25, 0.97), v(0, -1, 0));
     } else if (movement === "legpress") {
       ik(upper, lower, hand, v(sign * 0.27, 0.34, -0.28), v(sign * 1, -1, 0));
     } else {
@@ -539,14 +569,12 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
     }
     if (id === "narrowpushup")
       orient(hand, new Quaternion().setFromUnitVectors(v(0, 1, 0), v(0, 0, 1)));
+    // Neutral grips face the body's midline: the palms look at each other.
     if (id === "hammer" || id === "closefloor")
-      orient(
+      setHand(
         hand,
-        get(hand)
-          .bone.getWorldQuaternion(new Quaternion())
-          .multiply(
-            new Quaternion().setFromAxisAngle(v(0, 1, 0), (sign * Math.PI) / 2),
-          ),
+        get(hand).bone.localToWorld(v(0, 1, 0)).sub(pos(hand)),
+        v(-sign, 0, 0),
       );
     const grips =
       ["curl", "press", "rdl", "row", "floor", "goblet", "pulldown"].includes(

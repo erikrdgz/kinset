@@ -281,3 +281,91 @@ describe("joint limits and contact", () => {
     }
   });
 });
+
+/* Orientation, not position. A hand can sit exactly where it belongs with the
+   palm facing backwards, and a foot can stand on the right spot with the toes
+   pointing behind it, so these read the bones' own axes.
+   The bind pose is anatomical: arms out, palms forward. So the hand's local +Y
+   runs wrist to fingertips and its local +Z is the palm normal. The foot is
+   flat at rest, so its sole is world-down carried through the bone's rotation. */
+describe("hand and foot orientation", () => {
+  const palm = (rig: ReturnType<typeof prepareRig>, side: string) =>
+    new Vector3(0, 0, 1).applyQuaternion(
+      rig.bones.get("hand_" + side)!.bone.getWorldQuaternion(new Quaternion()),
+    );
+  const sole = (rig: ReturnType<typeof prepareRig>, side: string) => {
+    const foot = rig.bones.get("foot_" + side)!;
+    return new Vector3(0, -1, 0).applyQuaternion(
+      foot.bone
+        .getWorldQuaternion(new Quaternion())
+        .multiply(foot.worldQ.clone().invert()),
+    );
+  };
+  const place = (rig: ReturnType<typeof prepareRig>, name: string) =>
+    rig.bones.get(name)!.bone.getWorldPosition(new Vector3());
+
+  it.each(["pushup", "narrowpushup", "bridge", "bird", "donkey", "hydrant"] as const)(
+    "%s rests its supporting palms on the surface, not on their edge",
+    (movement) => {
+      const rig = rigFromAsset();
+      for (let i = 0; i < 12; i++) {
+        applyPose(rig, movement, (motionDuration(movement) * i) / 12);
+        for (const side of ["l", "r"]) {
+          // Only the planted hand: bird dog reaches the other one forward.
+          if (place(rig, "hand_" + side).y > 0.25) continue;
+          expect(palm(rig, side).y).toBeLessThan(-0.8);
+        }
+      }
+    },
+  );
+
+  it.each(["hammer", "closefloor"] as const)(
+    "%s holds a neutral grip, with the palms facing each other",
+    (movement) => {
+      const rig = rigFromAsset();
+      applyPose(rig, movement, REP * 0.45);
+      expect(palm(rig, "l").x).toBeLessThan(-0.9);
+      expect(palm(rig, "r").x).toBeGreaterThan(0.9);
+    },
+  );
+
+  it.each(["lateral", "reversefly"] as const)(
+    "%s finishes the raise palm-down",
+    (movement) => {
+      const rig = rigFromAsset();
+      applyPose(rig, movement, REP * 0.45);
+      for (const side of ["l", "r"])
+        expect(palm(rig, side).y).toBeLessThan(-0.9);
+    },
+  );
+
+  it("grips the pulldown bar across it rather than along it", () => {
+    const rig = rigFromAsset();
+    for (let i = 0; i < 12; i++) {
+      applyPose(rig, "pulldown", (REP * i) / 12);
+      for (const side of ["l", "r"]) {
+        // The bar runs along x, so a palm pointing that way is a hand turned
+        // ninety degrees out of its grip.
+        expect(Math.abs(palm(rig, side).x)).toBeLessThan(0.3);
+        expect(palm(rig, side).y).toBeLessThan(-0.8);
+      }
+    }
+  });
+
+  it.each(["split", "lunge"] as const)(
+    "%s keeps the rear toes pointing forward",
+    (movement) => {
+      const rig = rigFromAsset();
+      for (let i = 0; i < 16; i++) {
+        applyPose(rig, movement, (motionDuration(movement) * i) / 16);
+        for (const side of ["l", "r"]) {
+          const ball = place(rig, "ball_" + side);
+          if (ball.y > 0.06) continue; // mid-step, off the floor
+          const ankle = place(rig, "foot_" + side);
+          expect(ball.z).toBeGreaterThan(ankle.z);
+          expect(sole(rig, side).y).toBeLessThan(0.1);
+        }
+      }
+    },
+  );
+});

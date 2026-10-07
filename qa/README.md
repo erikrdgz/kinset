@@ -25,6 +25,22 @@ wrist height, and how far the arm is extended (1.00 is straight). Reading the
 numbers beats reading a screenshot; the preview cameras sit at an angle, so a
 limb's direction is easy to misjudge by eye.
 
+## `orient.ts` — hand and foot rotation
+
+```
+npx vite-node qa/orient.ts [movement ...]
+```
+
+Position checks pass happily while a palm faces backwards or a toe points
+behind the ankle, so this reads the bones' own axes. The bind pose is
+anatomical (arms out, palms forward), which makes the hand's local +Y the
+fingers and its local +Z the palm normal; the foot is flat at rest, so its
+local +Y is the toe. The sole is better taken as world-down carried through
+the bone's rotation, since the foot's local +Z sits 31 degrees off it.
+
+Prints the convention from the rest pose first, then a row per movement and
+side.
+
 ## `qa.html` + `qa.ts` — visual harness
 
 Served by `npm run dev`. Two modes:
