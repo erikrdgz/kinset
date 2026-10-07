@@ -2,7 +2,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useProgress, useGLTF } from "@react-three/drei";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { Group, Mesh, MeshStandardMaterial, Vector3 } from "three";
+import { Group, Mesh, MeshStandardMaterial } from "three";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import type { Exercise } from "./domain";
 import {
@@ -22,14 +22,20 @@ import {
   ExerciseMat,
   Beam,
 } from "./motion/Equipment";
-/** Demos play 25% faster than the base pose timing; 1× and 0.5× stay relative to this. */
+/** Demos play 25% faster than the base pose timing (a 3.2 s rep); 1× and 0.5× stay relative to this. */
 const MOTION_RATE = 1.25;
-const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
 function Camera({ side, movement }: { side: boolean; movement: Movement }) {
   const { camera, invalidate } = useThree();
   useEffect(() => {
     const low = floorMovements.has(baseMovement(movement));
-    const target = movement === "row" ? 0.7 : low ? 0.45 : 1.05;
+    const target =
+      movement === "row"
+        ? 0.7
+        : movement === "legpress"
+          ? 0.65
+          : low
+            ? 0.45
+            : 1.05;
     camera.position.set(
       side ? (low ? 3.2 : 4) : low ? 2.5 : 0.7,
       low ? 1.6 : 1.55,
@@ -150,12 +156,7 @@ function Trainer({
         cable.current.scale.y = 2.05 - midpoint.y;
       }
     }
-    if (plate.current)
-      plate.current.position
-        .copy(pose.ankles[0])
-        .add(pose.ankles[1])
-        .multiplyScalar(0.5)
-        .add(v(0, 0.04, 0.17));
+    if (plate.current && pose.plate) plate.current.position.copy(pose.plate);
   });
   const base = baseMovement(movement);
   const pair = [

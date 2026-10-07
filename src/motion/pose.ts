@@ -6,9 +6,60 @@ import {
   Quaternion,
   Vector3,
 } from "three";
-import { baseMovement, type Movement } from "./catalog";
+import { REP, baseMovement, lowersFirst, type Movement } from "./catalog";
 const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
 const xAxis = v(1, 0, 0);
+const zAxis = v(0, 0, 1);
+const rx = (angle: number) => new Quaternion().setFromAxisAngle(xAxis, angle);
+/** Pitch of a direction about the x axis; rx(a) adds a to it. */
+const pitch = (d: Vector3) => Math.atan2(d.z, d.y);
+const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+const smoother = (x: number) => x * x * x * (x * (x * 6 - 15) + 10);
+/** Concentric: leave the start smoothly, drive through the middle, ease into the end range. */
+const drive = (x: number) => smoother(x);
+/** Eccentric: controlled throughout, with a longer deceleration into the stretch. */
+const control = (x: number) => smoother(1 - Math.pow(1 - x, 1.4));
+/**
+ * Rep position, 0 at the start and 1 at the end range. Each rep has a hold at both ends
+ * and an eccentric that takes longer than the concentric.
+ */
+export function tempo(id: Movement, time: number) {
+  const p = (((time % REP) + REP) % REP) / REP;
+  if (lowersFirst.has(id)) {
+    if (p < 0.4) return control(p / 0.4);
+    if (p < 0.5) return 1;
+    if (p < 0.8) return 1 - drive((p - 0.5) / 0.3);
+    return 0;
+  }
+  if (p < 0.3) return drive(p / 0.3);
+  if (p < 0.46) return 1;
+  if (p < 0.86) return 1 - control((p - 0.46) / 0.4);
+  return 0;
+}
+/** Leg press sled travel in the plate's normal direction. */
+const sled = v(0, Math.SQRT1_2, Math.SQRT1_2);
+/** Rest sole centre relative to the ankle, used to seat the leg press plate. */
+const soleCentre = v(0, -0.1037, 0.089);
+const pressTilt = (-3 * Math.PI) / 4;
+// Contact tuning, measured against the mesh in QA.
+const QUAD_HIP = 0.515;
+const QUAD_BALL_Z = -0.7;
+const QUAD_HAND_Y = 0.108;
+const PUSH_BALL_Z = -0.78;
+const PUSH_ANKLE = -0.2;
+const PUSH_DEPTH = 0.18;
+const PUSH_HAND_Y = 0.715;
+const BRIDGE_HAND_Y = 0.108;
+const FLOOR_FEET_Z = 0.56;
+const CALF_RAISE = 0.7;
+const SPLIT_DROP = 0.26;
+const SPLIT_BALL_Z = -0.62;
+const LUNGE_DROP = 0.3;
+const LUNGE_BALL_Z = -0.6;
+const PRESS_HIP = [0.43, -0.37] as const;
+const PRESS_RECLINE = -1.05;
+const PRESS_REACH = [0.436, 0.393] as const;
+const PRESS_TRAVEL = 0.21;
 export type RestBone = {
   bone: Bone;
   q: Quaternion;
@@ -61,7 +112,8 @@ export function solveJoint(
 }
 export function applyPose(rig: Rig, id: Movement, time: number) {
   const movement = baseMovement(id);
-  const u = (1 - Math.cos((time / 4.8) * Math.PI * 2)) / 2;
+  const u = tempo(id, time);
+  const alternate = Math.floor(time / REP) % 2 === 0;
   const get = (name: string) => rig.bones.get(name)!;
   const pos = (name: string) => get(name).bone.getWorldPosition(new Vector3());
   for (const b of rig.bones.values()) {
@@ -100,6 +152,60 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
     aim(a, b, joint.clone().sub(origin));
     aim(b, c, target.clone().sub(pos(b)));
   };
+  // Toe offset from the ankle at rest; the same for both feet apart from x.
+  const ballRel = get("ball_l").worldP.clone().sub(get("foot_l").worldP);
+  ballRel.x = 0;
+  const shinPitch = (s: string) =>
+    wrap(
+      pitch(pos("foot_" + s).sub(pos("calf_" + s))) -
+        pitch(
+          get("foot_" + s)
+            .worldP.clone()
+            .sub(get("calf_" + s).worldP),
+        ),
+    );
+  const ankleOver = (ball: Vector3, tilt: number) =>
+    ball.clone().sub(ballRel.clone().applyQuaternion(rx(tilt)));
+  /**
+   * Stands a foot on its ball with the toes flat. `rel` holds the ankle relative to the shin
+   * (+ points the toes); `weight` blends from a flat foot (0) to the ball stance (1).
+   */
+  const plant = (
+    s: string,
+    ball: Vector3,
+    rel: number,
+    pole: Vector3,
+    weight = 1,
+  ) => {
+    let tilt = 0;
+    for (let i = 0; i < 4; i++) {
+      ik("thigh_" + s, "calf_" + s, "foot_" + s, ankleOver(ball, tilt), pole);
+      tilt = weight * (shinPitch(s) + rel);
+    }
+    ik("thigh_" + s, "calf_" + s, "foot_" + s, ankleOver(ball, tilt), pole);
+    return tilt;
+  };
+  /** Foot follows the shin, turned by `rel` about the leg's own side axis. */
+  const footFollows = (s: string, rel: number) => {
+    const c = get("calf_" + s);
+    const turn = c.bone
+      .getWorldQuaternion(new Quaternion())
+      .multiply(c.worldQ.clone().invert());
+    const side = xAxis.clone().applyQuaternion(turn);
+    orient(
+      "foot_" + s,
+      new Quaternion()
+        .setFromAxisAngle(side, rel)
+        .multiply(turn)
+        .multiply(get("foot_" + s).worldQ),
+    );
+  };
+  /** Toes lie flat on the floor at 1 and follow the foot at 0. */
+  const toesFlat = (s: string, amount: number) => {
+    const ball = get("ball_" + s);
+    const follow = ball.bone.getWorldQuaternion(new Quaternion());
+    orient("ball_" + s, follow.slerp(ball.worldQ, amount));
+  };
   let tilt = 0,
     hip = get("pelvis")
       .worldP.clone()
@@ -125,29 +231,35 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
     tilt = -Math.PI / 2 - 0.4 * u;
   }
   if (movement === "bird") {
-    hip.set(0, 0.53, -0.2);
+    hip.set(0, QUAD_HIP, -0.2);
     tilt = 1.48;
   }
   if (movement === "pushup") {
-    tilt = 0.9 + 0.2 * u;
-    hip.set(0, 0.104 + 0.81 * Math.cos(tilt), -0.9 + 0.81 * Math.sin(tilt));
+    // Straight line from the balls of the feet; the body pivots over the toes.
+    tilt = 0.9 + PUSH_DEPTH * u;
+    hip
+      .copy(ankleOver(v(0, 0.0152, PUSH_BALL_Z), tilt + PUSH_ANKLE))
+      .add(v(0, 0.805, -0.014).applyQuaternion(rx(tilt)));
   }
   if (movement === "pulldown") {
     hip.set(0, 0.55, 0);
     tilt = -0.13;
   }
   if (movement === "legpress") {
-    hip.set(0, 0.43, -0.37);
-    tilt = -0.7;
+    hip.set(0, PRESS_HIP[0], PRESS_HIP[1]);
+    tilt = PRESS_RECLINE;
   }
-  if (id === "calf" || id === "dbcalf") hip.add(v(0, 0.06 * u, 0.06 * u));
+  // Calf raise: the body rises by exactly what the heel rotation lifts the ankle.
+  const raise = id === "calf" || id === "dbcalf" ? CALF_RAISE * u : 0;
+  if (raise)
+    hip.add(ankleOver(v(0, 0.0152, 0.1132), raise).sub(v(0, 0.1037, -0.0358)));
   if (id === "split") {
-    hip.set(0, 0.82 - 0.23 * u, -0.05);
+    hip.set(0, 0.84 - SPLIT_DROP * u, -0.08);
     tilt = 0.12;
   }
   if (id === "lunge") {
-    hip.set(0, 0.908 - 0.28 * u, -0.05 - 0.08 * u);
-    tilt = 0.12 * u;
+    hip.set(0, 0.908 - LUNGE_DROP * u, -0.05 - 0.14 * u);
+    tilt = 0.14 * u;
   }
   if (id === "seatedpress") {
     hip.set(0, 0.55, 0);
@@ -166,7 +278,6 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         .setFromAxisAngle(xAxis, -Math.PI / 2)
         .multiply(get("neck_01").worldQ),
     );
-  const birdLeft = Math.floor(time / 4.8) % 2 === 0;
   const hands: Vector3[] = [];
   const ankles: Vector3[] = [];
   for (const [index, suffix, sign] of [
@@ -178,52 +289,58 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
       foot = "foot_" + suffix;
     let ankle = v(sign * 0.13, 0.1037, -0.0358),
       pole = v(0, 0, 1),
-      footTilt = 0;
+      footTilt = 0,
+      // Set when the foot stands on its ball rather than flat.
+      ball: Vector3 | null = null,
+      ballAnkle = 0,
+      ballWeight = 1;
     if (movement === "row") ankle.z = sign === 1 ? 0.15 : -0.25;
     if (movement === "floor" || movement === "bridge") {
-      ankle.z = 0.65;
+      ankle.z = FLOOR_FEET_Z;
+      ankle.y += 0.004; // on the mat
       pole = v(0, 1, 0);
     }
     if (movement === "pushup") {
-      ankle.z = -0.9;
-      pole = v(0, 0, 1);
+      // Legs stay straight, so the foot turns with the body on the balls of the feet.
+      footTilt = tilt + PUSH_ANKLE;
+      ankle = ankleOver(v(sign * 0.13, 0.0152, PUSH_BALL_Z), footTilt);
     }
     if (movement === "pulldown") {
       ankle.z = 0.48;
       pole = v(0, 0, 1);
     }
     if (movement === "legpress") {
-      ankle.set(sign * 0.14, 0.62 + 0.23 * u, 0.12 + 0.26 * u);
+      // Feet flat on the sled; it travels along its own normal.
+      ankle = pos(thigh)
+        .add(v(0, PRESS_REACH[0], PRESS_REACH[1]))
+        .addScaledVector(sled, PRESS_TRAVEL * u);
+      ankle.x = sign * 0.13;
       pole = v(0, 1, 0);
-      footTilt = -Math.PI / 4;
+      footTilt = pressTilt;
     }
-    if (movement === "bird") {
-      const extending = (suffix === "r") === birdLeft;
-      ankle = v(sign * 0.1, 0.09, -0.66);
-      if (extending) ankle.lerp(v(sign * 0.1, 0.54, -1.02), u);
-      pole = v(0, -1, 0);
-      footTilt = extending ? -1.25 * u : 0;
-    }
-    const alternate = Math.floor(time / 4.8) % 2 === 0;
     if (id === "sumo") {
       ankle.x = sign * 0.24;
       pole = v(sign * 0.25, 0, 1);
     }
     if (id === "split") {
-      ankle.z = sign === 1 ? 0.28 : -0.5;
-      if (sign === -1) {
-        ankle.y = 0.18;
-        footTilt = 0.5;
+      if (sign === 1) ankle.z = 0.28;
+      else {
+        ball = v(sign * 0.13, 0.0152, SPLIT_BALL_Z);
+        ballAnkle = 0.1;
       }
     }
     if (id === "lunge" && (suffix === "r") === alternate) {
-      ankle.z -= 0.55 * u;
-      ankle.y += 0.08 * u;
-      footTilt = 0.5 * u;
+      // Step back: the heel peels first, the foot arcs clear and lands on its ball.
+      const travel = Math.min(1, u * 1.15);
+      ball = v(sign * 0.13, 0.0152, 0.1132)
+        .lerp(v(sign * 0.13, 0.0152, LUNGE_BALL_Z), travel)
+        .add(v(0, 0.07 * Math.sin(Math.PI * travel), 0));
+      ballAnkle = 0.1;
+      ballWeight = smoother(Math.min(1, u * 3));
     }
-    if (id === "calf" || id === "dbcalf") {
-      ankle.add(v(0, 0.06 * u, 0.06 * u));
-      footTilt = 0.5 * u;
+    if (raise) {
+      ankle = ankleOver(v(sign * 0.13, 0.0152, 0.1132), raise);
+      footTilt = raise;
     }
     if (id === "seatedpress") ankle.z = 0.48;
     if (id === "deadbug") {
@@ -232,28 +349,57 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         ankle.lerp(v(sign * 0.12, 0.13, 0.84), u);
       pole = v(0, 1, 0);
     }
-    if (id === "donkey" || id === "hydrant") {
+    if (movement === "bird") {
+      // Kneel on tucked toes; the working leg lifts out of that exact position.
       const phase = (suffix === "r") === alternate ? u : 0;
-      const angle = (id === "donkey" ? Math.PI / 2 : 0.8) * phase;
-      aim(
-        thigh,
-        calf,
-        id === "donkey"
-          ? v(0, -Math.cos(angle), -Math.sin(angle))
-          : v(sign * Math.sin(angle), -Math.cos(angle), 0),
+      const rest = plant(
+        suffix,
+        v(sign * 0.1, 0.021, QUAD_BALL_Z),
+        0,
+        v(0, -1, 0),
       );
-      aim(
-        calf,
-        foot,
-        id === "donkey" ? v(0, Math.sin(angle), -Math.cos(angle)) : v(0, 0, -1),
-      );
+      if (phase > 0) {
+        const knee = pos(calf),
+          upperLeg = knee.clone().sub(pos(thigh)),
+          lowerLeg = pos(foot).sub(knee);
+        let turnFoot = 0;
+        if (id === "hydrant") {
+          upperLeg.applyAxisAngle(zAxis, sign * 0.85 * phase);
+          lowerLeg.applyAxisAngle(zAxis, sign * 0.85 * phase);
+        } else {
+          // Donkey: thigh to horizontal, shin to vertical. Bird dog: whole leg long.
+          const thighTo = id === "donkey" ? v(0, 0.05, -1) : v(0, 0.08, -1);
+          const shinTo = id === "donkey" ? v(0, 1, -0.05) : thighTo;
+          upperLeg.applyAxisAngle(
+            xAxis,
+            wrap(pitch(thighTo) - pitch(upperLeg)) * phase,
+          );
+          lowerLeg.applyAxisAngle(
+            xAxis,
+            wrap(pitch(shinTo) - pitch(lowerLeg)) * phase,
+          );
+          if (id === "bird") turnFoot = -0.15 * phase;
+        }
+        aim(thigh, calf, upperLeg);
+        aim(calf, foot, lowerLeg);
+        footFollows(suffix, turnFoot);
+        // Toes stay pressed flat until the ball clears the floor by a toe length.
+        toesFlat(
+          suffix,
+          1 - Math.min(1, Math.max(0, (pos("ball_" + suffix).y - 0.035) / 0.1)),
+        );
+      } else {
+        orient(foot, rx(rest).multiply(get(foot).worldQ));
+        toesFlat(suffix, 1);
+      }
+    } else if (ball) {
+      footTilt = plant(suffix, ball, ballAnkle, pole, ballWeight);
     } else ik(thigh, calf, foot, ankle, pole);
-    orient(
-      foot,
-      new Quaternion()
-        .setFromAxisAngle(xAxis, footTilt)
-        .multiply(get(foot).worldQ),
-    );
+    if (movement === "floor" && id === "deadbug") footFollows(suffix, 0.15);
+    else if (movement !== "bird") {
+      orient(foot, rx(footTilt).multiply(get(foot).worldQ));
+      if (ball || raise || movement === "pushup") toesFlat(suffix, 1);
+    }
     ankles[index] = pos(foot);
     const upper = "upperarm_" + suffix,
       lower = "lowerarm_" + suffix,
@@ -290,7 +436,13 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
       aim(upper, lower, direction);
       aim(lower, hand, direction);
     } else if (id === "donkey" || id === "hydrant") {
-      ik(upper, lower, hand, v(sign * 0.2, 0.04, 0.34), v(sign * 0.1, -1, 0));
+      ik(
+        upper,
+        lower,
+        hand,
+        v(sign * 0.2, QUAD_HAND_Y, 0.34),
+        v(sign * 0.1, -1, 0),
+      );
     } else if (id === "closefloor") {
       aim(
         upper,
@@ -303,7 +455,7 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
         upper,
         lower,
         hand,
-        v(sign * 0.15, 0.63, 0.43),
+        v(sign * 0.15, PUSH_HAND_Y, 0.43),
         v(sign * 0.2, -0.3, -1),
       );
     } else if (movement === "curl") {
@@ -336,18 +488,24 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
       );
       aim(lower, hand, v(-sign * 0.05, 1, 0));
     } else if (movement === "bridge") {
-      ik(upper, lower, hand, v(sign * 0.27, 0.08, 0.12), v(sign * 0.5, 0, 0));
+      ik(
+        upper,
+        lower,
+        hand,
+        v(sign * 0.27, BRIDGE_HAND_Y, 0.12),
+        v(sign * 0.5, 0, 0),
+      );
     } else if (movement === "pushup") {
       ik(
         upper,
         lower,
         hand,
-        v(sign * 0.26, 0.63, 0.43),
+        v(sign * 0.26, PUSH_HAND_Y, 0.43),
         v(sign * 0.7, -0.3, -0.5),
       );
     } else if (movement === "bird") {
-      const extending = (suffix === "l") === birdLeft;
-      const target = v(sign * 0.2, 0.04, 0.34);
+      const extending = (suffix === "l") === alternate;
+      const target = v(sign * 0.2, QUAD_HAND_Y, 0.34);
       if (extending) target.lerp(v(sign * 0.2, 0.6, 0.96), u);
       ik(upper, lower, hand, target, v(sign * 0.1, -1, 0));
     } else if (movement === "pulldown") {
@@ -401,5 +559,15 @@ export function applyPose(rig: Rig, id: Movement, time: number) {
     get(hand).bone.updateWorldMatrix(false, true);
     hands[index] = get(hand).bone.localToWorld(v(0, 0.075, 0));
   }
-  return { u, hands, ankles };
+  // Leg press plate face sits flush under both soles.
+  const plate =
+    movement === "legpress"
+      ? ankles[0]
+          .clone()
+          .add(ankles[1])
+          .multiplyScalar(0.5)
+          .add(soleCentre.clone().applyQuaternion(rx(pressTilt)))
+          .addScaledVector(sled, 0.025)
+      : null;
+  return { u, hands, ankles, plate };
 }

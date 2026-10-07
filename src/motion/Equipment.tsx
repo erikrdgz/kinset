@@ -77,34 +77,52 @@ export function PulldownMachine() {
     </group>
   );
 }
+/** Reclined 45° sled. Seat and back fit the leg press pose; rails follow the plate's travel. */
 export function LegPressMachine() {
+  // Rails run under the plate's lower edge, parallel to its travel (y - z = 0.726).
+  const rail = (y: number): Point => [0, y, y - 0.726];
+  const low = rail(0.75),
+    high = rail(1.3);
   return (
     <group>
       <Pad position={[0, 0.31, -0.38]} size={[0.48, 0.12, 0.4]} />
       <Pad
-        position={[0, 0.67, -0.62]}
-        size={[0.48, 0.68, 0.1]}
-        rotation={-0.7}
+        position={[0, 0.515, -0.835]}
+        size={[0.48, 0.9, 0.08]}
+        rotation={-1.05}
       />
       {[-0.39, 0.39].map((x) => (
-        <Beam
-          key={x}
-          from={[x, 0.34, -0.05]}
-          to={[x, 1.18, 0.79]}
-          radius={0.027}
-        />
+        <group key={x}>
+          <Beam
+            from={[x, low[1], low[2]]}
+            to={[x, high[1], high[2]]}
+            radius={0.027}
+          />
+          <Beam from={[x, 0.025, high[2]]} to={[x, high[1], high[2]]} />
+          <Beam from={[x, 0.025, low[2]]} to={[x, low[1], low[2]]} />
+        </group>
       ))}
-      <Beam from={[-0.45, 0.025, -0.4]} to={[0.45, 0.025, -0.4]} />
+      <Beam from={[-0.45, 0.025, low[2]]} to={[0.45, 0.025, low[2]]} />
+      <Beam from={[-0.45, 0.025, high[2]]} to={[0.45, 0.025, high[2]]} />
+      <Beam from={[0, 0.025, -1.02]} to={[0, 0.025, high[2]]} />
       <Beam from={[0, 0.025, -0.4]} to={[0, 0.3, -0.4]} radius={0.04} />
+      <Beam from={[0, 0.025, -0.98]} to={[0, 0.47, -0.9]} radius={0.03} />
     </group>
   );
 }
 export function FootPlate() {
   return (
-    <mesh rotation={[-Math.PI / 4, 0, 0]} castShadow>
-      <boxGeometry args={[0.64, 0.38, 0.05]} />
-      <meshStandardMaterial color="#de612f" roughness={0.7} />
-    </mesh>
+    <group rotation={[-Math.PI / 4, 0, 0]}>
+      <mesh castShadow>
+        <boxGeometry args={[0.64, 0.38, 0.05]} />
+        <meshStandardMaterial color="#de612f" roughness={0.7} />
+      </mesh>
+      {/* Carriage that rides the rails */}
+      <mesh position={[0, -0.2, 0.045]} castShadow>
+        <boxGeometry args={[0.86, 0.08, 0.04]} />
+        <meshStandardMaterial color="#555a5d" roughness={0.65} />
+      </mesh>
+    </group>
   );
 }
 export function ExerciseMat() {

@@ -43,13 +43,27 @@ export function baseMovement(id: Movement): BaseMovement {
     ? variants[id as keyof typeof variants]
     : (id as BaseMovement);
 }
+/** Seconds per rep at 1× in pose time. Alternating movements play one rep per side. */
+export const REP = 4;
 export function motionDuration(id: Movement) {
   return ["bird", "deadbug", "donkey", "hydrant", "lunge", "altcurl"].includes(
     id,
   )
-    ? 9.6
-    : 4.8;
+    ? REP * 2
+    : REP;
 }
+/** Movements that start by lowering into the rep (eccentric first). */
+export const lowersFirst: ReadonlySet<Movement> = new Set<Movement>([
+  "squat",
+  "goblet",
+  "sumo",
+  "split",
+  "lunge",
+  "rdl",
+  "goodmorning",
+  "pushup",
+  "narrowpushup",
+]);
 export const demoIds: ReadonlySet<string> = new Set(movements);
 export const floorMovements = new Set<Movement>([
   "floor",
