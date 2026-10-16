@@ -5,6 +5,11 @@
  * stylesheet still covers auth, onboarding and the plan editor, which have not been
  * lifted across yet; this file governs everything else and takes its values from
  * tokens.css rather than restating colours.
+ *
+ * The art direction is editorial: hierarchy is carried by size, not by decoration. The
+ * duration numeral on Today and the countdown in the player are the loudest elements on
+ * their screens by design, prescriptions sit in hairline tables, and the accent is used
+ * for actions and progress rather than for quiet labels.
  */
 
 body {
@@ -14,21 +19,17 @@ body {
 }
 
 /**
- * Opting the redesigned shell out of one legacy global.
+ * Opting the redesigned shell out of two legacy globals.
  *
  * styles.css paints every `small`, `.muted`, `.fine` and `.eyebrow` with a warm orange
- * gradient using background-clip: text and a transparent text fill. That wins over any
- * `color` declaration no matter how specific, so secondary copy here would come out
- * orange and, at these sizes, below the contrast the token system promises. Secondary
- * text is a neutral in this design; the accent carries actions, not quiet labels.
+ * gradient using background-clip: text and a transparent text fill, which wins over any
+ * `color` declaration no matter how specific. It also turns any hovered button white,
+ * which reads as a different design system mid-screen.
  *
- * Scoped to .shell so the auth and onboarding screens, which have not been lifted across
- * yet, keep their existing treatment until they are.
- *
- * `.shell.shell` is a deliberate specificity bump, not a typo. That legacy selector list
+ * `.shell.shell` is a deliberate specificity bump, not a typo: that legacy selector list
  * contains `.session-kicker > span:last-child`, and :is() takes the highest specificity
  * of any argument, so the rule weighs (0,2,1) — more than a plain `.shell` descendant
- * selector. Repeating the class clears it without depending on the DOM shape.
+ * selector.
  */
 .shell.shell :is(.muted, .fine, .eyebrow, small, figcaption, dt) {
   background: none;
@@ -37,22 +38,17 @@ body {
   font-weight: 400;
 }
 
-.shell.shell :is(.faint, .lineup-index) {
+.shell.shell :is(.faint, .rule-index) {
   color: var(--faint);
 }
 
-/**
- * Interaction language. The legacy sheet turns any hovered button white, which reads as
- * a different design system mid-screen; here a press is a small shift in the surface's
- * own colour, at the duration the motion table specifies.
- */
 body .shell button.primary:hover:not(:disabled),
 body .shell .resume-bar:hover {
   background: var(--accent-soft);
 }
 
 body .shell button.quiet:hover:not(:disabled),
-body .shell :is(.lineup-list, .exercise-list, .history-list, .overview-list, .replace-list, .settings-list, .recent) button:hover {
+body .shell :is(.exercise-list, .history-list, .overview-list, .replace-list, .settings-list, .recent) button:hover {
   background: var(--raised);
   border-color: var(--border-strong);
 }
@@ -71,6 +67,12 @@ body .shell :is(.lineup-list, .exercise-list, .history-list, .overview-list, .re
 
 .shell[data-session] {
   padding-block-end: 0;
+}
+
+/* With a session in progress the resume bar floats above the tab bar, so the page
+   reserves room for both rather than letting it cover the last card. */
+.shell[data-resume] {
+  padding-block-end: calc(152px + env(safe-area-inset-bottom));
 }
 
 .topbar {
@@ -175,6 +177,7 @@ body .shell :is(.lineup-list, .exercise-list, .history-list, .overview-list, .re
   color: var(--accent-ink);
   box-shadow: var(--elevation);
   text-align: start;
+  animation: rise var(--m-sheet) var(--ease);
 }
 
 .resume-bar strong {
@@ -213,7 +216,7 @@ body .shell :is(.lineup-list, .exercise-list, .history-list, .overview-list, .re
 
 .workspace h3 {
   font-size: var(--t-body);
-  margin-block: var(--s4) var(--s2);
+  margin-block: var(--s5) var(--s2);
 }
 
 .eyebrow {
@@ -249,7 +252,9 @@ button.primary {
   align-items: center;
   justify-content: center;
   gap: var(--s2);
-  transition: transform var(--m-press) var(--ease);
+  transition:
+    transform var(--m-press) var(--ease),
+    background var(--m-press) var(--ease);
 }
 
 button.primary:active {
@@ -273,6 +278,14 @@ button.quiet {
   justify-content: center;
   gap: var(--s2);
   background: var(--surface);
+  transition:
+    background var(--m-press) var(--ease),
+    border-color var(--m-press) var(--ease),
+    transform var(--m-press) var(--ease);
+}
+
+button.quiet:active {
+  transform: scale(0.98);
 }
 
 button.quiet.danger {
@@ -309,6 +322,9 @@ button.quiet.danger {
 
 button.chip {
   min-block-size: 40px;
+  transition:
+    background var(--m-press) var(--ease),
+    color var(--m-press) var(--ease);
 }
 
 .chip.selected {
@@ -371,7 +387,7 @@ button.chip {
   margin-block: 0 var(--s2);
 }
 
-/* --------------------------------------------------------------- today */
+/* ---------------------------------------------------------------- today */
 
 .today-head h1 {
   margin-block-end: var(--s4);
@@ -391,7 +407,7 @@ button.chip {
   gap: var(--s2);
   list-style: none;
   padding: 0;
-  margin: 0 0 var(--s3);
+  margin: 0 0 var(--s5);
 }
 
 .week-day {
@@ -429,60 +445,150 @@ button.chip {
   border-style: dashed;
 }
 
-.week-count {
-  font-size: var(--t-meta);
-  color: var(--muted);
-  margin-block-end: var(--s5);
-}
+/* ------------------------------------------------------- editorial hero */
 
 .hero {
+  position: relative;
   border-radius: var(--r-card);
   overflow: hidden;
   background: var(--surface);
   border: 1px solid var(--border);
-  margin-block-end: var(--s5);
+  margin-block-end: var(--s4);
 }
 
-/* A brand surface, not a stand-in for the photography that is not licensed yet. */
+/* Generative brand art, standing in for photography that is not licensed. */
+.brand-art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.brand-art svg {
+  inline-size: 100%;
+  block-size: 100%;
+  display: block;
+}
+
+.art-glow-in {
+  stop-color: color-mix(in srgb, var(--accent) 58%, transparent);
+}
+
+.art-glow-out {
+  stop-color: transparent;
+}
+
+.art-ridge {
+  fill: color-mix(in srgb, var(--canvas) 72%, transparent);
+}
+
+.art-ridge[data-layer="1"] {
+  fill: color-mix(in srgb, var(--canvas) 86%, transparent);
+}
+
+.art-ridge[data-layer="2"] {
+  fill: var(--canvas);
+}
+
+.art-dot {
+  fill: var(--ink);
+}
+
 .hero-art {
-  block-size: 140px;
-  background:
-    radial-gradient(
-      120% 90% at 18% 10%,
-      color-mix(in srgb, var(--accent) 42%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(90% 70% at 85% 95%, rgba(255, 255, 255, 0.07), transparent 60%),
-    linear-gradient(160deg, var(--raised), var(--canvas));
-  border-block-end: 1px solid var(--border);
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 300px;
+}
+
+.hero-over {
+  position: relative;
+  block-size: 300px;
+  padding: var(--card-pad);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.hero-chip {
+  margin: 0;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 7px var(--s3);
+  font-size: var(--t-meta);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* The monumental numeral. The loudest element on the screen, by design. */
+.hero-figure {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--t-editorial);
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  display: flex;
+  align-items: flex-end;
+}
+
+.hero-figure i {
+  font-style: normal;
+  font-size: 0.5em;
+  line-height: 1;
+  padding-block-end: 0.07em;
+}
+
+.hero-figure small {
+  margin-inline-start: var(--s2);
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin: 0 0 0.55em;
 }
 
 .hero-body {
+  position: relative;
   padding: var(--card-pad);
+  border-block-start: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .hero-body h2 {
   font-family: var(--font-display);
   font-size: clamp(2rem, 8vw, 2.75rem);
   text-transform: uppercase;
-  line-height: 0.98;
-  margin-block: 0 var(--s3);
+  line-height: 0.96;
+  margin-block: 0 var(--s2);
   /* Long titles wrap; they never shrink below a readable size. */
   overflow-wrap: anywhere;
-}
-
-.hero-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s2);
-  color: var(--ink);
-  margin-block: 0 var(--s1);
 }
 
 .hero-equipment {
   color: var(--muted);
   font-size: var(--t-meta);
-  margin-block: 0;
+  margin-block: 0 var(--s4);
+}
+
+/* One block per movement, the references' segmented progress. */
+.hero-segments {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--s4);
+}
+
+.hero-segments li {
+  flex: 1;
+  block-size: 3px;
+  border-radius: var(--r-pill);
+  background: var(--border-strong);
 }
 
 .hero-secondary {
@@ -495,46 +601,89 @@ button.chip {
   flex: 1;
 }
 
-.lineup-list,
-.preview-list {
+/* ----------------------------------------------------------- stat tiles */
+
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s2);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--s5);
+}
+
+.stat-tiles li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  padding: var(--s4) var(--s3);
+}
+
+.stat-tiles strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.stat-tiles span {
+  display: block;
+  margin-block-start: var(--s2);
+  font-size: 0.8125rem;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+.stat-tiles small {
+  display: block;
+  color: var(--faint);
+}
+
+/* -------------------------------------------------- hairline rule lists */
+
+.rule-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
-  gap: var(--s2);
 }
 
-.lineup-list button,
-.preview-row {
+.rule-list li + li {
+  border-block-start: 1px solid var(--border);
+}
+
+.rule-list button,
+.rule-row {
   inline-size: 100%;
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: var(--s3);
-  padding: var(--s3) var(--s4);
+  padding-block: var(--s4);
   min-block-size: var(--target);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-control);
   text-align: start;
+  transition: padding-inline-start var(--m-press) var(--ease);
 }
 
-.lineup-index {
+.rule-list button:hover {
+  padding-inline-start: var(--s2);
+}
+
+.rule-index {
   color: var(--faint);
   font-size: var(--t-meta);
 }
 
-.lineup-name strong {
+.rule-name strong {
   display: block;
 }
 
-.lineup-name small {
+.rule-name small {
   color: var(--muted);
   margin: 0;
 }
 
-.lineup-sets {
-  color: var(--muted);
+.rule-value {
+  color: var(--ink);
   font-size: var(--t-meta);
   white-space: nowrap;
 }
@@ -553,7 +702,11 @@ button.chip {
   text-align: start;
 }
 
-/* ------------------------------------------------------------- preview */
+/* -------------------------------------------------------------- preview */
+
+.preview {
+  padding-block-end: calc(var(--target-training) + var(--s6));
+}
 
 .preview-facts {
   display: flex;
@@ -569,13 +722,8 @@ button.chip {
 
 /**
  * The start action stays above the safe area, so committing never means scrolling back
- * up. It sits over the page, so the page reserves room for it — otherwise it covers the
- * last rows of the session list permanently.
+ * up. It sits over the page, so the page reserves room for it.
  */
-.preview {
-  padding-block-end: calc(var(--target-training) + var(--s6));
-}
-
 .sticky-action {
   position: sticky;
   inset-block-end: calc(88px + env(safe-area-inset-bottom));
@@ -599,7 +747,7 @@ button.back {
   margin-block-end: var(--s4);
 }
 
-/* ------------------------------------------------------------- session */
+/* -------------------------------------------------------------- session */
 
 .session {
   min-block-size: 100dvh;
@@ -637,6 +785,7 @@ button.back {
   color: var(--muted);
 }
 
+/* Segmented block progress, as the references put at the top of the player. */
 .session-progress {
   display: flex;
   gap: 4px;
@@ -648,6 +797,7 @@ button.back {
   block-size: 4px;
   border-radius: var(--r-pill);
   background: var(--border);
+  transition: background var(--m-switch) var(--ease);
 }
 
 .session-progress span[data-state="done"] {
@@ -666,6 +816,10 @@ button.back {
   color: var(--danger);
   font-size: var(--t-meta);
   margin-block-end: var(--s3);
+}
+
+.session-exercise {
+  animation: fade var(--m-switch) var(--ease);
 }
 
 .exercise-head {
@@ -770,13 +924,19 @@ button.back {
   color: var(--muted);
   transition:
     background var(--m-set) var(--ease),
-    color var(--m-set) var(--ease);
+    color var(--m-set) var(--ease),
+    transform var(--m-press) var(--ease);
+}
+
+.check:active {
+  transform: scale(0.94);
 }
 
 .check.checked {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--accent-ink);
+  animation: pop var(--m-set) var(--ease);
 }
 
 .set-actions {
@@ -813,6 +973,7 @@ button.back {
   border: 1px solid var(--accent);
   border-radius: var(--r-control);
   box-shadow: var(--elevation);
+  animation: rise var(--m-sheet) var(--ease);
 }
 
 .rest-strip strong {
@@ -884,20 +1045,7 @@ button.back {
   border-block-end: 0;
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
   padding: var(--s3) var(--gutter) calc(var(--s6) + env(safe-area-inset-bottom));
-  animation: sheet-in var(--m-sheet) var(--ease);
-}
-
-@keyframes sheet-in {
-  from {
-    transform: translateY(16px);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sheet {
-    animation: none;
-  }
+  animation: rise var(--m-sheet) var(--ease);
 }
 
 .sheet-grip {
@@ -953,12 +1101,19 @@ button.back {
   min-block-size: 44px;
   border-radius: var(--r-pill);
   color: var(--muted);
+  transition:
+    background var(--m-press) var(--ease),
+    color var(--m-press) var(--ease);
 }
 
 .howto-tabs button.selected {
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 600;
+}
+
+.howto-panel {
+  animation: fade var(--m-switch) var(--ease);
 }
 
 .howto-facts {
@@ -1039,13 +1194,14 @@ button.back {
   background: var(--raised);
 }
 
-.media-video {
+.media-video,
+.media-gif {
   inline-size: 100%;
   display: block;
   background: #000;
 }
 
-/* ----------------------------------------------------------- muscle map */
+/* ------------------------------------------------------------ muscle map */
 
 .muscle-figures {
   display: flex;
@@ -1115,7 +1271,7 @@ button.back {
   margin: 0;
 }
 
-/* --------------------------------------------------- lists in sheets */
+/* ------------------------------------------------------ lists in sheets */
 
 .overview-list,
 .replace-list,
@@ -1148,6 +1304,9 @@ button.back {
   border: 1px solid var(--border);
   border-radius: var(--r-control);
   text-align: start;
+  transition:
+    background var(--m-press) var(--ease),
+    border-color var(--m-press) var(--ease);
 }
 
 .overview-list button[aria-current] {
@@ -1267,6 +1426,7 @@ button.back {
   font-family: var(--font-display);
   font-weight: 700;
   color: var(--muted);
+  overflow: hidden;
 }
 
 /* ------------------------------------------------------------- progress */
@@ -1360,6 +1520,7 @@ button.back {
   block-size: 100%;
   background: var(--accent);
   border-radius: var(--r-pill);
+  transition: inline-size var(--m-switch) var(--ease);
 }
 
 .field select {
@@ -1384,20 +1545,7 @@ button.back {
   background: var(--accent);
   color: var(--accent-ink);
   margin-block-end: var(--s4);
-  animation: mark-in 420ms var(--ease);
-}
-
-@keyframes mark-in {
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .summary-mark {
-    animation: none;
-  }
+  animation: pop 420ms var(--ease);
 }
 
 .summary-stats {
@@ -1451,7 +1599,48 @@ button.back {
   inline-size: 100%;
 }
 
-/* ------------------------------------------------------------- desktop */
+/* --------------------------------------------------------------- motion */
+
+@keyframes rise {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.86);
+  }
+}
+
+/**
+ * Reduced motion removes movement rather than merely shortening it. Nothing here is the
+ * sole carrier of meaning, so dropping it costs no information.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .rest-strip,
+  .resume-bar,
+  .summary-mark,
+  .check.checked,
+  .session-exercise,
+  .howto-panel {
+    animation: none;
+  }
+
+  .rule-list button:hover {
+    padding-inline-start: 0;
+  }
+}
+
+/* -------------------------------------------------------------- desktop */
 
 @media (min-width: 900px) {
   .shell {
@@ -1500,5 +1689,10 @@ button.back {
   .session {
     max-inline-size: 760px;
     margin-inline: auto;
+  }
+
+  .hero-art,
+  .hero-over {
+    block-size: 380px;
   }
 }

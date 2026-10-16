@@ -201,7 +201,11 @@ export function Journal({
   const inSession = route.name === "session";
 
   return (
-    <div className="shell" data-session={inSession || undefined}>
+    <div
+      className="shell"
+      data-session={inSession || undefined}
+      data-resume={(data.active && !inSession) || undefined}
+    >
       {!inSession && (
         <header className="topbar">
           <Brand />

@@ -103,16 +103,16 @@ export function Preview({
 
       <section>
         <h2>The session</h2>
-        <ol className="preview-list">
+        <ol className="rule-list preview-list">
           {workout.entries.map((entry, i) => {
             const def = findExercise(entry.exerciseId);
             return (
               <li key={`${entry.exerciseId}-${i}`}>
                 <div className="preview-row">
-                  <span className="lineup-index tabular">
+                  <span className="rule-index tabular">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="lineup-name">
+                  <span className="rule-name">
                     <strong>{def?.name ?? entry.exerciseId}</strong>
                     <small>
                       {def?.patterns.map((p) => patternNames[p]).join(" · ")}
@@ -121,7 +121,7 @@ export function Preview({
                         : ""}
                     </small>
                   </span>
-                  <span className="lineup-sets tabular">
+                  <span className="rule-value tabular">
                     {entry.sets} × {prescriptionText(entry)}
                   </span>
                   <button

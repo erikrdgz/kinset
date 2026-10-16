@@ -1,6 +1,7 @@
 import { ArrowUpRight, ChevronRight, Info } from "lucide-react";
 import {
   completedSessions,
+  completedWorkingSets,
   equipmentNames,
   equipmentUnion,
   findExercise,
@@ -14,15 +15,21 @@ import {
   nextWorkout,
   prescriptionText,
 } from "../training/workout";
+import { BrandArt } from "../../ui/BrandArt";
 import type { Route } from "../../app/routes";
 
 /**
- * Today: one clear next action.
+ * Today: one clear next action, at editorial scale.
  *
  * The audited screen made training, discovery and navigation compete — a week dial, a
- * lineup, a demo-discovery banner, a plan footer and a recent session all at one level.
- * Here there is a single primary action in the hero, and everything else is explicitly
- * secondary. On a 390 × 844 phone the Start button sits above the fold.
+ * lineup, a demo banner, a plan footer and a recent session all at one level. The
+ * references answer that with hierarchy carried by size: the duration is the biggest
+ * thing on the screen, the action is a full-width bar under it, and everything else is
+ * visibly subordinate.
+ *
+ * The one honest departure from the references is the hero image. They show a figure
+ * mid-movement; no such photography is licensed, so the slot holds generative brand art
+ * instead of a stock body that would misrepresent the movement anyway.
  */
 export function Today({
   journal,
@@ -51,6 +58,13 @@ export function Today({
   const completedThisWeek = week.filter((d) => d.completed).length;
   const last = done[0];
 
+  const weekStart = new Date();
+  weekStart.setHours(0, 0, 0, 0);
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+  const setsThisWeek = completedWorkingSets(journal).filter(
+    (s) => Date.parse(s.at) >= weekStart.getTime(),
+  ).length;
+
   return (
     <div className="today">
       <header className="today-head">
@@ -78,44 +92,54 @@ export function Today({
             </span>
             <span className="week-mark" aria-hidden="true" />
             <span className="sr-only">
-              {day.label}: {day.completed ? "trained" : day.future ? "ahead" : "no session recorded"}
+              {day.label}:{" "}
+              {day.completed
+                ? "trained"
+                : day.future
+                  ? "ahead"
+                  : "no session recorded"}
             </span>
           </li>
         ))}
       </ol>
-      <p className="week-count tabular">
-        <strong>{completedThisWeek}</strong> of {profile.days} planned sessions this week
-      </p>
 
       <section className="hero" aria-labelledby="hero-title">
-        {/* No licensed hero photography exists yet, so this is a brand surface rather
-            than a stock photo standing in for one. */}
-        <div className="hero-art" aria-hidden="true" />
-        <div className="hero-body">
-          <p className="eyebrow">{active ? "In progress" : "Up next"}</p>
-          <h2 id="hero-title">{active?.name ?? workout.name}</h2>
-          <p className="hero-facts tabular">
-            <span>{durationText(duration)}</span>
-            <span aria-hidden="true">·</span>
-            <span>
-              {workout.entries.length} movement
-              {workout.entries.length === 1 ? "" : "s"}
-            </span>
+        <BrandArt seed={active?.name ?? workout.name} className="hero-art" />
+
+        <div className="hero-over">
+          <p className="hero-chip">
+            {active
+              ? "In progress"
+              : `${workout.entries.length} moves${
+                  focus[0] ? ` · ${patternNames[focus[0]]}` : ""
+                }`}
           </p>
+
+          {/* The monumental numeral the references lead with. */}
+          <p className="hero-figure tabular" aria-hidden="true">
+            {duration.min}
+            {duration.max !== duration.min && <i>–{duration.max}</i>}
+            <small>MIN</small>
+          </p>
+          <p className="sr-only">{durationText(duration)}</p>
+        </div>
+
+        <div className="hero-body">
+          <p className="eyebrow">{active ? "Resume" : "Up next"}</p>
+          <h2 id="hero-title">{active?.name ?? workout.name}</h2>
           <p className="hero-equipment">
             {equipment.length
               ? equipment.map((e) => equipmentNames[e]).join(" · ")
               : "No equipment needed"}
           </p>
-          {focus.length > 0 && (
-            <ul className="chip-row" aria-label="Focus">
-              {focus.map((p) => (
-                <li key={p} className="chip">
-                  {patternNames[p]}
-                </li>
-              ))}
-            </ul>
-          )}
+
+          {/* One segment per movement, the references' block progress. */}
+          <ol className="hero-segments" aria-hidden="true">
+            {workout.entries.map((e, i) => (
+              <li key={`${e.exerciseId}-${i}`} />
+            ))}
+          </ol>
+
           <button className="primary big" onClick={onStart}>
             {active ? "Resume workout" : "Start workout"}
             <ArrowUpRight size={20} aria-hidden="true" />
@@ -130,6 +154,31 @@ export function Today({
           </div>
         </div>
       </section>
+
+      {/* Facts, not a streak. Rest is not a broken chain. */}
+      <ul className="stat-tiles">
+        <li>
+          <strong className="tabular">{completedThisWeek}</strong>
+          <span>
+            of {profile.days} sessions
+            <small>this week</small>
+          </span>
+        </li>
+        <li>
+          <strong className="tabular">{setsThisWeek}</strong>
+          <span>
+            sets logged
+            <small>this week</small>
+          </span>
+        </li>
+        <li>
+          <strong className="tabular">{done.length}</strong>
+          <span>
+            workouts
+            <small>all time</small>
+          </span>
+        </li>
+      </ul>
 
       {/* An unfillable slot is stated here, not silently filled with a stand-in. */}
       {workout.unmet.length > 0 && (
@@ -149,7 +198,8 @@ export function Today({
 
       <section className="lineup">
         <h3>The lineup</h3>
-        <ol className="lineup-list">
+        {/* Hairline rows, as the references' prescription table. */}
+        <ol className="rule-list">
           {workout.entries.map((entry, i) => {
             const definition = findExercise(entry.exerciseId);
             return (
@@ -159,10 +209,10 @@ export function Today({
                     go({ name: "library", exerciseId: entry.exerciseId })
                   }
                 >
-                  <span className="lineup-index tabular">
+                  <span className="rule-index tabular">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="lineup-name">
+                  <span className="rule-name">
                     <strong>{definition?.name ?? entry.exerciseId}</strong>
                     <small>
                       {definition?.patterns
@@ -170,7 +220,7 @@ export function Today({
                         .join(" · ")}
                     </small>
                   </span>
-                  <span className="lineup-sets tabular">
+                  <span className="rule-value tabular">
                     {entry.sets} × {prescriptionText(entry)}
                   </span>
                   <ChevronRight size={16} aria-hidden="true" />
