@@ -20,6 +20,7 @@ export type Route =
   | { name: "library"; query?: string; group?: string; exerciseId?: string }
   | { name: "progress"; exerciseId?: string }
   | { name: "plans" }
+  | { name: "run" }
   | { name: "settings" };
 
 export type TabName = "today" | "train" | "library" | "progress";
@@ -32,6 +33,7 @@ export function tabFor(route: Route): TabName | null {
     case "train":
     case "preview":
     case "plans":
+    case "run":
       return "train";
     case "library":
       return "library";
@@ -89,6 +91,8 @@ export function fromHash(hash: string): Route {
       return { name: "progress", exerciseId: params.get("id") || undefined };
     case "plans":
       return { name: "plans" };
+    case "run":
+      return { name: "run" };
     case "settings":
       return { name: "settings" };
     default:

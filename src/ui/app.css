@@ -1696,3 +1696,208 @@ button.back {
     block-size: 380px;
   }
 }
+
+/* ------------------------------------------------------------- running */
+
+.run-entry {
+  inline-size: 100%;
+  justify-content: flex-start;
+  text-align: start;
+  padding: var(--s4);
+  min-block-size: 72px;
+  margin-block-end: var(--s5);
+}
+
+.run-entry strong {
+  display: block;
+}
+
+.run-entry small {
+  color: var(--muted);
+  margin: 0;
+}
+
+.run-start-options {
+  display: grid;
+  gap: var(--s2);
+  margin-block: var(--s5) var(--s3);
+}
+
+.run-start-options button {
+  inline-size: 100%;
+}
+
+/* Distance is the headline on a recording screen, legible at arm's length outdoors. */
+.run-figure {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 20vw, 6rem);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+  margin: var(--s2) 0 var(--s4);
+  display: flex;
+  align-items: flex-end;
+}
+
+.run-figure small {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin: 0 0 0.7em var(--s2);
+}
+
+.run-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s3);
+  margin-block-end: var(--s4);
+}
+
+.run-metrics dt {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
+
+.run-metrics dd {
+  margin: var(--s1) 0 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.run-controls {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--s2);
+  margin-block-start: var(--s5);
+}
+
+.run-controls button {
+  min-block-size: var(--target-training);
+}
+
+button.quiet.big {
+  inline-size: 100%;
+  min-block-size: var(--target-training);
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.run-discard {
+  inline-size: 100%;
+  margin-block-start: var(--s3);
+}
+
+.route-map {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: var(--s4);
+  margin-block: var(--s4);
+}
+
+.route-map svg {
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 1 / 1;
+  max-block-size: 320px;
+  display: block;
+}
+
+.route-map-empty {
+  display: grid;
+  place-items: center;
+  min-block-size: 120px;
+}
+
+.route-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.route-start {
+  fill: var(--ink);
+}
+
+.route-end {
+  fill: var(--accent);
+  stroke: var(--canvas);
+  stroke-width: 1.5;
+}
+
+.run-trim {
+  display: flex;
+  gap: var(--s3);
+  align-items: flex-start;
+  padding: var(--s4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  margin-block-end: var(--s4);
+}
+
+.run-trim input {
+  inline-size: 20px;
+  block-size: 20px;
+  margin-block-start: 2px;
+  accent-color: var(--accent);
+  flex: none;
+}
+
+.run-trim small {
+  display: block;
+  color: var(--muted);
+  margin-block-start: var(--s1);
+}
+
+.splits-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+
+.splits-table th[scope="col"] {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  text-align: start;
+  padding-block-end: var(--s2);
+}
+
+.splits-table th[scope="row"],
+.splits-table td {
+  text-align: start;
+  padding-block: var(--s3);
+  border-block-start: 1px solid var(--border);
+  font-weight: 400;
+}
+
+.field {
+  display: block;
+  margin-block-end: var(--s3);
+}
+
+.field > span {
+  display: block;
+  font-size: var(--t-meta);
+  color: var(--muted);
+  margin-block-end: var(--s2);
+}
+
+.field input {
+  inline-size: 100%;
+  min-block-size: var(--target);
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  padding-inline: var(--s3);
+  font-size: var(--t-body);
+}

@@ -28,6 +28,7 @@ import { Library } from "../features/library/Library";
 import { Progress } from "../features/progress/Progress";
 import { buildSession, nextWorkout, advancePlan } from "../features/training/workout";
 import Plans from "../PlanManager";
+import { Run } from "../features/running/Run";
 import { Sheet } from "../ui/Sheet";
 
 const tabs: Array<{ id: TabName; label: string; icon: typeof House; route: Route }> = [
@@ -272,7 +273,18 @@ export function Journal({
           />
         )}
 
+        {route.name === "run" && (
+          <Run owner={owner} unit={profile.unit === "kg" ? "km" : "mi"} />
+        )}
+
         {route.name === "train" && (
+          <>
+            <button className="quiet run-entry" onClick={() => go({ name: "run" })}>
+              <span>
+                <strong>Go for a run</strong>
+                <small>Record a route, or add one by hand</small>
+              </span>
+            </button>
           <Plans
             data={data}
             update={(next) => void update(next)}
@@ -296,7 +308,8 @@ export function Journal({
               });
               go({ name: "session" });
             }}
-          />
+            />
+          </>
         )}
 
         {route.name === "session" &&
