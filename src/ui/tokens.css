@@ -1,0 +1,109 @@
+/**
+ * Kinset design tokens.
+ *
+ * The references the art direction was drawn from all use an acid lime accent. Kinset's
+ * accent is orange, so the lime in those references reads as --accent here, and the
+ * neutrals are warm-leaning rather than green-leaning so they sit with it.
+ *
+ * Contrast against --canvas, computed for the four pairs that carry most of the
+ * interface: ink 17.0:1, muted 9.9:1, accent 6.6:1, and --accent-ink on filled accent
+ * 6.6:1. All pass WCAG AA for normal text. Pairs added later need their own check;
+ * nothing here has been sampled from a running build.
+ */
+:root {
+  /* Surfaces, darkest to lightest. */
+  --canvas: #111010;
+  --surface: #1b1a19;
+  --raised: #262423;
+  --border: #423e3b;
+  --border-strong: #5a5450;
+
+  /* Text. --muted is a neutral, never the accent used as a quiet colour. */
+  --ink: #f3f1ed;
+  --muted: #b9b4ae;
+  --faint: #8c8782;
+
+  /* Brand. */
+  --accent: #ff692b;
+  --accent-soft: #ff8a57;
+  --accent-wash: rgba(255, 105, 43, 0.12);
+  /* Text and icons sitting on a filled accent surface. */
+  --accent-ink: #140f0c;
+
+  /* Status gets its own hues. The accent is not a universal "good" colour. */
+  --warning: #f2b544;
+  --warning-ink: #140f0c;
+  --danger: #ff6b61;
+  --success: #7cc98a;
+
+  /* Spacing scale. */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --gutter: 20px;
+  --card-pad: 20px;
+
+  /* Corners. Pills are reserved for chips and segmented controls. */
+  --r-control: 12px;
+  --r-card: 16px;
+  --r-sheet: 24px;
+  --r-pill: 999px;
+
+  /* Targets. The 48px product minimum deliberately exceeds WCAG 2.2's 24px. */
+  --target: 48px;
+  --target-training: 56px;
+
+  /* Type. */
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-ui: "Barlow", system-ui, sans-serif;
+  --t-meta: 0.875rem;
+  --t-body: 1rem;
+  --t-section: 1.25rem;
+  --t-title: clamp(1.75rem, 5vw, 2.25rem);
+  --t-editorial: clamp(3rem, 14vw, 5rem);
+
+  --elevation: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* Motion. Durations come from the motion table in the art direction. */
+  --m-press: 100ms;
+  --m-set: 160ms;
+  --m-sheet: 240ms;
+  --m-switch: 180ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/**
+ * Reduced motion removes translation and scaling rather than merely shortening them,
+ * and nothing essential is conveyed by animation alone.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --m-press: 0ms;
+    --m-set: 0ms;
+    --m-sheet: 0ms;
+    --m-switch: 0ms;
+  }
+}
+
+/** Timers, set values and chart labels need digits that do not shift width. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/** Screen-reader-only text, used wherever an icon carries meaning. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

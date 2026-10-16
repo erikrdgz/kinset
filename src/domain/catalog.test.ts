@@ -15,6 +15,7 @@ import {
   convertLoad,
   exerciseBest,
   exerciseTrend,
+  formatBest,
   loadVolume,
   workingSetsByMuscle,
 } from "./metrics";
@@ -268,10 +269,29 @@ describe("metrics", () => {
   });
 
   it("produces one trend point per session and never interpolates", () => {
-    const trend = exerciseTrend(journal, "goblet", "kg");
-    expect(trend).toHaveLength(2);
-    expect(trend.map((p) => p.value)).toEqual([20, 24]);
-    expect(Date.parse(trend[0].at)).toBeLessThan(Date.parse(trend[1].at));
+    const { points, basis } = exerciseTrend(journal, "goblet", "kg");
+    expect(basis).toBe("load");
+    expect(points).toHaveLength(2);
+    expect(points.map((p) => p.value)).toEqual([20, 24]);
+    expect(Date.parse(points[0].at)).toBeLessThan(Date.parse(points[1].at));
+  });
+
+  it("ranks a movement with no external load by reps, not by a zero weight", () => {
+    // A bodyweight squat logged at 0 kg has no weight to compare; ranking it by load
+    // would report "0 kg" as a personal best, which is a unit error, not a record.
+    const best = exerciseBest(journal, "squat", "kg")!;
+    expect(best.basis).toBe("reps");
+    expect(best.set.reps).toBe(15);
+    expect(best.converted).toBe(15);
+    expect(formatBest(best, "kg")).toBe("15 reps");
+
+    const { basis } = exerciseTrend(journal, "squat", "kg");
+    expect(basis).toBe("reps");
+
+    // A loaded movement still reads as a weight.
+    expect(formatBest(exerciseBest(journal, "goblet", "kg")!, "kg")).toBe(
+      "24 kg × 8",
+    );
   });
 
   it("marks a migrated session's duration as approximate", () => {

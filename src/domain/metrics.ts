@@ -133,6 +133,13 @@ export function exerciseBest(
 ) {
   const definition = findExercise(exerciseId);
   if (!definition) return null;
+  /**
+   * A movement with no external load has nothing to rank by weight — every set would
+   * tie at zero and report "0 kg", which is not a record, it is a unit error. Those
+   * rank by reps instead, and the caller renders them accordingly.
+   */
+  const basis: "load" | "reps" =
+    definition.measurement.load === "none" ? "reps" : "load";
   let best: { set: SetWithContext; converted: number } | null = null;
   let excludedLegacy = 0;
 
@@ -148,7 +155,8 @@ export function exerciseBest(
         if (set.loadSemantics !== definition.measurement.load) continue;
         const { reps, load } = set.performed;
         if (reps === undefined || load === undefined) continue;
-        const converted = convertLoad(load, session.unit, displayUnit);
+        const converted =
+          basis === "reps" ? reps : convertLoad(load, session.unit, displayUnit);
         if (!best || converted > best.converted)
           best = {
             converted,
@@ -164,7 +172,17 @@ export function exerciseBest(
           };
       }
     }
-  return best ? { ...best, excludedLegacy } : null;
+  return best ? { ...best, basis, excludedLegacy } : null;
+}
+
+/** How a best should read: a weight for loaded movements, a rep count otherwise. */
+export function formatBest(
+  best: NonNullable<ReturnType<typeof exerciseBest>>,
+  unit: Unit,
+) {
+  return best.basis === "reps"
+    ? `${best.set.reps} reps`
+    : `${formatLoad(best.converted, unit)} × ${best.set.reps}`;
 }
 
 /**
@@ -250,17 +268,23 @@ export function loadVolume(
 export type TrendPoint = { at: string; value: number };
 
 /**
- * A trend for one movement: the heaviest comparable working set per session, in the
- * display unit. One session yields one point, and a caller must not draw it as a line —
- * a single point is not a trend.
+ * A trend for one movement: the best comparable working set per session.
+ *
+ * Loaded movements trend on weight in the display unit; movements with no external load
+ * trend on reps, since plotting a bodyweight squat's weight would draw a flat line at
+ * zero. `basis` tells the caller which it is so the axis can be labelled truthfully.
+ *
+ * One session yields one point, and a caller must not draw a single point as a line.
  */
 export function exerciseTrend(
   journal: Journal,
   exerciseId: string,
   displayUnit: Unit,
-): TrendPoint[] {
+): { points: TrendPoint[]; basis: "load" | "reps" } {
   const definition = findExercise(exerciseId);
-  if (!definition) return [];
+  if (!definition) return { points: [], basis: "load" };
+  const basis: "load" | "reps" =
+    definition.measurement.load === "none" ? "reps" : "load";
   const points: TrendPoint[] = [];
   for (const session of completedSessions(journal)) {
     let best = 0;
@@ -270,10 +294,11 @@ export function exerciseTrend(
       for (const set of entry.sets) {
         if (!set.done || !set.performed || set.setType !== "working") continue;
         if (set.loadSemantics !== definition.measurement.load) continue;
-        const load = set.performed.load;
-        if (load === undefined) continue;
-        const converted = convertLoad(load, session.unit, displayUnit);
-        if (converted > best) best = converted;
+        const { load, reps } = set.performed;
+        if (load === undefined || reps === undefined) continue;
+        const value =
+          basis === "reps" ? reps : convertLoad(load, session.unit, displayUnit);
+        if (value > best) best = value;
         found = true;
       }
     }
@@ -283,5 +308,8 @@ export function exerciseTrend(
         value: best,
       });
   }
-  return points.sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+  return {
+    points: points.sort((a, b) => Date.parse(a.at) - Date.parse(b.at)),
+    basis,
+  };
 }

@@ -1,7 +1,7 @@
 import { Select } from "./Select";
 import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2, ChevronRight } from "lucide-react";
-import { exercises, type State } from "./domain";
+import { exercises, type Journal } from "./domain";
 import {
   newPlan,
   foundationPlan,
@@ -17,8 +17,8 @@ export default function Plans({
   onPreview,
   onStart,
 }: {
-  data: State;
-  update: (next: State) => void;
+  data: Journal;
+  update: (next: Journal) => void;
   onPreview: (id: string) => void;
   onStart: (plan: WorkoutPlan, day: PlanDay) => void;
 }) {
