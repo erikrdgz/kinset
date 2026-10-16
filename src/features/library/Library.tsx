@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronRight, Search } from "lucide-react";
 import {
   equipmentNames,
@@ -8,6 +8,7 @@ import {
   type MovementPattern,
 } from "../../domain";
 import { HowTo } from "./HowTo";
+import { loadManifest, mediaFor } from "../../media/manifest";
 
 /**
  * The movement library.
@@ -46,6 +47,12 @@ export function Library({
   onClose: () => void;
 }) {
   const [alphabetical, setAlphabetical] = useState(false);
+  const [, setManifestReady] = useState(false);
+
+  // Thumbnails appear once the manifest resolves; the list renders immediately either way.
+  useEffect(() => {
+    void loadManifest().then(() => setManifestReady(true));
+  }, []);
 
   const matches = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -201,10 +208,19 @@ export function Library({
 }
 
 /**
- * A consistent list poster. No licensed imagery exists, so this is a typographic mark
- * rather than a grid of autoplaying video or a mismatched stock photo.
+ * A consistent list poster: the manifest's still frame when one is licensed, otherwise a
+ * typographic mark. Never a grid of autoplaying video — the references put a calm
+ * thumbnail in the row and keep motion for the detail view.
  */
 function Poster({ exercise }: { exercise: ExerciseDefinition }) {
+  const media = mediaFor(exercise.id);
+  const still = media?.resolvedPoster ?? (media?.kind === "image" ? media.resolvedSrc : undefined);
+  if (still && !media?.expired)
+    return (
+      <span className="poster">
+        <img src={still} alt="" loading="lazy" decoding="async" />
+      </span>
+    );
   return (
     <span className="poster" aria-hidden="true">
       {exercise.name

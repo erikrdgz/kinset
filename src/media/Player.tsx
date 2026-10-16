@@ -1,49 +1,89 @@
-import { Suspense, lazy, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Play, VideoOff } from "lucide-react";
 import { demoIds } from "../motion/catalog";
 import { exercises as legacyExercises, type ExerciseDefinition } from "../domain";
+import { loadManifest, mediaFor, type ResolvedMedia } from "./manifest";
 
 const ExerciseDemo = lazy(() => import("../ExerciseDemo"));
 
 /**
  * The movement media slot.
  *
- * Kinset has no filmed instruction. No media supplier is contracted, and the brief is
- * explicit that inventing a URL or passing a rendered animation off as reviewed footage
- * is not acceptable. So this component is the adapter and the honest fallback, with the
- * filmed-asset case written and unreachable until `media.provider` is set.
+ * Order of preference: a licensed asset from the manifest, then the procedural 3D
+ * illustration if one exists for this movement, then the written guide alone. Logging
+ * never waits on any of it, and no state here is a dead end — the guide below is always
+ * the authoritative instruction.
  *
- * The procedural 3D demo that exists in the repository is still available, but it is no
- * longer the default and it is labelled as what it is: an illustration of the movement
- * path, not reviewed instruction. It loads only when asked for, because it pulls a large
- * chunk and the written guide beside it is the part that is actually authoritative.
- *
- * Logging never waits on any of this.
+ * The 3D demo is no longer a default and no longer framed as a demonstration. It is
+ * labelled as a computer-generated illustration of the movement path, because that is
+ * what it is, and it loads only when asked for since it pulls a megabyte of renderer.
  */
 export function MovementMedia({ exercise }: { exercise: ExerciseDefinition }) {
+  const [media, setMedia] = useState<ResolvedMedia | null>(null);
+  const [failed, setFailed] = useState(false);
   const [playing, setPlaying] = useState(false);
   const hasIllustration = demoIds.has(exercise.id);
 
-  // The real path, once a supplier exists. Deliberately kept so the shape of the
-  // integration is visible rather than being invented later under time pressure.
-  if (exercise.media.provider && exercise.media.poster) {
+  useEffect(() => {
+    let live = true;
+    setFailed(false);
+    void loadManifest().then(() => {
+      if (live) setMedia(mediaFor(exercise.id));
+    });
+    return () => {
+      live = false;
+    };
+  }, [exercise.id]);
+
+  if (media && !failed && !media.expired)
     return (
       <div className="media-slot">
-        <video
-          className="media-video"
-          poster={exercise.media.poster}
-          controls
-          playsInline
-          muted
-          loop
-          preload="none"
-        />
-        {exercise.media.attribution && (
-          <p className="fine">{exercise.media.attribution}</p>
+        {media.kind === "video" ? (
+          <video
+            className="media-video"
+            src={media.resolvedSrc}
+            poster={media.resolvedPoster}
+            controls
+            playsInline
+            muted
+            loop
+            preload="none"
+            onError={() => setFailed(true)}
+          />
+        ) : (
+          <img
+            className="media-gif"
+            src={media.resolvedSrc}
+            alt={`${exercise.name} demonstration`}
+            loading="lazy"
+            decoding="async"
+            width={media.width}
+            height={media.height}
+            onError={() => setFailed(true)}
+          />
         )}
+        <p className="fine">
+          {media.attribution ?? "Licensed movement media."}
+          {media.techniqueReviewed
+            ? ""
+            : " This clip has not yet been checked by a qualified reviewer."}
+        </p>
       </div>
     );
-  }
+
+  // An expired or broken asset is reported as such, not silently replaced.
+  if (media && (failed || media.expired))
+    return (
+      <div className="media-slot media-empty">
+        <VideoOff size={22} aria-hidden="true" />
+        <p>
+          <strong>
+            {media.expired ? "This clip has expired." : "This clip could not load."}
+          </strong>
+          <span>The written steps below are unaffected.</span>
+        </p>
+      </div>
+    );
 
   if (!hasIllustration)
     return (
