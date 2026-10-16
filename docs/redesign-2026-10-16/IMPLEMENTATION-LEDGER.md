@@ -24,7 +24,8 @@ Deliberately **not** attempted in this pass, with reasons:
 | Filmed instruction media | No media contract exists and the brief forbids inventing media URLs. A provider-independent player with honest states is built instead; the filmed-asset slot is empty by design. |
 | K08 production offline hardening | Needs a production install plus airplane-mode cold-reopen on real devices. Not performed. |
 | K10 programs / K11 timed+superset depth | P1, and programs depend on reviewed progression rules. |
-| K13–K15 running, Strava, health | Gated on native background-recording field tests (05-running.md). No run UI is presented as working GPS. |
+| Native background run recording | Gated on the field-test matrix in 05-running.md across real devices. The web recorder ships, labelled foreground-only on screen. |
+| Strava connection | Needs server-side encrypted token custody; not something to improvise. GPX/FIT export is the sensible first step. |
 
 ## Done
 
@@ -93,8 +94,38 @@ tests across 7 files, `tsc -b` clean, `vite build` passes.
 
 | Measure | Now | Full-redesign target (03) |
 |---|---:|---:|
-| Published movements | 30 | 90 |
-| Movements with enriched structured metadata | 30 | 90 |
-| Movements with reviewed filmed instruction | 0 | 90 |
+| Published movements | **90** | 90 |
+| Movements with enriched structured metadata | **90** | 90 |
+| Movements with reviewed technique | **0** | 90 |
+| Movements with licensed media | **0** | 90 |
 | Published workout templates | 0 | 24 |
 | Programs | 0 | 6 |
+
+Catalog distribution, against the audited starting point:
+
+| Group | Audited | Now | Audited share | Now |
+|---|---:|---:|---:|---:|
+| Legs | 13 | 26 | 43.3% | 28.9% |
+| Back | 3 | 16 | 10.0% | 17.8% |
+| Arms | 3 | 13 | 10.0% | 14.4% |
+| Core | 2 | 13 | 6.7% | 14.4% |
+| Shoulders | 5 | 11 | 16.7% | 12.2% |
+| Chest | 4 | 11 | 13.3% | 12.2% |
+
+All 19 movement patterns are now represented, including triceps, carries,
+anti-rotation and vertical pulling, which had none.
+
+## Second pass: art direction, catalog, media, running
+
+| Item | What landed | Evidence |
+|---|---|---|
+| Editorial art direction | Monumental duration numeral over generative point-cloud brand art, accent pill, segmented hero progress, stat tiles, hairline prescription tables | Today rebuilt; verified at 390×844 |
+| Micro-animations | Sheets and rest strip rise, set check pops, exercise crossfade, row hover shift, summary mark — all at the motion table's durations, all removed under reduced motion | `src/ui/app.css` motion section |
+| Catalog expansion | 42 strength, 12 mobility, 6 conditioning authored with original guides and full structured metadata | 90 published; distribution table above; 6 new catalog tests |
+| Exercise roles | Strength slots draw only on strength movements; substitutions must share the original's role | Test: a child's-pose lat stretch is never offered as the pull or as a pulldown substitute |
+| Media manifest | Provider-independent, rights-bearing manifest; `streamOnly` cannot be marked cacheable; expired assets reported as expired; `licenseId` mandatory | 9 manifest tests; `npm run check:media` |
+| Run recorder | Spec state machine, checkpointed, idempotent, single watcher, manual pause intervals, manual entry | Driven in-browser with synthetic positions |
+| Run filtering | Rejects vague fixes, impossible jumps and replayed sequences; gaps are not interpolated | 17 running tests; verified live — km 1 at 4:10 for 4 m/s, gap-spanning split flagged |
+| Route rendering | Drawn from samples, no tiles, line breaks at reception gaps | Verified: two segments either side of a simulated 60 s gap |
+| Privacy trimming | Removes every sample within a radius of both ends, including a loop passing back through | Test covers the out-and-back case |
+| Run storage | Separate keys, never the 5 MB journal row | `src/data/runs.ts` |
