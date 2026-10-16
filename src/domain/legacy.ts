@@ -1,5 +1,5 @@
-import { extraExercises } from "./extraExercises";
-import type { WorkoutPlan } from "./plans";
+import { extraExercises } from "../extraExercises";
+import type { WorkoutPlan } from "../plans";
 import { z } from "zod";
 export const profileSchema = z.object({
   name: z.string().trim().min(1).max(40),

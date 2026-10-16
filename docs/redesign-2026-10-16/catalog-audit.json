@@ -1,0 +1,200 @@
+{
+  "auditDate": "2026-10-16",
+  "commit": "8d43f72511de9b99f203f2c112725a0d05ace25c",
+  "total": 30,
+  "muscles": {
+    "Legs": 13,
+    "Back": 3,
+    "Shoulders": 5,
+    "Arms": 3,
+    "Chest": 4,
+    "Core": 2
+  },
+  "equipment": {
+    "Dumbbells": 16,
+    "Bodyweight": 12,
+    "Full gym": 2
+  },
+  "exercises": [
+    {
+      "id": "sumo",
+      "name": "Dumbbell sumo squat",
+      "muscle": "Legs",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "split",
+      "name": "Split squat",
+      "muscle": "Legs",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "lunge",
+      "name": "Reverse lunge",
+      "muscle": "Legs",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "calf",
+      "name": "Standing calf raise",
+      "muscle": "Legs",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "dbcalf",
+      "name": "Dumbbell calf raise",
+      "muscle": "Legs",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "goodmorning",
+      "name": "Bodyweight good morning",
+      "muscle": "Legs",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "bentrow",
+      "name": "Bent-over dumbbell row",
+      "muscle": "Back",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "reversefly",
+      "name": "Dumbbell reverse fly",
+      "muscle": "Shoulders",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "lateral",
+      "name": "Dumbbell lateral raise",
+      "muscle": "Shoulders",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "frontraise",
+      "name": "Dumbbell front raise",
+      "muscle": "Shoulders",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "hammer",
+      "name": "Dumbbell hammer curl",
+      "muscle": "Arms",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "altcurl",
+      "name": "Alternating dumbbell curl",
+      "muscle": "Arms",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "seatedpress",
+      "name": "Seated dumbbell shoulder press",
+      "muscle": "Shoulders",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "closefloor",
+      "name": "Close-grip dumbbell floor press",
+      "muscle": "Chest",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "deadbug",
+      "name": "Dead bug",
+      "muscle": "Core",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "donkey",
+      "name": "Quadruped hip extension",
+      "muscle": "Legs",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "hydrant",
+      "name": "Fire hydrant",
+      "muscle": "Legs",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "narrowpushup",
+      "name": "Close-hand incline push-up",
+      "muscle": "Chest",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "goblet",
+      "name": "Goblet squat",
+      "muscle": "Legs",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "floor",
+      "name": "Dumbbell floor press",
+      "muscle": "Chest",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "row",
+      "name": "Supported dumbbell row",
+      "muscle": "Back",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "rdl",
+      "name": "Dumbbell Romanian deadlift",
+      "muscle": "Legs",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "press",
+      "name": "Dumbbell shoulder press",
+      "muscle": "Shoulders",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "curl",
+      "name": "Dumbbell curl",
+      "muscle": "Arms",
+      "equipment": "Dumbbells"
+    },
+    {
+      "id": "squat",
+      "name": "Bodyweight squat",
+      "muscle": "Legs",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "pushup",
+      "name": "Incline push-up",
+      "muscle": "Chest",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "bridge",
+      "name": "Glute bridge",
+      "muscle": "Legs",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "bird",
+      "name": "Bird dog",
+      "muscle": "Core",
+      "equipment": "Bodyweight"
+    },
+    {
+      "id": "pulldown",
+      "name": "Lat pulldown",
+      "muscle": "Back",
+      "equipment": "Full gym"
+    },
+    {
+      "id": "legpress",
+      "name": "Leg press",
+      "muscle": "Legs",
+      "equipment": "Full gym"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import {
   type Profile,
   type Session,
   type State,
-} from "./domain";
+} from "./domain/legacy";
 const entrySchema = z
   .object({
     exerciseId: z
