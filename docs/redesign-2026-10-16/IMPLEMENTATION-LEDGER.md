@@ -28,7 +28,31 @@ Deliberately **not** attempted in this pass, with reasons:
 
 ## Done
 
-_(evidence recorded as work lands)_
+Commits: `e074e76` (domain and migration), `5bc99c4` (training slice). Suite at 223
+tests across 7 files, `tsc -b` clean, `vite build` passes.
+
+| Item | What landed | Evidence |
+|---|---|---|
+| K01 versioned schema | v2 journal with `schemaVersion`, entry IDs distinct from exercise IDs, planned/input/performed separated, per-set load semantics, snapshotted exercise names, persisted rest and pause intervals | `src/domain/schema.ts`; 11 migration tests |
+| K01 migration | Deterministic, rerunnable v1→v2 deriving IDs rather than generating them; reconciles sessions, entries, sets, set identities, plans, drafts and units; quarantines rather than resets | `src/domain/migrate.ts`, `migrate.test.ts` |
+| K01 live migration | Seeded a v1 journal (mixed kg/lb, unknown exercise ID, half-typed active session, plan + draft) into IndexedDB and reloaded | App reported "2 sessions and 7 sets carried across unchanged". All 7 set IDs and 3 session IDs preserved exactly; units stayed kg/lb; `retired-move` rendered as "Unknown movement (retired-move)" with its values; every migrated set `unspecifiedLegacy`; half-typed value kept as `input`, not as a record; the `kinset:v1:demo` original left in place |
+| Catalog structure | All 30 IDs preserved, enriched with precise primary/supporting muscles, movement patterns, full equipment requirement lists, measurement and load semantics, aliases, difficulty, review and media state | `src/domain/exercises.ts`; 5 catalog tests |
+| Honest selection | Unfillable slots reported with the equipment that would unlock them | `src/domain/selection.ts`; test asserts a bodyweight lineup reports an unmet pull instead of serving a glute bridge — the audit's finding 6 |
+| K02 four tabs + routes | Today · Train · Library · Progress, settings under the profile, hash routes with history; typing in Library replaces rather than pushes | `src/app/routes.ts`, `src/app/Journal.tsx` |
+| K02 tokens | Charcoal/ivory/**orange** token system; the legacy orange-gradient paint on secondary text scoped out of the new shell | `src/ui/tokens.css`, `src/ui/app.css` |
+| K03 session workspace | Focused current movement, overview sheet, minimize + Resume bar, progress segments, finish review showing completed against skipped | Logged a set in-browser; finish review listed 1/2, 0/2, 0/2, 0/2 |
+| K03 idempotent finish | Double-tapped "Finish and save" | One summary record; Progress reported "Sessions 1" |
+| K03 summary | Keeps planned-but-unfinished work; load-volume states its convention and counts exclusions | Migrated session showed "35m approximate" and "2 sets are left out of that total" |
+| K04 contextual help | How-to sheet opens on **instruction**, muscles second; returns focus to the opening control | Opened mid-set: typed "7" preserved, completed "10" preserved, scroll preserved, rest kept running 0:20 → 0:19 |
+| K04 muscle map | Vector front/back map, prime movers vs supporting by fill **and** pattern, text equivalent always present, "not activation or recovery" caption | Rendered inline on Preview |
+| K04 media honesty | Provider-independent slot; the 3D demo is opt-in and labelled computer-generated and unreviewed; filmed-asset path written but unreachable | `src/media/Player.tsx` |
+| K05 rest persistence | Deadline stored on the session | 1:30 before a reload, 1:13 after — the audited timer lost it entirely |
+| K05 edit/undo | Uncomplete returns a result to editable input; completed sets cannot be edited or removed in place | 6 session tests |
+| K05 substitution | Matches pattern + full equipment, keeps completed sets, offers nothing rather than a bad swap | 3 substitution tests; sheet states what it keeps |
+| Bodyweight handling | No typed zero required; bests and trends rank by reps where there is no external load | Summary read "Split squat — 10 reps", not "0 kg × 10" |
+| Anatomy payload | The ~11 MiB GLB anatomy model left every code path; no GLTF chunk in the build | `dist/assets/` contains only the app chunk, the opt-in demo chunk and CSS |
+| Interruption recovery | Demo choice kept for the tab, so a reload resumes instead of returning to sign-in | Reloaded mid-session; session, logged set and rest all resumed |
+| Responsive | No horizontal overflow at 320px; on 390×844 the start action sits at 660–716px, above both the fold and the tab bar | Measured in-browser |
 
 ## Blocked on an external decision
 
@@ -45,10 +69,25 @@ _(evidence recorded as work lands)_
 | Claim | What would verify it |
 |---|---|
 | Production offline cold reopen | Install the production build, quit, airplane mode, relaunch |
-| Real-device performance budgets | Measure on an agreed midrange phone |
+| Real-device performance budgets | Measure on an agreed midrange phone. The main chunk is 739 kB / 215 kB gzip and still over the brief's budget; the build warns. Code-splitting the shell is outstanding. |
 | Usability targets in 02 §"Usability acceptance tasks" | A study with at least five lifters |
-| Exercise technique and muscle attribution | Qualified reviewer sign-off |
+| Exercise technique and muscle attribution | Qualified reviewer sign-off. Every definition carries `techniqueReviewed: false`. |
 | Live account lifecycle | Real signup, confirm, reset, delete against production email |
+| Multi-device sync and conflict merge | Two real devices offline, then reconnected. Only the audited revision check is in place; per-entity sync is K12. |
+| Screen reader and 200% zoom | Only keyboard focus order and the text equivalents were built; neither was exercised with assistive technology |
+
+## Known follow-ups
+
+- `src/Body.tsx` and `src/ExerciseInstructions.tsx` are now unreferenced. Their entry
+  points are replaced, so they can be archived — but the anatomy GLBs carry CC BY-SA
+  attribution, so removal should handle the credits page deliberately rather than as a
+  side effect.
+- Auth, onboarding and the plan editor still use the legacy stylesheet and have not been
+  lifted onto the token system. The plan editor renders inside the new shell, so it
+  inherits the neutral secondary text but not the rest of the design.
+- `nextWorkout` still derives equipment from the coarse onboarding bucket via
+  `assumedEquipment`. The explicit equipment chips in 02 §1 would remove the guess; the
+  bench and machine assumptions are the ones most likely to be wrong today.
 
 ## Coverage counts
 
