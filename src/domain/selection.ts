@@ -74,7 +74,12 @@ function matchesSlot(exercise: ExerciseDefinition, slot: Slot) {
  */
 function missingFor(slot: Slot, available: ReadonlySet<EquipmentItem>) {
   const candidates = exerciseDefinitions
-    .filter((e) => e.review.state === "published" && matchesSlot(e, slot))
+    .filter(
+      (e) =>
+        e.review.state === "published" &&
+        e.role === "strength" &&
+        matchesSlot(e, slot),
+    )
     .map((e) => e.requires.filter((item) => !available.has(item)));
   if (!candidates.length) return [];
   // The cheapest route in: the candidate needing the fewest additional pieces.
@@ -101,6 +106,8 @@ export function buildLineup(
     let pool = exerciseDefinitions.filter(
       (e) =>
         e.review.state === "published" &&
+        // A stretch that shares a pattern is still not a working set.
+        e.role === "strength" &&
         matchesSlot(e, slot) &&
         canPerform(e, available) &&
         !used.has(e.id),
@@ -156,6 +163,8 @@ export function substitutionsFor(
       (e) =>
         e.id !== original.id &&
         e.review.state === "published" &&
+        // A replacement has to do the same job, not merely share a pattern family.
+        e.role === original.role &&
         canPerform(e, available),
     )
     .map((e) => {

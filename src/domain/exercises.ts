@@ -22,6 +22,8 @@
  */
 import { exercises as legacyExercises } from "./legacy";
 import { guides, type ExerciseGuide } from "../guides";
+import { authoredStrength } from "./expansion";
+import { authoredMobility, authoredConditioning } from "./mobility";
 
 /** Precise muscles. Deliberately finer than the six browse groups. */
 export type MuscleId =
@@ -117,6 +119,8 @@ export type MovementPattern =
   | "elbowExtension"
   | "antiExtension"
   | "antiRotation"
+  | "rotation"
+  | "hipFlexion"
   | "carry";
 
 export const patternNames: Record<MovementPattern, string> = {
@@ -136,6 +140,8 @@ export const patternNames: Record<MovementPattern, string> = {
   elbowExtension: "Elbow extension",
   antiExtension: "Anti-extension",
   antiRotation: "Anti-rotation",
+  rotation: "Rotation",
+  hipFlexion: "Hip flexion",
   carry: "Carry",
 };
 
@@ -151,7 +157,25 @@ export type EquipmentItem =
   | "elevatedSurface"
   | "seatWithBack"
   | "latPulldownMachine"
-  | "legPressMachine";
+  | "legPressMachine"
+  | "flatBench"
+  | "inclineBench"
+  | "cableMachine"
+  | "bandWithAnchor"
+  | "resistanceBand"
+  | "pullUpBar"
+  | "assistedPullUpMachine"
+  | "landmineOrCorner"
+  | "chestPressMachine"
+  | "rowMachine"
+  | "legCurlMachine"
+  | "legExtensionMachine"
+  | "stepPlatform"
+  | "abWheel"
+  | "wall"
+  | "stationaryBike"
+  | "rowingErgometer"
+  | "openSpace";
 
 export const equipmentNames: Record<EquipmentItem, string> = {
   floorSpace: "Floor space",
@@ -162,6 +186,24 @@ export const equipmentNames: Record<EquipmentItem, string> = {
   seatWithBack: "A seat with back support",
   latPulldownMachine: "Lat pulldown machine",
   legPressMachine: "Leg press machine",
+  flatBench: "A flat bench",
+  inclineBench: "An adjustable incline bench",
+  cableMachine: "A cable machine",
+  bandWithAnchor: "A resistance band and a secure anchor",
+  resistanceBand: "A resistance band",
+  pullUpBar: "A rated pull-up bar",
+  assistedPullUpMachine: "An assisted pull-up machine",
+  landmineOrCorner: "A landmine attachment or a padded corner",
+  chestPressMachine: "Chest press machine",
+  rowMachine: "Seated row machine",
+  legCurlMachine: "Hamstring curl machine",
+  legExtensionMachine: "Leg extension machine",
+  stepPlatform: "A stable step or platform",
+  abWheel: "An ab wheel",
+  wall: "A clear stretch of wall",
+  stationaryBike: "A stationary bike",
+  rowingErgometer: "A rowing ergometer",
+  openSpace: "Room to walk a few steps",
 };
 
 /**
@@ -201,6 +243,17 @@ export type Measurement =
 export type Difficulty = "beginner" | "intermediate" | "advanced";
 
 /**
+ * What a movement is for.
+ *
+ * This exists because a pattern alone is not enough to pick with. A child's-pose lat
+ * stretch genuinely involves the lats and genuinely belongs to the vertical-pull family,
+ * but serving it as the pull in a strength session would be the same category of lie as
+ * the glute bridge it replaced. Strength slots take strength movements; mobility and
+ * conditioning are selected deliberately, for the sessions that want them.
+ */
+export type ExerciseRole = "strength" | "mobility" | "conditioning";
+
+/**
  * The content workflow from 03-content-and-media.md. `published` means the movement is
  * visible to users; it does NOT imply technique review, which is tracked separately
  * because no qualified reviewer has been engaged yet.
@@ -231,6 +284,7 @@ export type ExerciseDefinition = {
   browseGroup: "Chest" | "Back" | "Shoulders" | "Arms" | "Core" | "Legs";
   /** The legacy three-way label, retained so existing plan/equipment code keeps working. */
   browseEquipment: "Dumbbells" | "Full gym" | "Bodyweight";
+  role: ExerciseRole;
   patterns: MovementPattern[];
   primaryMuscles: MuscleId[];
   supportingMuscles: MuscleId[];
@@ -562,7 +616,7 @@ function parseReps(text: string) {
  * default prescription. A missing structure entry throws at module load rather than
  * shipping a half-described movement.
  */
-export const exerciseDefinitions: ExerciseDefinition[] = legacyExercises.map(
+const originalDefinitions: ExerciseDefinition[] = legacyExercises.map(
   (e) => {
     const s = structure[e.id];
     if (!s) throw new Error(`No structured definition for exercise "${e.id}".`);
@@ -572,6 +626,7 @@ export const exerciseDefinitions: ExerciseDefinition[] = legacyExercises.map(
       version: 1,
       name: e.name,
       aliases: s.aliases,
+      role: "strength" as const,
       browseGroup: e.muscle,
       browseEquipment: e.equipment,
       patterns: s.patterns,
@@ -588,6 +643,54 @@ export const exerciseDefinitions: ExerciseDefinition[] = legacyExercises.map(
     };
   },
 );
+
+/**
+ * The movements authored for the redesign, in the same shape as the original thirty.
+ * They are published — visible and trainable — but like the originals they carry
+ * `techniqueReviewed: false`, because no qualified reviewer has seen any of this
+ * catalog. That flag is the thing the ledger counts, not the publication state.
+ */
+const withRole = (
+  list: typeof authoredStrength,
+  role: ExerciseRole,
+): Array<(typeof authoredStrength)[number] & { role: ExerciseRole }> =>
+  list.map((e) => ({ ...e, role }));
+
+const authoredDefinitions: ExerciseDefinition[] = [
+  ...withRole(authoredStrength, "strength"),
+  ...withRole(authoredMobility, "mobility"),
+  ...withRole(authoredConditioning, "conditioning"),
+].map((e) => ({
+  id: e.id,
+  version: 1,
+  name: e.name,
+  aliases: e.aliases,
+  role: e.role,
+  browseGroup: e.browseGroup,
+  browseEquipment: e.browseEquipment,
+  patterns: e.patterns,
+  primaryMuscles: e.primaryMuscles,
+  supportingMuscles: e.supportingMuscles,
+  requires: e.requires,
+  measurement: e.measurement,
+  difficulty: e.difficulty,
+  defaultReps: e.defaultReps,
+  cue: e.cue,
+  guide: e.guide,
+  review: unreviewed,
+  media: noMedia,
+}));
+
+export const exerciseDefinitions: ExerciseDefinition[] = [
+  ...originalDefinitions,
+  ...authoredDefinitions,
+];
+
+const duplicates = exerciseDefinitions
+  .map((e) => e.id)
+  .filter((id, i, all) => all.indexOf(id) !== i);
+if (duplicates.length)
+  throw new Error(`Duplicate exercise IDs: ${duplicates.join(", ")}`);
 
 const byId = new Map(exerciseDefinitions.map((e) => [e.id, e]));
 
@@ -606,6 +709,18 @@ export function resolveExerciseName(id: string, snapshotName?: string) {
 
 export const publishedExercises = exerciseDefinitions.filter(
   (e) => e.review.state === "published",
+);
+
+export const strengthExercises = publishedExercises.filter(
+  (e) => e.role === "strength",
+);
+
+export const mobilityExercises = publishedExercises.filter(
+  (e) => e.role === "mobility",
+);
+
+export const conditioningExercises = publishedExercises.filter(
+  (e) => e.role === "conditioning",
 );
 
 /** Every piece of equipment the user would need to run this list, deduplicated. */
@@ -638,7 +753,8 @@ export function assumedEquipment(
   bucket: "Dumbbells" | "Full gym" | "Bodyweight",
 ): Set<EquipmentItem> {
   const base: EquipmentItem[] = ["floorSpace"];
-  if (bucket === "Bodyweight") return new Set([...base, "elevatedSurface"]);
+  if (bucket === "Bodyweight")
+    return new Set([...base, "elevatedSurface", "wall", "openSpace"]);
   if (bucket === "Dumbbells")
     return new Set([
       ...base,
@@ -647,6 +763,8 @@ export function assumedEquipment(
       "elevatedSurface",
       "benchOrSupport",
       "seatWithBack",
+      "wall",
+      "openSpace",
     ]);
   return new Set([
     ...base,
@@ -657,6 +775,24 @@ export function assumedEquipment(
     "seatWithBack",
     "latPulldownMachine",
     "legPressMachine",
+    "flatBench",
+    "inclineBench",
+    "cableMachine",
+    "bandWithAnchor",
+    "resistanceBand",
+    "pullUpBar",
+    "assistedPullUpMachine",
+    "landmineOrCorner",
+    "chestPressMachine",
+    "rowMachine",
+    "legCurlMachine",
+    "legExtensionMachine",
+    "stepPlatform",
+    "abWheel",
+    "wall",
+    "stationaryBike",
+    "rowingErgometer",
+    "openSpace",
   ]);
 }
 

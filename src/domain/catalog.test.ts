@@ -22,14 +22,47 @@ import {
 import type { Journal, Session2 } from "./schema";
 
 describe("structured catalog", () => {
-  it("covers every original exercise, with its ID and name unchanged", () => {
-    expect(exerciseDefinitions).toHaveLength(legacyExercises.length);
+  it("keeps every original exercise, with its ID and name unchanged", () => {
+    // The catalog grew; none of the original thirty may be renamed or dropped, because
+    // history resolves through these IDs.
     for (const legacy of legacyExercises) {
       const def = findExercise(legacy.id);
       expect(def, `missing definition for ${legacy.id}`).toBeDefined();
       expect(def!.name).toBe(legacy.name);
       expect(def!.browseGroup).toBe(legacy.muscle);
     }
+  });
+
+  it("is no longer 43% legs", () => {
+    // The audited catalog was 13 legs to 2 core, which is why a balanced lineup could
+    // not be built from it.
+    const counts = new Map<string, number>();
+    for (const e of publishedExercises)
+      counts.set(e.browseGroup, (counts.get(e.browseGroup) ?? 0) + 1);
+    const total = publishedExercises.length;
+    expect(total).toBeGreaterThanOrEqual(90);
+
+    const legShare = (counts.get("Legs") ?? 0) / total;
+    expect(legShare).toBeLessThan(0.33);
+    // Every group carries real weight now; none is a rounding error.
+    for (const group of ["Chest", "Back", "Shoulders", "Arms", "Core", "Legs"])
+      expect(counts.get(group) ?? 0, group).toBeGreaterThanOrEqual(10);
+  });
+
+  it("has a unique ID for every movement", () => {
+    const ids = exerciseDefinitions.map((e) => e.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("covers every movement pattern the selector can ask for", () => {
+    const covered = new Set(
+      publishedExercises.filter((e) => e.role === "strength").flatMap((e) => e.patterns),
+    );
+    for (const slot of fullBodySlots)
+      expect(
+        slot.patterns.some((p) => covered.has(p)),
+        slot.label,
+      ).toBe(true);
   });
 
   it("gives every movement at least one pattern and one primary muscle", () => {
@@ -74,9 +107,11 @@ describe("structured catalog", () => {
 });
 
 describe("lineup selection", () => {
-  it("reports an unmet pull instead of passing off a glute bridge as one", () => {
-    // The audited bug: no Back movement is Bodyweight, so the pull slot fell through
-    // to a hip extension and said nothing.
+  it("reports an unmet pull rather than substituting a hip extension or a stretch", () => {
+    // Two separate failures guarded here. The audited one: no Back movement was
+    // Bodyweight, so the pull slot fell through to a glute bridge silently. The one the
+    // expansion introduced: a child's-pose lat stretch shares the vertical-pull pattern,
+    // and serving it as a working pull would be the same lie in nicer clothes.
     const bodyweight = assumedEquipment("Bodyweight");
     const lineup = buildLineup(bodyweight, 7);
 
@@ -84,11 +119,23 @@ describe("lineup selection", () => {
     expect(pull, "pull should be reported as unmet").toBeDefined();
     expect(pull!.reason).toContain("pull");
 
-    // Whatever was filled genuinely matches its slot.
-    for (const { slot, exercise } of lineup.filled)
+    // Whatever was filled genuinely matches its slot, and is a working movement.
+    for (const { slot, exercise } of lineup.filled) {
       expect(exercise.patterns.some((p) => slot.patterns.includes(p))).toBe(true);
-    // And no filled slot is a hip extension standing in for a pull.
+      expect(exercise.role).toBe("strength");
+    }
     expect(lineup.filled.map((f) => f.slot.id)).not.toContain("pull");
+  });
+
+  it("fills the pull once the user actually has something to pull on", () => {
+    const withBar = new Set([
+      ...assumedEquipment("Bodyweight"),
+      "pullUpBar" as const,
+    ]);
+    const lineup = buildLineup(withBar, 7);
+    const pull = lineup.filled.find((f) => f.slot.id === "pull");
+    expect(pull).toBeDefined();
+    expect(pull!.exercise.role).toBe("strength");
   });
 
   it("fills every slot when the equipment is there, without repeating a movement", () => {
@@ -148,6 +195,13 @@ describe("substitution matching", () => {
   it("returns nothing rather than a bad swap when equipment rules it out", () => {
     const options = substitutionsFor("pulldown", assumedEquipment("Bodyweight"));
     expect(options).toEqual([]);
+  });
+
+  it("never offers a stretch as a substitute for a working movement", () => {
+    const options = substitutionsFor("pulldown", assumedEquipment("Full gym"));
+    expect(options.length).toBeGreaterThan(0);
+    for (const option of options) expect(option.exercise.role).toBe("strength");
+    expect(options.map((o) => o.exercise.id)).not.toContain("childslat");
   });
 
   it("only ever offers published movements", () => {
