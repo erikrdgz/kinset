@@ -20,16 +20,10 @@ export default function App() {
   const [loading, setLoading] = useState(!!supabase);
   const [recover, setRecover] = useState(false);
   const [entry, setEntry] = useState<number | null>(null);
-  // The cold open plays once per tab, before sign-in only. A returning signed-in user
-  // goes straight to their journal rather than sitting through it.
-  const [intro, setIntro] = useState(() => {
-    try { return sessionStorage.getItem("kinset:intro") !== "1"; }
-    catch { return true; }
-  });
-  const endIntro = useCallback(() => {
-    try { sessionStorage.setItem("kinset:intro", "1"); } catch { /* ignore */ }
-    setIntro(false);
-  }, []);
+  // The cold open plays on every load of the signed-out view. A restored session skips
+  // it, so a returning signed-in user goes straight to their journal.
+  const [intro, setIntro] = useState(true);
+  const endIntro = useCallback(() => setIntro(false), []);
   const entrySequence = useRef(0);
   const authGate = useRef(createAuthEntryGate<AuthSession>());
   const finishEntry = useCallback(() => setEntry(null), []);
