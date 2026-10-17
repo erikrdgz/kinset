@@ -7,6 +7,8 @@ import {
   validSet,
   completedSets,
   shuffledProgram,
+  startingSets,
+  experienceLevels,
   exercises,
   type Profile,
 } from "./domain";
@@ -15,7 +17,7 @@ const profile: Profile = {
   goal: "Build consistency",
   days: 3,
   equipment: "Dumbbells",
-  experience: "New to training",
+  experience: "New to lifting",
   unit: "kg",
   weight: "",
   height: "",
@@ -66,6 +68,45 @@ describe("training journal", () => {
     expect(validSet({ ...s, weight: -1 })).toBe(false);
     expect(validSet({ ...s, weight: Infinity })).toBe(false);
   });
+  it("accepts a week from one day to seven", () => {
+    for (const days of [1, 2, 3, 4, 5, 6, 7])
+      expect(profileSchema.safeParse({ ...profile, days }).success, String(days)).toBe(
+        true,
+      );
+    expect(profileSchema.safeParse({ ...profile, days: 0 }).success).toBe(false);
+    expect(profileSchema.safeParse({ ...profile, days: 8 }).success).toBe(false);
+  });
+
+  it("upgrades the retired experience wording instead of rejecting it", () => {
+    // These are stored in every journal written before the rename. Failing the parse
+    // would quarantine real training data over a change of words.
+    const retired = {
+      "New to training": "New to lifting",
+      Returning: "Getting back into it",
+      Consistent: "Training regularly",
+    } as const;
+    for (const [stored, expected] of Object.entries(retired)) {
+      const result = profileSchema.safeParse({ ...profile, experience: stored });
+      expect(result.success, stored).toBe(true);
+      if (result.success) expect(result.data.experience).toBe(expected);
+    }
+    expect(
+      profileSchema.safeParse({ ...profile, experience: "Olympian" }).success,
+    ).toBe(false);
+  });
+
+  it("starts a beginner lighter and a veteran heavier", () => {
+    expect(startingSets("New to lifting")).toBe(2);
+    expect(startingSets("Getting back into it")).toBe(3);
+    expect(startingSets("Training regularly")).toBe(3);
+    expect(startingSets("Training for years")).toBe(4);
+    // The mapping is what the session actually uses.
+    for (const experience of experienceLevels) {
+      const s = startSession({ ...profile, experience });
+      expect(s.entries[0].sets).toHaveLength(startingSets(experience));
+    }
+  });
+
   it("validates profile bounds", () => {
     expect(profileSchema.safeParse(profile).success).toBe(true);
     expect(profileSchema.safeParse({ ...profile, days: 9 }).success).toBe(

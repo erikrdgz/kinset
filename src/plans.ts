@@ -1,19 +1,20 @@
 import { z } from "zod";
 import { demoIds } from "./motion/catalog";
+import { findExercise } from "./domain/exercises";
 import {
-  exercises,
   program,
   shuffledProgram,
+  startingSets,
   type Profile,
   type Session,
   type State,
-} from "./domain";
+} from "./domain/legacy";
 const entrySchema = z
   .object({
     exerciseId: z
       .string()
       .refine(
-        (id) => exercises.some((e) => e.id === id),
+        (id) => findExercise(id)?.role === "strength",
         "Choose an exercise from the library.",
       ),
     sets: z.number().int().min(1).max(10),
@@ -56,13 +57,14 @@ export type WorkoutPlan = z.infer<typeof planSchema>;
 export type PlanDay = WorkoutPlan["days"][number];
 export type PlanEntry = PlanDay["entries"][number];
 export function defaultEntry(exerciseId: string): PlanEntry {
-  const e = exercises.find((e) => e.id === exerciseId)!;
-  const numbers = e.reps.match(/\d+/g)!.map(Number);
+  const exercise = findExercise(exerciseId);
+  if (!exercise || exercise.role !== "strength")
+    throw new Error(`No strength prescription is available for ${exerciseId}.`);
   return {
     exerciseId,
     sets: 3,
-    repsMin: numbers[0],
-    repsMax: numbers[1] || numbers[0],
+    repsMin: exercise.defaultReps.min,
+    repsMax: exercise.defaultReps.max,
   };
 }
 export function newPlan(): WorkoutPlan {
@@ -81,7 +83,7 @@ export function foundationPlan(p: Profile): WorkoutPlan {
       name: `Full body ${String.fromCharCode(65 + i)}`,
       entries: program(p, i).map((e) => ({
         ...defaultEntry(e.id),
-        sets: p.experience === "New to training" ? 2 : 3,
+        sets: startingSets(p.experience),
       })),
     })),
   };
@@ -117,7 +119,7 @@ export function nextWorkout(data: State) {
         )
     ).map((e) => ({
       ...defaultEntry(e.id),
-      sets: p.experience === "New to training" ? 2 : 3,
+      sets: startingSets(p.experience),
     })),
   };
 }
@@ -137,7 +139,7 @@ export function startWorkout(
       exerciseId: e.exerciseId,
       targetReps:
         targetReps(e) +
-        (exercises.find((x) => x.id === e.exerciseId)!.reps.includes("/ side")
+        (findExercise(e.exerciseId)?.measurement.perSide
           ? " / side"
           : ""),
       sets: Array.from({ length: e.sets }, () => ({

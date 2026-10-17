@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -13,15 +14,35 @@ export function Select({
   options: readonly (string | { value: string; label: string })[];
   label: string;
 }) {
+  const trigger = useRef<HTMLButtonElement>(null);
+  /**
+   * A modal <dialog> makes everything outside it inert, so a menu portalled to the
+   * body renders where nothing can see or click it. Inside one, the portal targets
+   * the dialog instead. Resolved on open rather than at mount, because the trigger is
+   * not in the document yet on the first render.
+   */
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+
   return (
-    <SelectPrimitive.Root value={value} onValueChange={onValueChange}>
-      <SelectPrimitive.Trigger className="kinset-select" aria-label={label}>
+    <SelectPrimitive.Root
+      value={value}
+      onValueChange={onValueChange}
+      onOpenChange={(open) => {
+        if (open)
+          setContainer(trigger.current?.closest("dialog") ?? document.body);
+      }}
+    >
+      <SelectPrimitive.Trigger
+        ref={trigger}
+        className="kinset-select"
+        aria-label={label}
+      >
         <SelectPrimitive.Value />
         <SelectPrimitive.Icon className="kinset-select-icon">
           <ChevronDown size={20} />
         </SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
-      <SelectPrimitive.Portal>
+      <SelectPrimitive.Portal container={container ?? undefined}>
         <SelectPrimitive.Content
           className="kinset-select-menu"
           position="popper"

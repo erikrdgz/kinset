@@ -1,0 +1,20 @@
+.auth-transition { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: #0c0d0e; pointer-events: auto; touch-action: none; animation: entry-veil 920ms ease both; }
+.auth-transition-mark { position: relative; width: clamp(180px, 27vw, 360px); aspect-ratio: 980 / 270; animation: entry-mark 720ms cubic-bezier(.16,1,.3,1) both; }
+.auth-transition-mark > span { position: absolute; inset: 0; display: block; mask: var(--entry-wordmark) center / contain no-repeat; -webkit-mask: var(--entry-wordmark) center / contain no-repeat; }
+.auth-transition-base { background: #f2f1eb; }
+.auth-transition-slice { background: #ff692b; }
+.auth-transition-slice-a { clip-path: inset(24% 0 58%); animation: entry-slice-a 660ms ease-out both; }
+.auth-transition-slice-b { clip-path: inset(62% 0 28%); animation: entry-slice-b 660ms ease-out both; }
+.auth-transition-rule { position: absolute; top: calc(100% + 24px); left: 10%; width: 80%; height: 1px; background: #ff692b; transform-origin: left; animation: entry-rule 730ms cubic-bezier(.25,.65,.3,1) both; }
+@keyframes entry-veil { 0%, 72% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes entry-mark { 0% { opacity: 0; transform: translateY(7px) scale(.98); } 20%, 100% { opacity: 1; transform: translateY(0) scale(1); } }
+/* One small displacement per slice; no blinking or full-screen brightness changes. */
+@keyframes entry-slice-a { 0%, 16% { opacity: 0; transform: translateX(0); } 27% { opacity: 1; transform: translateX(9px); } 47% { opacity: 1; transform: translateX(-3px); } 62%, 100% { opacity: 0; transform: translateX(0); } }
+@keyframes entry-slice-b { 0%, 26% { opacity: 0; transform: translateX(0); } 38% { opacity: .85; transform: translateX(-7px); } 58%, 100% { opacity: 0; transform: translateX(0); } }
+@keyframes entry-rule { 0%, 15% { opacity: 0; transform: scaleX(.03); } 30% { opacity: .7; } 78% { opacity: .7; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .auth-transition { animation: entry-reduced-fade 160ms ease-out both; }
+  .auth-transition-mark { animation: none; }
+  .auth-transition-slice, .auth-transition-rule { display: none; animation: none; }
+  @keyframes entry-reduced-fade { 0%, 35% { opacity: 1; } 100% { opacity: 0; } }
+}

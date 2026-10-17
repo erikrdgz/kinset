@@ -14,7 +14,7 @@ const profile: Profile = {
   goal: "Build consistency",
   days: 3,
   equipment: "Dumbbells",
-  experience: "Returning",
+  experience: "Getting back into it",
   unit: "lb",
   height: "",
   weight: "",
@@ -140,5 +140,16 @@ describe("custom workout plans", () => {
     const restored = JSON.parse(JSON.stringify(data));
     expect(nextWorkout(restored).dayId).toBe("lower");
     expect(restored.planDraft.days).toHaveLength(1);
+  });
+});
+
+describe("expanded catalog programming", () => {
+  it("can save and snapshot a newly added shoulder movement", () => {
+    const plan = makePlan();
+    plan.days[0].entries = [defaultEntry("machineshoulderpress")];
+    expect(plan.days[0].entries[0]).toMatchObject({ repsMin: 8, repsMax: 12 });
+    expect(planSchema.safeParse(plan).success).toBe(true);
+    const session = startWorkout(profile, nextWorkout({ ...emptyState, profile, plans: [plan], activePlanId: plan.id }));
+    expect(session.entries[0]).toMatchObject({ exerciseId: "machineshoulderpress", targetReps: "8–12" });
   });
 });

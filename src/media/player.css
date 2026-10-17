@@ -1,0 +1,25 @@
+.movement-media { --media-ink: #f1f1ed; background: #17191b; border: 1px solid #ffffff12; color: var(--media-ink); }
+.movement-film { position: relative; background: #0c0d0e; }
+.movement-film .media-video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; }
+.movement-film-start { position: absolute; inset: 0 0 36px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border: 0; border-radius: 0; color: #fff; background: #0004; cursor: pointer; }
+.movement-film-start span { display: grid; place-items: center; width: 58px; height: 58px; border: 1px solid #ffffff60; border-radius: 50%; background: #101214b3; backdrop-filter: blur(10px); box-shadow: 0 8px 28px #0005; transition: transform 180ms ease, background 180ms ease; }
+.movement-film-start:hover span { transform: scale(1.07); background: #ff692b; }
+.movement-film-start strong { font-size: 13px; font-weight: 600; letter-spacing: .01em; text-shadow: 0 1px 8px #000; }
+.movement-playback { display: flex; align-items: center; gap: 10px; min-height: 55px; padding: 8px 16px; border-bottom: 1px solid #ffffff0d; }
+.movement-media-label { flex: 1; color: #acafb2; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.movement-speed, .movement-position-controls { display: flex; align-items: center; gap: 3px; }
+.movement-playback button, .movement-gif-toggle { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; min-height: 40px; padding: 7px 10px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #c2c5c8; font: inherit; font-size: 12px; cursor: pointer; }
+.movement-speed button[aria-pressed="true"] { color: #f2f1ed; background: #ffffff0b; border-color: #ffffff12; }
+.movement-playback button:hover, .movement-gif-toggle:hover { color: #fff; background: #ffffff10; }
+.movement-position-controls span { min-width: 35px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; color: #d0d2d3; }
+.movement-positions { background: #f3f3f0; padding: 20px; }
+.movement-position { display: block; height: 280px; max-height: 44vh; width: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.movement-credits { padding: 12px 16px 14px; font-size: 11px; line-height: 1.65; color: #9da1a5; }
+.movement-credits p { margin: 0; }
+.movement-credits a { color: #c9cdcf; text-decoration-color: #ffffff50; text-underline-offset: 3px; }
+.movement-credits summary { display: list-item; width: fit-content; padding: 6px 0 2px; cursor: pointer; color: #c9cdcf; }
+.movement-credits details[open] p { margin-top: 5px; }
+.movement-variant { margin: 0; padding: 12px 16px 0; color: #b8bdc0; font-size: 12px; line-height: 1.55; }
+.movement-gif { position: relative; min-height: 150px; }
+.movement-gif-toggle { position: absolute; bottom: 14px; left: 14px; gap: 8px; background: #111c; }
+@media (prefers-reduced-motion: reduce) { .movement-film-start span { transition: none; } .movement-film-start:hover span { transform: none; } }

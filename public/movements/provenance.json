@@ -1,0 +1,1218 @@
+{
+  "retrievedAt": "2026-10-16",
+  "assets": [
+    {
+      "exerciseId": "cablerow",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/1/",
+      "originalUrl": "https://wger.de/media/exercise-video/512/fff4c294-93f0-4926-b3a2-bf59ad4afaa5.MOV",
+      "originalSha256": "623708fc1e5b1fb1be2b1647a0fa044d0208b2ebea2a5ed6bf1a77e9c1e21b90",
+      "originalMetadata": {
+        "id": 1,
+        "uuid": "fff4c294-93f0-4926-b3a2-bf59ad4afaa5",
+        "exercise": 512,
+        "exercise_uuid": "00fcf603-b0d0-48d2-9b5e-c7f0d510d46c",
+        "video": "https://wger.de/media/exercise-video/512/fff4c294-93f0-4926-b3a2-bf59ad4afaa5.MOV",
+        "is_main": false,
+        "size": 34332925,
+        "duration": "10.49",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u201310.49s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 387124
+    },
+    {
+      "exerciseId": "cablelateral",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/5/",
+      "originalUrl": "https://wger.de/media/exercise-video/349/9896d82e-d8b6-48af-bdd5-b8545dc523e9.MOV",
+      "originalSha256": "14b3c3fc75f882edd98b0af2f685441753349f239aeb5f4cb09c54a4809a7f58",
+      "originalMetadata": {
+        "id": 5,
+        "uuid": "9896d82e-d8b6-48af-bdd5-b8545dc523e9",
+        "exercise": 349,
+        "exercise_uuid": "57263316-6f34-4539-952b-b07e09bac3ba",
+        "video": "https://wger.de/media/exercise-video/349/9896d82e-d8b6-48af-bdd5-b8545dc523e9.MOV",
+        "is_main": false,
+        "size": 33127028,
+        "duration": "13.22",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u201313.22s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 681625
+    },
+    {
+      "exerciseId": "lateral",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/6/",
+      "originalUrl": "https://wger.de/media/exercise-video/348/de69928a-8a35-4096-821c-1f46de5e0e03.MOV",
+      "originalSha256": "41c47c5efd245d0dfbcd25e4c1e6a4f46f2093281871df3503278ea9e5444d7f",
+      "originalMetadata": {
+        "id": 6,
+        "uuid": "de69928a-8a35-4096-821c-1f46de5e0e03",
+        "exercise": 348,
+        "exercise_uuid": "63375f5b-2d81-471c-bea4-fc3d207e96cb",
+        "video": "https://wger.de/media/exercise-video/348/de69928a-8a35-4096-821c-1f46de5e0e03.MOV",
+        "is_main": false,
+        "size": 43874331,
+        "duration": "18.26",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 2\u201316s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 888500
+    },
+    {
+      "exerciseId": "seatedreversefly",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/7/",
+      "originalUrl": "https://wger.de/media/exercise-video/82/28b53647-27e7-47cf-8852-2ee666c8b628.MOV",
+      "originalSha256": "e0a0b55272b6ba9ccf30238802d65c1baf5d6526dbf23dbd940354bf42b73f05",
+      "originalMetadata": {
+        "id": 7,
+        "uuid": "28b53647-27e7-47cf-8852-2ee666c8b628",
+        "exercise": 82,
+        "exercise_uuid": "6f79b381-98a4-40d5-8a45-3bb0558be6fe",
+        "video": "https://wger.de/media/exercise-video/82/28b53647-27e7-47cf-8852-2ee666c8b628.MOV",
+        "is_main": false,
+        "size": 13386307,
+        "duration": "7.60",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u20137.6s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 346170
+    },
+    {
+      "exerciseId": "machineshoulderpress",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/11/",
+      "originalUrl": "https://wger.de/media/exercise-video/543/dbfd396b-1aab-4a64-a50b-2c31ff0a2cf7.MOV",
+      "originalSha256": "1b3f5619a871ea77871a17b777c606e793f1d728a8253bad45c13f3877e999d6",
+      "originalMetadata": {
+        "id": 11,
+        "uuid": "dbfd396b-1aab-4a64-a50b-2c31ff0a2cf7",
+        "exercise": 543,
+        "exercise_uuid": "5912d7ed-6a0e-4b4c-b30a-fc9f3f890fc1",
+        "video": "https://wger.de/media/exercise-video/543/dbfd396b-1aab-4a64-a50b-2c31ff0a2cf7.MOV",
+        "is_main": false,
+        "size": 23511495,
+        "duration": "12.27",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u201312.27s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 453453
+    },
+    {
+      "exerciseId": "seatedpress",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/12/",
+      "originalUrl": "https://wger.de/media/exercise-video/567/64f33c19-1d96-4b7c-af17-6c6a4941c614.MOV",
+      "originalSha256": "0151a7cd43894d60c1fe1ffb34f4f4b709fc17aa6a5913c7edea4a14c9113985",
+      "originalMetadata": {
+        "id": 12,
+        "uuid": "64f33c19-1d96-4b7c-af17-6c6a4941c614",
+        "exercise": 567,
+        "exercise_uuid": "87affa4b-395b-437c-9581-2bd20ea5aa7c",
+        "video": "https://wger.de/media/exercise-video/567/64f33c19-1d96-4b7c-af17-6c6a4941c614.MOV",
+        "is_main": false,
+        "size": 62860017,
+        "duration": "23.13",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 2\u201316s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 785803
+    },
+    {
+      "exerciseId": "dbbench",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/17/",
+      "originalUrl": "https://wger.de/media/exercise-video/75/080c799b-8afd-4130-8d72-9cef0cd79f54.MOV",
+      "originalSha256": "d96fa783d10b476965e926a2c88f4b6d69da5f9e91cd7656fbafadb001981afa",
+      "originalMetadata": {
+        "id": 17,
+        "uuid": "080c799b-8afd-4130-8d72-9cef0cd79f54",
+        "exercise": 75,
+        "exercise_uuid": "28321cf3-70e6-48a4-ade1-d11382180cb3",
+        "video": "https://wger.de/media/exercise-video/75/080c799b-8afd-4130-8d72-9cef0cd79f54.MOV",
+        "is_main": false,
+        "size": 4543158,
+        "duration": "14.16",
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264",
+        "codec_long": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u201314s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 568878
+    },
+    {
+      "exerciseId": "inclinedbpress",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/24/",
+      "originalUrl": "https://wger.de/media/exercise-video/537/b9c937e9-daeb-42a9-be8e-7a77e368478c.MOV",
+      "originalSha256": "4861d89988c8e8886435e62064aedd68c04484f0c4646270d182307025c3a162",
+      "originalMetadata": {
+        "id": 24,
+        "uuid": "b9c937e9-daeb-42a9-be8e-7a77e368478c",
+        "exercise": 537,
+        "exercise_uuid": "57e17672-52b9-43cf-8d0d-4b3f06a0c0d0",
+        "video": "https://wger.de/media/exercise-video/537/b9c937e9-daeb-42a9-be8e-7a77e368478c.MOV",
+        "is_main": false,
+        "size": 10602354,
+        "duration": "27.49",
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264",
+        "codec_long": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 2\u201316s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 757299
+    },
+    {
+      "exerciseId": "legpress",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/44/",
+      "originalUrl": "https://wger.de/media/exercise-video/371/6aae16b4-01b9-4eb4-935c-3250f84d2c59.MOV",
+      "originalSha256": "a92f5677ce005b10385668c88e5cce77c57658b63f8808b8684be0a5abeaa2ef",
+      "originalMetadata": {
+        "id": 44,
+        "uuid": "6aae16b4-01b9-4eb4-935c-3250f84d2c59",
+        "exercise": 371,
+        "exercise_uuid": "66a42396-c207-44da-bc75-758a89d32404",
+        "video": "https://wger.de/media/exercise-video/371/6aae16b4-01b9-4eb4-935c-3250f84d2c59.MOV",
+        "is_main": false,
+        "size": 57665329,
+        "duration": "34.69",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 2\u201316s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 737097
+    },
+    {
+      "exerciseId": "cablecurl",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/50/",
+      "originalUrl": "https://wger.de/media/exercise-video/95/ab770931-47d3-44fd-aef0-ac7a64c3b794.MOV",
+      "originalSha256": "4a7f995405ea08af81ede59bc07ed05458596b420a7ca596a154f9e27a24c2cb",
+      "originalMetadata": {
+        "id": 50,
+        "uuid": "ab770931-47d3-44fd-aef0-ac7a64c3b794",
+        "exercise": 95,
+        "exercise_uuid": "bcb7020c-8678-496d-8f4d-aad0e233a5bd",
+        "video": "https://wger.de/media/exercise-video/95/ab770931-47d3-44fd-aef0-ac7a64c3b794.MOV",
+        "is_main": false,
+        "size": 34233084,
+        "duration": "10.45",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u201310.45s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 359054
+    },
+    {
+      "exerciseId": "hammer",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/51/",
+      "originalUrl": "https://wger.de/media/exercise-video/272/df069052-2173-4f24-855f-a0eebe729f24.MOV",
+      "originalSha256": "1bb9997de44f2c7b1ff182001c988ae1245006458a3a6e1bc85db52dcb1a4e38",
+      "originalMetadata": {
+        "id": 51,
+        "uuid": "df069052-2173-4f24-855f-a0eebe729f24",
+        "exercise": 272,
+        "exercise_uuid": "c0d9fe98-f4fe-49f3-8037-05e1984e7d2d",
+        "video": "https://wger.de/media/exercise-video/272/df069052-2173-4f24-855f-a0eebe729f24.MOV",
+        "is_main": false,
+        "size": 30154182,
+        "duration": "10.37",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u201310.37s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 275038
+    },
+    {
+      "exerciseId": "overheadcableextension",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/55/",
+      "originalUrl": "https://wger.de/media/exercise-video/659/1f2eb3b6-3185-429f-8330-26dc88f39aff.MOV",
+      "originalSha256": "2b1cb2e47da66abd03bba3ef51ff83f5aebb84e3ac31cbad2435db91417fdf0e",
+      "originalMetadata": {
+        "id": 55,
+        "uuid": "1f2eb3b6-3185-429f-8330-26dc88f39aff",
+        "exercise": 659,
+        "exercise_uuid": "3188868c-84e2-4a3b-b7dc-f79d8650988d",
+        "video": "https://wger.de/media/exercise-video/659/1f2eb3b6-3185-429f-8330-26dc88f39aff.MOV",
+        "is_main": false,
+        "size": 7557215,
+        "duration": "15.09",
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264",
+        "codec_long": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u201314s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 892586
+    },
+    {
+      "exerciseId": "dboverheadextension",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/57/",
+      "originalUrl": "https://wger.de/media/exercise-video/211/85f6eb25-a76c-409e-9af9-497794ac0dfb.MOV",
+      "originalSha256": "3ca3071ca6e4d19e6aac1197b22977932d527c7661a2cacb0652b6d976bc80ff",
+      "originalMetadata": {
+        "id": 57,
+        "uuid": "85f6eb25-a76c-409e-9af9-497794ac0dfb",
+        "exercise": 211,
+        "exercise_uuid": "d8bddb58-91b0-4d7b-8ec1-cd742584b607",
+        "video": "https://wger.de/media/exercise-video/211/85f6eb25-a76c-409e-9af9-497794ac0dfb.MOV",
+        "is_main": false,
+        "size": 11837332,
+        "duration": "32.02",
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264",
+        "codec_long": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 2\u201316s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 655496
+    },
+    {
+      "exerciseId": "lyingdbextension",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/60/",
+      "originalUrl": "https://wger.de/media/exercise-video/245/c253303e-9160-4f1f-b4fe-daf1e6c8661d.MOV",
+      "originalSha256": "ea90aab3561008a60ae462277b49332be8d76567713fc90abe2ee4a047753f09",
+      "originalMetadata": {
+        "id": 60,
+        "uuid": "c253303e-9160-4f1f-b4fe-daf1e6c8661d",
+        "exercise": 245,
+        "exercise_uuid": "893c07ea-2e24-49b6-92e4-d0033eedec62",
+        "video": "https://wger.de/media/exercise-video/245/c253303e-9160-4f1f-b4fe-daf1e6c8661d.MOV",
+        "is_main": false,
+        "size": 5813842,
+        "duration": "18.72",
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264",
+        "codec_long": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 2\u201316s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 579795
+    },
+    {
+      "exerciseId": "tricepskickback",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/75/",
+      "originalUrl": "https://wger.de/media/exercise-video/655/69e8c1e5-55b2-4da6-8166-092c24b16735.MOV",
+      "originalSha256": "b6bffd6e53e6e2ade4d9f9af6188fad11082e99d63932956ff92e0b274299f58",
+      "originalMetadata": {
+        "id": 75,
+        "uuid": "69e8c1e5-55b2-4da6-8166-092c24b16735",
+        "exercise": 655,
+        "exercise_uuid": "5915fabe-c941-4dac-b196-bc4e8c7ce57b",
+        "video": "https://wger.de/media/exercise-video/655/69e8c1e5-55b2-4da6-8166-092c24b16735.MOV",
+        "is_main": false,
+        "size": 4541168,
+        "duration": "12.19",
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264",
+        "codec_long": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u201312.19s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 614487
+    },
+    {
+      "exerciseId": "facepull",
+      "sourceMetadataUrl": "https://wger.de/api/v2/video/78/",
+      "originalUrl": "https://wger.de/media/exercise-video/222/245a824b-cd39-45f2-b251-2c0b7efead0d.MOV",
+      "originalSha256": "7a336d6b99e52f1f74850945958a72a9082b735e02cafb3e29bb6183c11f5422",
+      "originalMetadata": {
+        "id": 78,
+        "uuid": "245a824b-cd39-45f2-b251-2c0b7efead0d",
+        "exercise": 222,
+        "exercise_uuid": "d7a418d4-d0cb-4f85-8a7c-1e9d97152cbd",
+        "video": "https://wger.de/media/exercise-video/222/245a824b-cd39-45f2-b251-2c0b7efead0d.MOV",
+        "is_main": false,
+        "size": 21001245,
+        "duration": "8.70",
+        "width": 1920,
+        "height": 1080,
+        "codec": "hevc",
+        "codec_long": "H.265 / HEVC (High Efficiency Video Coding)",
+        "license": 2,
+        "license_title": "",
+        "license_object_url": "",
+        "license_author": "Goulart",
+        "license_author_url": "",
+        "license_derivative_source_url": "",
+        "author_history": [
+          "Goulart"
+        ]
+      },
+      "licenseMetadata": {
+        "id": 2,
+        "full_name": "Creative Commons Attribution Share Alike 4",
+        "short_name": "CC-BY-SA 4",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+      },
+      "changes": "Kinset: excerpt 0\u20138.7s; resized to 640px, converted to H.264 at 24 fps, audio removed; poster extracted. Media adaptations remain CC BY-SA 4.0.",
+      "fileBytes": 387222
+    },
+    {
+      "exerciseId": "dbfly",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 270,
+        "id_num": "0056",
+        "id_hex": "f59",
+        "name": "dumbbell-flys",
+        "title": "Dumbbell Flys",
+        "url": "http://db.everkinetic.com/exercise/dumbbell-flys",
+        "primer": "This is an exercise for chest, triceps and shoulder strengthening.",
+        "type": "isolation",
+        "primary": "chest",
+        "secondary": [
+          "shoulders",
+          "triceps"
+        ],
+        "equipment": [
+          "flat bench",
+          "dumbbells"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=270&number=0&key=69cadbdd2&version=95988fc6&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=270&number=1&key=69cadbdd2&version=35902a60&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/dumbbell-flys-1.png",
+          "_images/web/dumbbell-flys-2.png"
+        ],
+        "steps": [
+          "Lie on a flat bench with a dumbbell in each hand and your feet firmly on the ground.",
+          "Lift the dumbbells over your chest extending your arms fully with a slight bend in your elbows, this is your starting position.",
+          "Keeping a slight bend in your elbows, lower the dumbbells to the floor in an arc like motion.",
+          "Slowly return the dumbbells over your chest to the starting position in a controlled motion.",
+          "Repeat."
+        ],
+        "tips": [
+          "Ensure your back and hips remain in contact with the bench at all times during this exercise."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/dumbbell-flys-1.png",
+          "sha256": "c7a4a0d604d2ae14ff911874b11ceabd7447fac2c18297fb3ada8a1e6bb647e7"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/dumbbell-flys-2.png",
+          "sha256": "17776c61ebad8733652c46abd0dc73821552384d504fccd6040d22e3dca1e3d1"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "pushupfull",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 340,
+        "id_num": "0077",
+        "id_hex": "f77",
+        "name": "push-ups",
+        "title": "Push Ups",
+        "url": "http://db.everkinetic.com/exercise/push-ups",
+        "primer": "This exercise is the main strengthening exercise when wanting to strengthen ones chest, biceps and triceps as well as core muscles.",
+        "type": "isolation",
+        "primary": "chest",
+        "secondary": [
+          "triceps",
+          "shoulders"
+        ],
+        "equipment": [
+          "body"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=340&number=0&key=69cadbdd2&version=52850b73&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=340&number=1&key=69cadbdd2&version=b3f29a67&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/push-ups-1.png",
+          "_images/web/push-ups-2.png"
+        ],
+        "steps": [
+          "Start with a basic push up, lay face down on the floor, or a mat; with your feet together curled slightly so you rise onto the ball of your feet.",
+          "Place you hands shoulder width apart on the either side of your chest.",
+          "Draw your abs in.",
+          "Inhale as you raise your body up till your arms are straight.",
+          "Keep your head and neck level with your body (don\u2019t look up or down) and don\u2019t allow your back to rise or fall.",
+          "Exhale out as you lower your body back to the ground.",
+          "Repeat."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/push-ups-1.png",
+          "sha256": "77477aefb953da7088092d5171b8de44a31c949de968150bd4728ca148824b67"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/push-ups-2.png",
+          "sha256": "c5de8393510880a52ae8529bf63318ca9258a1e6b52d1713e2e7dcc01489588e"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "pullup",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 374,
+        "id_num": "0087",
+        "id_hex": "f88",
+        "name": "pull-ups",
+        "title": "Pull Ups",
+        "url": "http://db.everkinetic.com/exercise/pull-ups",
+        "primer": "This is an exercise in lats, biceps and middle back strengthening.",
+        "type": "isolation",
+        "primary": "lats",
+        "secondary": [
+          "middle back",
+          "biceps"
+        ],
+        "equipment": [
+          "bar"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=374&number=0&key=69cadbdd2&version=b2fcdad0&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=374&number=1&key=69cadbdd2&version=fbe8dcfa&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/pull-ups-1.png",
+          "_images/web/pull-ups-2.png"
+        ],
+        "steps": [
+          "Grab the pull-up bar with the palms facing forward using the prescribed grip.",
+          "As you have both arms extended in front of you holding the bar at the chosen grip width, bring your torso back around 30 degrees or so while creating a curvature on your lower back and sticking your chest out. This is your starting position.",
+          "Pull your torso up until the bar touches your upper chest by drawing the shoulders and the upper arms down and back. Exhale as you perform this portion of the movement.",
+          "After a second on the contracted position, start to inhale and slowly lower your torso back to the starting position when your arms are fully extended and the lats are fully stretched.",
+          "Repeat this motion.",
+          "<h3>\u00a0Tip</h3>",
+          "Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary as it moves through space and only the arms should move. The forearms should do no other work other than hold the bar."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/pull-ups-1.png",
+          "sha256": "f260e0a48b4e7ec8d06a22a018e214a38f8145be50d4659e0fb6a78ced0fe8d5"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/pull-ups-2.png",
+          "sha256": "66b15aedec83478f65e40d3f394990b460cb8ae28d23dab29ca1af5623e0c468"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "chinup",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 380,
+        "id_num": "0089",
+        "id_hex": "f90",
+        "name": "chin-ups",
+        "title": "Chin Ups",
+        "url": "http://db.everkinetic.com/exercise/chin-ups",
+        "primer": "This is an extremely good exercise for upper arm and middle back strengthening.",
+        "type": "isolation",
+        "primary": "lats",
+        "secondary": [
+          "biceps",
+          "middle back"
+        ],
+        "equipment": [
+          "body",
+          "bar"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=380&number=0&key=69cadbdd2&version=30f71856&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=380&number=1&key=69cadbdd2&version=6cc58063&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/chin-ups-1.png",
+          "_images/web/chin-ups-2.png"
+        ],
+        "steps": [
+          "Grasp the bar with an supinated (overhand) grip.",
+          "Let your body hang from the bar with your arms straight.",
+          "Slowly pull yourself up so that your chin is higher than the bar.",
+          "With a controlled movement lower yourself to the starting position."
+        ],
+        "tips": [
+          "Ensure to contract your back and core muscles throughout this exercise to prevent injury and to maximise the effectiveness of the exercise."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/chin-ups-1.png",
+          "sha256": "70f3dc20cddbe79aa5761e9a0757271f6685f494cf071ca34cb47333c30b76d0"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/chin-ups-2.png",
+          "sha256": "ac522ab4422550d624ee5e04302d81eb963c1214d36af91c8980de32565a9c93"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "straightarmpulldown",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 389,
+        "id_num": "0092",
+        "id_hex": "f93",
+        "name": "straight-arm-push-down",
+        "title": "Straight Arm Push Down",
+        "url": "http://db.everkinetic.com/exercise/straight-arm-push-down",
+        "primer": "This exercise for strengthening the Lats and also works the Triceps.",
+        "type": "isolation",
+        "primary": "lats",
+        "secondary": [
+          "triceps"
+        ],
+        "equipment": [
+          "cable machine"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=389&number=0&key=69cadbdd2&version=73604806&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=389&number=1&key=69cadbdd2&version=d9d3cac1&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/straight-arm-push-down-1.png",
+          "_images/web/straight-arm-push-down-2.png"
+        ],
+        "steps": [
+          "Grasp wide grip pull down bar with a wide grip so your hands are on the portion of the bar which curves down.",
+          "Stand erect with your abs drawn in.",
+          "Keeping a slight bend in your elbows and your wrist steady pull the bar down from the starting position to your upper thighs.",
+          "With a controlled motion bring the bar back up to starting position."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/straight-arm-push-down-1.png",
+          "sha256": "ce9a4b72e4497114bec228bea11eaacf34292e2f3c9588e8dbdb0424d734bf80"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/straight-arm-push-down-2.png",
+          "sha256": "7366b533dfd889c8fea5f5159a322cd8027277aaefdf94c594c07b42fcd11dd9"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "pulldown",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 404,
+        "id_num": "0097",
+        "id_hex": "f98",
+        "name": "wide-grip-lat-pull-down",
+        "title": "Wide Grip Lat Pull Down",
+        "url": "http://db.everkinetic.com/exercise/wide-grip-lat-pull-down",
+        "primer": "This is an exercise for lats, biceps and middle back strengthening.",
+        "type": "isolation",
+        "primary": "lats",
+        "secondary": [
+          "biceps",
+          "middle back"
+        ],
+        "equipment": [
+          "cable machine"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=404&number=0&key=69cadbdd2&version=5634c5bc&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=404&number=1&key=69cadbdd2&version=695f735f&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/wide-grip-lat-pull-down-1.png",
+          "_images/web/wide-grip-lat-pull-down-2.png"
+        ],
+        "steps": [
+          "Sit at a cable pull down machine fitted with a wide bar.",
+          "Grasp the bar with a wide overhand grip (palms facing forward) .",
+          "With your abs drawn in and back straight pull the bar down to your upper chest.",
+          "Pause for a moment and then return the bar to the starting position.",
+          "Repeat."
+        ],
+        "tips": [
+          "Ensure you maintain a straight back trough out this exercise."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/wide-grip-lat-pull-down-1.png",
+          "sha256": "c6b61f2653d1f0fdb0e1f52beab8482fcffae33dc90fe04bc2729be57a7fe410"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/wide-grip-lat-pull-down-2.png",
+          "sha256": "b3c1a2a0f64eeee0d045ded7779c8beb2ad54bb0a6b7eafc28c3e4038d9fb0b2"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "bridge",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 447,
+        "id_num": "0109",
+        "id_hex": "f110",
+        "name": "bridging",
+        "title": "Bridging",
+        "url": "http://db.everkinetic.com/exercise/bridging",
+        "primer": "This is an excellent exercise for strengthening and maintaining the core muscles.",
+        "type": "isolation",
+        "primary": "gluts",
+        "secondary": [
+          "core"
+        ],
+        "equipment": [
+          "body"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=447&number=0&key=69cadbdd2&version=8f3c61db&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=447&number=1&key=69cadbdd2&version=8d4ca279&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/bridging-1.png",
+          "_images/web/bridging-2.png"
+        ],
+        "steps": [
+          "Lie on your back with your knees bent and your feet flat on the floor.",
+          "Lift up hips and bum off the floor as you draw your abs in and keep your gluts tight."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/bridging-1.png",
+          "sha256": "8b46dfb94c0d7e985298c36efd5aee19f5214000453d30295aa7a0452c5824f7"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/bridging-2.png",
+          "sha256": "291b9ab2a269d1edd72a6bacd6c844e39249bd2e615fc249ba5bd0196e9f877c"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "sideplank",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 456,
+        "id_num": "0113",
+        "id_hex": "f114",
+        "name": "side-plank",
+        "title": "Side Plank",
+        "url": "http://db.everkinetic.com/exercise/side-plank",
+        "primer": "This is an exercise for core strengthening.",
+        "type": "isolation",
+        "primary": "core",
+        "equipment": [
+          "body"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=456&number=0&key=69cadbdd2&version=9d379ce4&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=456&number=1&key=69cadbdd2&version=27e06d67&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/side-plank-1.png",
+          "_images/web/side-plank-2.png"
+        ],
+        "steps": [
+          "Lay on one side of your body with your legs straight and your forearm perpendicular to your body in front of you.",
+          "Drawing your abs in, slowly raise yourself up so you are balanced on your feet and your forearm.",
+          "Hold this position and slowly return back to the starting position.",
+          "Repeat on other side."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/side-plank-1.png",
+          "sha256": "a859983a16a4d2ec7cfcb05bb4cb8141491905a15bb8a0cf0916d313af042c9f"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/side-plank-2.png",
+          "sha256": "f2b47d68c0c657ba871ec8abd60a0034c04a3218fc0d0094c0cca346ff10965f"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "legcurl",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 474,
+        "id_num": "0119",
+        "id_hex": "f120",
+        "name": "seated-leg-curl",
+        "title": "Seated Leg Curl",
+        "url": "http://db.everkinetic.com/exercise/seated-leg-curl",
+        "primer": "This is an exercise for hamstring strengthening which is similar to the laying leg curls.",
+        "type": "isolation",
+        "primary": "hamstrings",
+        "equipment": [
+          "machine"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=474&number=0&key=69cadbdd2&version=9a7e9ef9&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=474&number=1&key=69cadbdd2&version=1ca2624c&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/seated-leg-curl-1.png",
+          "_images/web/seated-leg-curl-2.png"
+        ],
+        "steps": [
+          "Adjust the machine so that the footpad is just above your heels.",
+          "Sit upright with your abs drawn in and your legs in front of you.",
+          "Slowly curl your legs back towards you and hold for a moment.",
+          "With controlled movement return to the starting position."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/seated-leg-curl-1.png",
+          "sha256": "b43ef327ac9061185262980c00bf909954f98625fa4ee8ef850fd722a03e301b"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/seated-leg-curl-2.png",
+          "sha256": "44758a5cc2e075238b1caf6a1c60afa300799f8f7497a9534726c923b7082a5c"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "legextension",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 893,
+        "id_num": "0142",
+        "id_hex": "f143",
+        "name": "leg-extensions",
+        "title": "Leg Extensions",
+        "url": "http://db.everkinetic.com/exercise/leg-extensions",
+        "primer": "This exercise is a staple for building strong legs.",
+        "type": "isolation",
+        "primary": "quadriceps",
+        "equipment": [
+          "machine"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=893&number=0&key=69cadbdd2&version=cfd35cbb&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=893&number=1&key=69cadbdd2&version=0913c3bc&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/leg-extensions-1.png",
+          "_images/web/leg-extensions-2.png"
+        ],
+        "steps": [
+          "Adjust the seat so that your knees have full range of motion and that the footpad fits over your legs, just above your ankles.",
+          "Grasp the handles with your hands for support, keeping your hip and back against the bench.",
+          "Slowly extend your legs until your knees are straight, but do not lock your knees.",
+          "Hold for a moment and then with controlled movements return to the starting position.",
+          "Note:\u00a0Use controlled movements for this exercise, do not swing the weight up."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/leg-extensions-1.png",
+          "sha256": "ac34dcdf616e0ccc4b81fb4dc894f8dd79a6dbb535b9986baa3bb7e3a590d70d"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/leg-extensions-2.png",
+          "sha256": "7e2dc46177dbbee65fb4eef4294a810bb9bfab6df69f05b55a06f65a72e2f4af"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "ropepushdown",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 955,
+        "id_num": "0206",
+        "id_hex": "f207",
+        "name": "triceps-pushdown-with-rope-and-cable",
+        "title": "Triceps Pushdown with Rope and Cable",
+        "url": "http://db.everkinetic.com/exercise/triceps-pushdown-with-rope-and-cable",
+        "primer": "This version of the triceps pushdown uses a rope for better definition in the muscle.",
+        "type": "isolation",
+        "primary": "triceps",
+        "equipment": [
+          "cable"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=955&number=0&key=69cadbdd2&version=ff20bf3e&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=955&number=1&key=69cadbdd2&version=1b30856b&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/triceps-pushdown-with-rope-and-cable-1.png",
+          "_images/web/triceps-pushdown-with-rope-and-cable-2.png"
+        ],
+        "steps": [
+          "Stand in front of a cable machine and attach a rope to a high pulley.",
+          "Grasp the rope with palms facing down.",
+          "Draw your abs in and keep your back straight.",
+          "Keeping your elbows at your side push the rope down towards your thighs, if possible \u201csplit\u201d the rope apart at the bottom.",
+          "Pause for a moment and then return to the starting position.",
+          "Note:\u00a0You may want to stager one foot in front of the other for a better stance."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/triceps-pushdown-with-rope-and-cable-1.png",
+          "sha256": "00764cad90818d2b8e1e9bfab0a74cae603e452da4e7083890c1c21ad4f4d031"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/triceps-pushdown-with-rope-and-cable-2.png",
+          "sha256": "9fc2af33660c035a889aed1e68a13ec1d2da060fd2d296b9cc6697c2b8619a87"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "reversecurl",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 1008,
+        "id_num": "0257",
+        "id_hex": "f259",
+        "name": "biceps-curl-reverse-with-dumbbells",
+        "title": "Biceps Curl Reverse with Dumbbells",
+        "url": "http://db.everkinetic.com/exercise/biceps-curl-reverse-with-dumbbells",
+        "primer": "This is a reverse curl exercise that works all of the muscles of the arms.",
+        "type": "isolation",
+        "primary": "biceps",
+        "secondary": [
+          "forearm"
+        ],
+        "equipment": [
+          "dumbbell"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=1008&number=0&key=69cadbdd2&version=f186fadb&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=1008&number=1&key=69cadbdd2&version=14c11b68&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/biceps-curl-reverse-with-dumbbells-1.png",
+          "_images/web/biceps-curl-reverse-with-dumbbells-2.png"
+        ],
+        "steps": [
+          "Stand with your feet shoulder width apart, your knees slightly bent and your abs drawn in.",
+          "Grasp a dumbbell in each hand with palms facing down.",
+          "Keeping your arms at your side your elbows steady, lift the dumbbells up towards your shoulders.",
+          "Pause for a moment and then return to the starting position."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/biceps-curl-reverse-with-dumbbells-1.png",
+          "sha256": "361224d638aa82fa14861802dbd53abff40a7a078c922f9fe0df03475417540d"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/biceps-curl-reverse-with-dumbbells-2.png",
+          "sha256": "d66580e8da63ab1c28de5148b9233b63427515f9ad87ee35f6c709fb03a9df38"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    },
+    {
+      "exerciseId": "reversecrunch",
+      "sourceMetadataUrl": "https://github.com/everkinetic/data/blob/main/exercises.json",
+      "sourceMetadata": {
+        "id": 1039,
+        "id_num": "0287",
+        "id_hex": "f289",
+        "name": "bent-knee-hip-raise",
+        "title": "Bent Knee Hip Raise",
+        "url": "http://db.everkinetic.com/exercise/bent-knee-hip-raise",
+        "primer": "This is a good exercise core muscle development.",
+        "type": "compound",
+        "primary": "abdominals",
+        "equipment": [
+          "body"
+        ],
+        "images": [
+          "http://img.everkinetic.com/?action=image&id=1039&number=0&key=69cadbdd2&version=bd2594a5&size=960,960&download=large",
+          "http://img.everkinetic.com/?action=image&id=1039&number=1&key=69cadbdd2&version=0e338a37&size=960,960&download=large"
+        ],
+        "img": [
+          "_images/web/bent-knee-hip-raise-1.png",
+          "_images/web/bent-knee-hip-raise-2.png"
+        ],
+        "steps": [
+          "Lie on your back with your arms outstretched to your sides.",
+          "Bend your knees at a 60 degree angle and hold your feet up just off the floor.",
+          "Keeping your back and arms down, raise your hips up and off the floor so that your knees are over your chest.",
+          "Contract your abs for a moment and then return to the starting position."
+        ]
+      },
+      "originalFiles": [
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/bent-knee-hip-raise-1.png",
+          "sha256": "049f41973f6fe4bad0245b38e4ac38f4d3715f642a34f5f7c432dd82d527316e"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/everkinetic/data/main/src/images-web/bent-knee-hip-raise-2.png",
+          "sha256": "6aba2fdbf72e8c7debb4a1e5a8916850d8e3d59111d620ccfe9ccbea0d541469"
+        }
+      ],
+      "licenseUrl": "https://github.com/everkinetic/data/blob/main/LICENSE.md",
+      "changes": "Unmodified original drawings, presented as two static positions."
+    }
+  ]
+}

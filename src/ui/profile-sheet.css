@@ -1,0 +1,290 @@
+/**
+ * Profile drawer.
+ *
+ * One rhythm, held to to the pixel: blocks are 20px apart, rows are 8px apart inside a
+ * group, and every row is exactly 60px. The version before this had three controls at
+ * 105, 68 and 48px with gaps of 0, 16, 8 and 0 between them — each value defensible on
+ * its own and arbitrary together, which is what reads as unpolished.
+ */
+
+.ps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- identity ---- */
+
+.ps-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ps-avatar {
+  inline-size: 52px;
+  block-size: 52px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-pill);
+  background: var(--grad-accent, var(--accent));
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: var(--glow-accent, none);
+}
+
+.ps-who {
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ps-who strong {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* Account and save state share one line: the state describes the account, so giving
+   it a row of its own padded the drawer for nothing. */
+.ps-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: var(--t-meta);
+  color: var(--muted);
+  min-inline-size: 0;
+}
+
+.ps-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-inline-size: 100%;
+}
+
+.ps-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.ps-state::before {
+  content: "·";
+  color: var(--faint);
+  margin-inline-end: 3px;
+}
+
+.ps-state i {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: var(--r-pill);
+  background: var(--muted);
+  flex: none;
+}
+
+.ps-state[data-state="synced"] i {
+  background: var(--success);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--success) 70%, transparent);
+}
+
+.ps-state[data-state="saving"] i {
+  background: var(--warning);
+}
+
+.ps-state[data-state="storageFailed"],
+.ps-state[data-state="conflict"],
+.ps-state[data-state="quarantined"] {
+  color: var(--danger);
+}
+
+.ps-state[data-state="storageFailed"] i,
+.ps-state[data-state="conflict"] i,
+.ps-state[data-state="quarantined"] i {
+  background: var(--danger);
+}
+
+/* ---- rows ---- */
+
+.ps-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-row {
+  inline-size: 100%;
+  block-size: 60px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-inline: 16px;
+  background: var(--grad-raised, var(--raised));
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  text-align: start;
+}
+
+.ps-label {
+  flex: 1;
+  min-inline-size: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.ps-row-link {
+  transition:
+    border-color var(--m-press) var(--ease),
+    background var(--m-press) var(--ease);
+}
+
+.ps-row-link:hover {
+  border-color: var(--border-strong);
+}
+
+.ps-row-link:active {
+  transform: scale(0.995);
+}
+
+.ps-row-link > svg:first-child {
+  color: var(--muted);
+  flex: none;
+}
+
+.ps-row-link > svg:last-child {
+  color: var(--faint);
+  flex: none;
+}
+
+/* ---- the inline unit switch ---- */
+
+/* A switch rather than two buttons: one thumb slides between the options, so the
+   change reads as a single movement instead of one fill appearing as another vanishes. */
+.ps-segmented {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 52px;
+  gap: 2px;
+  padding: 3px;
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  flex: none;
+}
+
+.ps-thumb {
+  position: absolute;
+  inset-block: 3px;
+  inset-inline-start: 3px;
+  inline-size: 52px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: transform 260ms cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+.ps-segmented[data-active="kg"] .ps-thumb {
+  transform: translateX(54px);
+}
+
+.ps-segmented button {
+  position: relative;
+  z-index: 1;
+  block-size: 34px;
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: color 180ms var(--ease);
+}
+
+.ps-segmented button.selected {
+  color: var(--accent-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-thumb {
+    transition: none;
+  }
+}
+
+/* ---- leaving ---- */
+
+.ps-signout {
+  inline-size: 100%;
+  block-size: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition:
+    color var(--m-press) var(--ease),
+    border-color var(--m-press) var(--ease);
+}
+
+.ps-signout:hover {
+  color: var(--ink);
+  border-color: var(--border-strong);
+}
+
+/* The first view is short, so it does not need the tall bottom padding a full sheet
+   gets. The settings view sets its own. */
+.sheet:has(.ps) {
+  padding-block-end: calc(24px + env(safe-area-inset-bottom));
+}
+
+/* Drilling into settings grows the same drawer rather than opening a screen. */
+.sheet-backdrop[data-tall] .sheet {
+  block-size: 88dvh;
+  max-block-size: 88dvh;
+}
+
+.sheet-back {
+  inline-size: 36px;
+  block-size: 36px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  margin-inline-start: -8px;
+  border-radius: var(--r-control);
+  color: var(--muted);
+  transition:
+    color var(--m-press) var(--ease),
+    background var(--m-press) var(--ease);
+}
+
+.sheet-back:hover {
+  color: var(--ink);
+  background: var(--raised);
+}
+
+.sheet-head {
+  gap: 10px;
+}
+
+.sheet-head h2 {
+  flex: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-row-link:active {
+    transform: none;
+  }
+}

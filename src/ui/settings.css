@@ -1,0 +1,245 @@
+/**
+ * Settings.
+ *
+ * A reading-and-changing screen, not a form: there is no submit button, so each control
+ * has to look individually settled rather than like a field waiting on one. Groups are
+ * separated by space and a quiet heading instead of boxes, which keeps a long screen
+ * scannable without turning every row into a card.
+ */
+
+/**
+ * One rhythm, the same as the drawer's: 8px from a label to its control, 20px between
+ * fields, 32px between groups. Stated once here rather than chosen per element, which
+ * is how the spacing drifted the first time.
+ */
+.settings {
+  padding-block-end: var(--s7);
+}
+
+.settings h1 {
+  margin-block-end: 28px;
+}
+
+.set-group {
+  padding-block-start: 32px;
+  margin-block-start: 32px;
+  border-block-start: 1px solid var(--border);
+}
+
+.set-group:first-of-type {
+  border-block-start: 0;
+  padding-block-start: 0;
+  margin-block-start: 0;
+}
+
+.set-group h2 {
+  margin-block: 0 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+
+.set-group > .fine {
+  margin-block: 0 20px;
+}
+
+/* ---- fields ---- */
+
+.set-field {
+  display: block;
+  margin-block-end: 20px;
+}
+
+.set-field:last-child {
+  margin-block-end: 0;
+}
+
+.set-field > span {
+  display: block;
+  margin-block-end: 8px;
+  font-size: var(--t-meta);
+  color: var(--muted);
+}
+
+.set-field > small {
+  display: block;
+  margin-block-start: 8px;
+  font-size: var(--t-meta);
+  color: var(--faint);
+  line-height: 1.5;
+}
+
+.set-field input {
+  inline-size: 100%;
+  block-size: 52px;
+  padding-inline: var(--s4);
+  background: var(--grad-raised, var(--raised));
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  font-size: var(--t-body);
+}
+
+.set-field input:focus-visible {
+  border-color: var(--accent);
+}
+
+.set-error {
+  color: var(--danger);
+}
+
+/* Radix trigger, matched to the inputs beside it. The legacy sheet gives it a
+   min-height of 54 and a top margin, both of which have to be cleared or the selects
+   sit 2px taller than the text fields and the column stops lining up. */
+.set-field .kinset-select {
+  inline-size: 100%;
+  block-size: 52px;
+  min-block-size: 0;
+  margin-block-start: 0;
+  padding-inline: var(--s4);
+  background: var(--grad-raised, var(--raised));
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  font-size: var(--t-body);
+}
+
+.set-segmented {
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 64px;
+  gap: 2px;
+  padding: 3px;
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+}
+
+.set-thumb {
+  position: absolute;
+  inset-block: 3px;
+  inset-inline-start: 3px;
+  inline-size: 64px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: transform 260ms cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+.set-segmented[data-active="kg"] .set-thumb {
+  transform: translateX(66px);
+}
+
+.set-segmented button {
+  position: relative;
+  z-index: 1;
+  block-size: 40px;
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: color 180ms var(--ease);
+}
+
+.set-segmented button.selected {
+  color: var(--accent-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .set-thumb {
+    transition: none;
+  }
+}
+
+/* ---- about ---- */
+
+.set-facts {
+  display: grid;
+  gap: var(--s3);
+  margin: 0 0 var(--s4);
+}
+
+.set-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding-block-end: var(--s3);
+  border-block-end: 1px solid var(--border);
+  font-size: var(--t-meta);
+}
+
+.set-facts dt {
+  color: var(--muted);
+}
+
+.set-facts dd {
+  margin: 0;
+}
+
+.set-credits summary {
+  min-block-size: var(--target);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: var(--t-meta);
+  color: var(--muted);
+}
+
+.set-credits p {
+  font-size: var(--t-meta);
+  color: var(--muted);
+  line-height: 1.6;
+  margin-block: 0 var(--s3);
+}
+
+.set-credits a {
+  color: var(--accent);
+}
+
+/* ---- deleting ---- */
+
+.set-danger p {
+  margin: 0 0 var(--s2);
+  font-size: var(--t-meta);
+  line-height: 1.5;
+}
+
+.set-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-block-size: var(--target);
+  padding-inline: var(--s3);
+  color: var(--danger);
+  font-size: var(--t-meta);
+  border-radius: var(--r-control);
+  transition: background var(--m-press) var(--ease);
+}
+
+.set-delete:hover {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.set-delete-confirm {
+  inline-size: 100%;
+  min-block-size: var(--target);
+  margin-block-start: var(--s3);
+  border-radius: var(--r-control);
+  background: var(--danger);
+  color: #1a0b0a;
+  font-weight: 700;
+}
+
+.set-danger .quiet {
+  inline-size: 100%;
+  margin-block-start: var(--s2);
+}

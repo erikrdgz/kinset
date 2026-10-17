@@ -1,0 +1,164 @@
+/**
+ * The shared picker, restyled onto the current system.
+ *
+ * The legacy sheet gives it square corners, a 2px grey border, an orange divider rule
+ * beside the chevron and a hard offset drop shadow — a different component language
+ * from everything around it. These rules load after styles.css and override it
+ * wherever the picker appears, so onboarding and the plan editor pick the change up
+ * too rather than drifting further apart.
+ *
+ * The menu is portalled to the body, so it cannot be scoped to a parent and has to be
+ * styled globally.
+ */
+
+.kinset-select {
+  min-block-size: 52px;
+  margin-block-start: 0;
+  padding: 0 16px;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  background: var(--grad-raised, var(--raised));
+  color: var(--ink);
+  font-size: var(--t-body);
+  font-weight: 500;
+  transition:
+    border-color var(--m-press) var(--ease),
+    background var(--m-press) var(--ease);
+}
+
+.kinset-select:hover {
+  border-color: var(--border-strong);
+}
+
+.kinset-select[data-state="open"] {
+  border-color: var(--accent);
+}
+
+/* No divider rule: the chevron is an affordance, not a second control. */
+.kinset-select-icon {
+  padding-inline-start: 0;
+  border-inline-start: 0;
+  color: var(--muted);
+  transition: transform var(--m-switch) var(--ease);
+}
+
+.kinset-select[data-state="open"] .kinset-select-icon {
+  color: var(--accent);
+}
+
+.kinset-select-menu {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-control);
+  background: var(--raised-high, var(--raised));
+  box-shadow: var(--shadow-2, 0 16px 40px rgba(0, 0, 0, 0.5));
+  padding: 6px;
+  overflow: hidden;
+  animation: select-in var(--m-switch) var(--ease);
+}
+
+/**
+ * Option states.
+ *
+ * Carrying `body` because the legacy sheet sets `body .kinset-select-option:hover` to a
+ * saturated fill with black 800-weight text, and anything less specific loses to it
+ * outside the shell — which is why onboarding still had the old slab after the first
+ * pass at this.
+ *
+ * The priority is the point: selection is a state the user chose and hover is the
+ * pointer passing over. So the checked row carries the accent and hover is a quiet
+ * lift. Nothing changes weight between states, because a row that re-bolds under the
+ * cursor reflows while you are reading it.
+ */
+body .kinset-select-option {
+  min-block-size: 46px;
+  padding: 10px 12px;
+  border-block-end: 0;
+  border-radius: 10px;
+  font-size: var(--t-body);
+  font-weight: 500;
+  color: var(--muted);
+  background: none;
+  transition:
+    background-color 140ms var(--ease),
+    color 140ms var(--ease);
+}
+
+/* Hover and keyboard highlight read identically — the same thing is happening. */
+body .kinset-select-option:hover,
+body .kinset-select-option[data-highlighted] {
+  background: var(--raised);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+body .kinset-select-option[data-state="checked"] {
+  background: var(--accent-wash);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+body .kinset-select-option[data-state="checked"] svg {
+  color: var(--accent);
+}
+
+body .kinset-select-option[data-state="checked"]:hover,
+body .kinset-select-option[data-state="checked"][data-highlighted] {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--ink);
+}
+
+.kinset-select-scroll {
+  block-size: 24px;
+  background: transparent;
+  color: var(--muted);
+}
+
+@keyframes select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kinset-select-menu {
+    animation: none;
+  }
+
+  .kinset-select-icon {
+    transition: none;
+  }
+}
+
+/**
+ * The highlight is painted by a pseudo-element, not by the option's own background:
+ *
+ *   body .kinset-select-option::before { inset: 0; background: linear-gradient(…) }
+ *   body .kinset-select-option:hover::before { opacity: 1 }
+ *
+ * That is why rounding the option did nothing — the gradient is a separate layer, and
+ * it carried no radius of its own, so it squared off a row that measured as rounded.
+ * It needs the same corner as the row it fills.
+ */
+body .kinset-select-option::before {
+  border-radius: 10px;
+}
+
+/*
+ * On the gradient, the row's own background has to stay out of the way or it covers
+ * it. Text and tick both go white: at the red end of the gradient a dark label loses
+ * contrast, and an accent-coloured tick disappears into its own background entirely.
+ */
+body .kinset-select-option[data-highlighted],
+body .kinset-select-option:hover,
+body .kinset-select-option[data-state="checked"][data-highlighted],
+body .kinset-select-option[data-state="checked"]:hover {
+  background: transparent;
+  color: #fff;
+}
+
+body .kinset-select-option[data-highlighted] svg,
+body .kinset-select-option:hover svg {
+  color: #fff;
+}

@@ -1,0 +1,138 @@
+/**
+ * Kinset design tokens.
+ *
+ * The references the art direction came from all use an acid lime accent. Kinset's
+ * accent is orange, so lime reads as orange here, and the neutrals lean warm to sit
+ * with it.
+ *
+ * What makes those references look expensive is not the hue — it is light. Surfaces are
+ * gradients rather than flat fills, every raised element carries a hairline highlight
+ * along its top edge where light would catch it, shadows are deep and soft, and the
+ * accent throws glow onto what sits near it. Flat rectangles with 1px borders read as a
+ * wireframe no matter how good the palette is, which is what the first pass shipped.
+ *
+ * Contrast against --canvas: ink 17.6:1, muted 10.2:1, accent 6.9:1, and --accent-ink
+ * on filled accent 6.6:1. All pass WCAG AA for normal text.
+ */
+:root {
+  /* Surfaces, darkest to lightest. */
+  --canvas: #0c0b0b;
+  --canvas-deep: #060606;
+  --surface: #171615;
+  --raised: #221f1e;
+  --raised-high: #2b2826;
+  --border: #322e2c;
+  --border-strong: #4a4542;
+  /* The hairline of caught light along a raised edge. */
+  --edge: rgba(255, 255, 255, 0.07);
+  --edge-strong: rgba(255, 255, 255, 0.12);
+
+  /* Text. --muted is a neutral; the accent is never used as a quiet colour. */
+  --ink: #f5f3f0;
+  --muted: #b5afa9;
+  --faint: #827c77;
+
+  /* Brand. */
+  --accent: #ff692b;
+  --accent-soft: #ff8d57;
+  --accent-deep: #d84a12;
+  --accent-wash: rgba(255, 105, 43, 0.14);
+  --accent-ink: #140d09;
+
+  /* Gradients. Surfaces are lit, not painted. */
+  --grad-surface: linear-gradient(170deg, #1d1b1a 0%, #141312 100%);
+  --grad-raised: linear-gradient(170deg, #2a2725 0%, #1e1c1b 100%);
+  --grad-accent: linear-gradient(160deg, #ff8d57 0%, #ff692b 52%, #e4531a 100%);
+  --grad-accent-soft: linear-gradient(
+    160deg,
+    rgba(255, 141, 87, 0.22) 0%,
+    rgba(255, 105, 43, 0.06) 100%
+  );
+
+  /* Glow: what stops the accent looking like flat paint. */
+  --glow-accent: 0 0 24px rgba(255, 105, 43, 0.38);
+  --glow-accent-strong: 0 0 40px rgba(255, 105, 43, 0.5);
+
+  /* Status gets its own hues. The accent is not a universal "good". */
+  --warning: #f2b544;
+  --danger: #ff6b61;
+  --success: #6fd38b;
+
+  /* Spacing scale. */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --gutter: 20px;
+  --card-pad: 20px;
+
+  /* Corners. Larger than the first pass; the references are generous here. */
+  --r-control: 14px;
+  --r-card: 22px;
+  --r-sheet: 28px;
+  --r-pill: 999px;
+
+  /* Targets. The 48px product minimum deliberately exceeds WCAG 2.2's 24px. */
+  --target: 48px;
+  --target-training: 56px;
+
+  /* Type. */
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-ui: "Barlow", system-ui, sans-serif;
+  --t-meta: 0.8125rem;
+  --t-body: 1rem;
+  --t-section: 1.25rem;
+  --t-title: clamp(1.875rem, 6vw, 2.5rem);
+  --t-editorial: clamp(3.5rem, 17vw, 6rem);
+
+  /* Elevation. Deep and soft, with the lit top edge. */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.5);
+  --shadow-3: 0 4px 8px rgba(0, 0, 0, 0.55), 0 32px 64px rgba(0, 0, 0, 0.6);
+  --inset-edge: inset 0 1px 0 var(--edge);
+
+  /* Motion. Durations from the art direction's table; the curve is a soft overshoot. */
+  --m-press: 120ms;
+  --m-set: 180ms;
+  --m-sheet: 300ms;
+  --m-switch: 200ms;
+  --m-draw: 900ms;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/**
+ * Reduced motion removes movement rather than shortening it. Nothing here is the sole
+ * carrier of meaning, so dropping it costs no information.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --m-press: 0ms;
+    --m-set: 0ms;
+    --m-sheet: 0ms;
+    --m-switch: 0ms;
+    --m-draw: 0ms;
+  }
+}
+
+/** Timers, set values and chart labels need digits that do not shift width. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/** Screen-reader-only text, used wherever an icon carries meaning. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

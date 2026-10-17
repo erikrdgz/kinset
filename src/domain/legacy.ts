@@ -1,6 +1,52 @@
-import { extraExercises } from "./extraExercises";
-import type { WorkoutPlan } from "./plans";
+import { extraExercises } from "../extraExercises";
+import type { WorkoutPlan } from "../plans";
 import { z } from "zod";
+/**
+ * Training experience.
+ *
+ * The old set — "New to training", "Returning", "Consistent" — mixed two different
+ * questions: how much lifting you have done, and how reliably you turn up. "Returning"
+ * and "Consistent" are not points on the same scale, so people could not place
+ * themselves on it. These four are one ladder of lifting history.
+ *
+ * The old values are still accepted and upgraded in place. They are stored in every
+ * existing journal, so rejecting them would fail the parse and quarantine real data
+ * over a wording change.
+ */
+export const experienceLevels = [
+  "New to lifting",
+  "Getting back into it",
+  "Training regularly",
+  "Training for years",
+] as const;
+
+export type Experience = (typeof experienceLevels)[number];
+
+const retiredExperience: Record<string, Experience> = {
+  "New to training": "New to lifting",
+  Returning: "Getting back into it",
+  Consistent: "Training regularly",
+};
+
+const experienceSchema = z.preprocess(
+  (value) =>
+    typeof value === "string" && value in retiredExperience
+      ? retiredExperience[value]
+      : value,
+  z.enum(experienceLevels),
+);
+
+/**
+ * How many sets a movement starts with. Experience is only ever a proxy for starting
+ * volume, so the mapping lives here rather than being re-derived as a ternary at each
+ * call site.
+ */
+export function startingSets(experience: Experience) {
+  if (experience === "New to lifting") return 2;
+  if (experience === "Training for years") return 4;
+  return 3;
+}
+
 export const profileSchema = z.object({
   name: z.string().trim().min(1).max(40),
   goal: z.enum([
@@ -8,9 +54,9 @@ export const profileSchema = z.object({
     "Build consistency",
     "Support getting leaner",
   ]),
-  days: z.coerce.number().int().min(2).max(4),
+  days: z.coerce.number().int().min(1).max(7),
   equipment: z.enum(["Dumbbells", "Full gym", "Bodyweight"]),
-  experience: z.enum(["New to training", "Returning", "Consistent"]),
+  experience: experienceSchema,
   unit: z.enum(["kg", "lb"]),
   weight: z.union([z.literal(""), z.coerce.number().positive().max(1500)]),
   height: z.union([z.literal(""), z.coerce.number().positive().max(300)]),
@@ -214,7 +260,7 @@ export function startSession(p: Profile, index = 0): Session {
     entries: program(p, index).map((e) => ({
       exerciseId: e.id,
       sets: Array.from(
-        { length: p.experience === "New to training" ? 2 : 3 },
+        { length: startingSets(p.experience) },
         () => ({ id: crypto.randomUUID(), reps: 0, weight: 0, done: false }),
       ),
     })),
