@@ -1,0 +1,116 @@
+/**
+ * Corners.
+ *
+ * Nothing in this app has a sharp edge, and a hover state is not an exception. The rule
+ * is simple: if an interaction paints a box, that box is rounded.
+ *
+ * Several controls had picked up `border-radius: 0` — some from the legacy sheet, some
+ * from list rows that are separated by hairlines rather than drawn as cards. A hairline
+ * row is a reasonable thing to want; a square slab of colour appearing under the cursor
+ * on top of one is not. So the rows keep their hairlines and gain a radius, which only
+ * shows when something is actually painted on them.
+ *
+ * Loaded last on purpose. These are corrections to rules spread across four
+ * stylesheets, and chasing each one back to its source would mean editing files that
+ * will keep being rewritten; stating the invariant once in a single place is easier to
+ * keep true.
+ */
+
+/* Controls that read as buttons but had square corners. */
+.shell :is(
+    .topbar-brand,
+    .text-link,
+    .text-button,
+    .quiet,
+    .day-session,
+    .last-session-row,
+    .plan-label,
+    .plan-pick-name,
+    .week-expand
+  ) {
+  border-radius: var(--r-control);
+}
+
+/* Pickers, wherever they appear. */
+.shell :is(.kinset-select, .prog-movement-select) {
+  border-radius: var(--r-control);
+}
+
+/*
+ * Full-bleed list rows. They are deliberately not cards — a hairline between them reads
+ * better in a long list — but their hover fill has to be rounded or it lands as a
+ * rectangle butted against the row above.
+ */
+.shell :is(.library .exercise-list, .settings-list, .atelier-week) button,
+.shell .exercise-list > li > button {
+  border-radius: var(--r-control);
+}
+
+/* Disclosure rows. */
+.shell summary {
+  border-radius: var(--r-control);
+}
+
+/* The legacy sheet paints a square fill under any option on hover. */
+.shell [role="option"],
+.kinset-select-menu [role="option"] {
+  border-radius: 10px;
+}
+
+/*
+ * A row that sits flush to the page edge needs its hover inset slightly, otherwise the
+ * rounded fill is clipped by the gutter and looks square again at the ends.
+ */
+.shell .library .exercise-list button:hover,
+.shell .settings-list button:hover {
+  padding-inline: 10px;
+  margin-inline: -10px;
+}
+
+/**
+ * Feature stylesheets are imported from their components, so they load after
+ * everything in main.tsx and outrank a plain `.shell` prefix. These carry `body` to
+ * win on specificity rather than on order, which is why they look heavier than the
+ * rules above.
+ *
+ * Each one is a control that paints on hover or focus, so a square corner shows.
+ */
+body .shell .running-history-heading .quiet,
+body .shell .running-studio .run-start-options > .quiet,
+body .shell .progress .prog-history li > button,
+body .shell .progress .prog-energy-footer > button,
+body .shell .plan-reorder button,
+body .shell .plan-card-actions button,
+body .shell .plan-days button,
+body .shell .saved-plan-days button {
+  border-radius: var(--r-control);
+}
+
+/*
+ * A full-width row whose hover fill would otherwise square off against the gutter.
+ * The negative margin lets the rounded fill breathe past the text without moving it.
+ */
+body .shell .progress .prog-history li > button:hover {
+  padding-inline: 10px;
+  margin-inline: -10px;
+}
+
+/*
+ * An underline tab is the one case where a square bottom edge is correct — the active
+ * indicator has to sit flush on the rule beneath it. Only the top corners round, so the
+ * hover fill is still soft where it is visible.
+ */
+body .shell .running-mode > button {
+  border-start-start-radius: 10px;
+  border-start-end-radius: 10px;
+}
+
+/*
+ * Hairline rule-lists — the lineup, the preview, run history. They are separated by
+ * rules rather than drawn as cards, but their rows still shift and highlight on hover,
+ * so the painted box needs a corner like everything else.
+ */
+body .shell .rule-list button,
+body .shell .running-history button {
+  border-radius: var(--r-control);
+}
