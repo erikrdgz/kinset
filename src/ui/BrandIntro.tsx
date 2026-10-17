@@ -32,7 +32,7 @@ export function BrandIntro({ onComplete }: { onComplete: () => void }) {
     // animation carries nothing the sign-in screen does not.
     const timer = window.setTimeout(
       finish,
-      motion.matches ? 420 : slow ? 20000 : 2250,
+      motion.matches ? 360 : slow ? 9000 : 1100,
     );
     const skip = (event: KeyboardEvent) => {
       if (event.key === "Escape" || event.key === "Enter" || event.key === " ")
