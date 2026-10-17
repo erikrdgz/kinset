@@ -132,28 +132,33 @@ body .kinset-select-option[data-state="checked"][data-highlighted] {
 }
 
 /**
- * The legacy sheet paints the highlight with a pseudo-element:
+ * The highlight is painted by a pseudo-element, not by the option's own background:
  *
- *   body .kinset-select-option::before { inset: 0; background: linear-gradient(...) }
+ *   body .kinset-select-option::before { inset: 0; background: linear-gradient(…) }
  *   body .kinset-select-option:hover::before { opacity: 1 }
  *
- * That is why every background rule above looked correct in the inspector and changed
- * nothing on screen — the gradient was never on the element, so overriding its
- * background could not reach it. It also carries no radius, so it squared off the
- * corners of a row that measured as rounded.
- *
- * Removed rather than restyled. The highlight is a background on the option now, which
- * is one thing to reason about instead of two stacked layers.
+ * That is why rounding the option did nothing — the gradient is a separate layer, and
+ * it carried no radius of its own, so it squared off a row that measured as rounded.
+ * It needs the same corner as the row it fills.
  */
 body .kinset-select-option::before {
-  content: none;
+  border-radius: 10px;
 }
 
-/**
- * The tick goes white the moment the row is highlighted. Against the accent wash an
- * accent-coloured tick bleeds into its own background and stops reading as a mark.
+/*
+ * On the gradient, the row's own background has to stay out of the way or it covers
+ * it. Text and tick both go white: at the red end of the gradient a dark label loses
+ * contrast, and an accent-coloured tick disappears into its own background entirely.
  */
-body .kinset-select-option[data-state="checked"]:hover svg,
-body .kinset-select-option[data-state="checked"][data-highlighted] svg {
-  color: var(--ink);
+body .kinset-select-option[data-highlighted],
+body .kinset-select-option:hover,
+body .kinset-select-option[data-state="checked"][data-highlighted],
+body .kinset-select-option[data-state="checked"]:hover {
+  background: transparent;
+  color: #fff;
+}
+
+body .kinset-select-option[data-highlighted] svg,
+body .kinset-select-option:hover svg {
+  color: #fff;
 }
