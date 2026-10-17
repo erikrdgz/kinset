@@ -1,0 +1,247 @@
+/**
+ * Settings.
+ *
+ * A reading-and-changing screen, not a form: there is no submit button, so each control
+ * has to look individually settled rather than like a field waiting on one. Groups are
+ * separated by space and a quiet heading instead of boxes, which keeps a long screen
+ * scannable without turning every row into a card.
+ */
+
+.settings {
+  padding-block-end: var(--s7);
+}
+
+.settings h1 {
+  margin-block-end: var(--s5);
+}
+
+.set-group {
+  padding-block: var(--s5);
+  border-block-start: 1px solid var(--border);
+}
+
+.set-group:first-of-type {
+  border-block-start: 0;
+  padding-block-start: 0;
+}
+
+.set-group h2 {
+  margin-block: 0 var(--s2);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+
+.set-group > .fine {
+  margin-block: 0 var(--s4);
+}
+
+/* ---- fields ---- */
+
+.set-field {
+  display: block;
+  margin-block-end: var(--s4);
+}
+
+.set-field > span {
+  display: block;
+  margin-block-end: var(--s2);
+  font-size: var(--t-meta);
+  color: var(--muted);
+}
+
+.set-field > small {
+  display: block;
+  margin-block-start: var(--s2);
+  font-size: var(--t-meta);
+  color: var(--faint);
+  line-height: 1.5;
+}
+
+.set-field input {
+  inline-size: 100%;
+  min-block-size: var(--target);
+  padding-inline: var(--s4);
+  background: var(--grad-raised, var(--raised));
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  font-size: var(--t-body);
+}
+
+.set-field input:focus-visible {
+  border-color: var(--accent);
+}
+
+.set-error {
+  color: var(--danger);
+}
+
+/* Radix trigger, matched to the inputs beside it. */
+.set-field .kinset-select {
+  inline-size: 100%;
+  min-block-size: var(--target);
+  padding-inline: var(--s4);
+  background: var(--grad-raised, var(--raised));
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  font-size: var(--t-body);
+}
+
+.set-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+}
+
+.set-segmented button {
+  min-inline-size: 64px;
+  min-block-size: 40px;
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition:
+    background var(--m-press) var(--ease),
+    color var(--m-press) var(--ease);
+}
+
+.set-segmented button.selected {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* ---- actions ---- */
+
+.set-action {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s4);
+  min-block-size: 68px;
+  background: var(--grad-raised, var(--raised));
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  text-align: start;
+  color: var(--ink);
+  transition: border-color var(--m-press) var(--ease);
+}
+
+.set-action:hover {
+  border-color: var(--border-strong);
+}
+
+.set-action svg {
+  color: var(--muted);
+  flex: none;
+}
+
+.set-action strong {
+  display: block;
+  font-weight: 600;
+}
+
+.set-action small {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--t-meta);
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ---- about ---- */
+
+.set-facts {
+  display: grid;
+  gap: var(--s3);
+  margin: 0 0 var(--s4);
+}
+
+.set-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding-block-end: var(--s3);
+  border-block-end: 1px solid var(--border);
+  font-size: var(--t-meta);
+}
+
+.set-facts dt {
+  color: var(--muted);
+}
+
+.set-facts dd {
+  margin: 0;
+}
+
+.set-credits summary {
+  min-block-size: var(--target);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: var(--t-meta);
+  color: var(--muted);
+}
+
+.set-credits p {
+  font-size: var(--t-meta);
+  color: var(--muted);
+  line-height: 1.6;
+  margin-block: 0 var(--s3);
+}
+
+.set-credits a {
+  color: var(--accent);
+}
+
+/* ---- deleting ---- */
+
+.set-danger p {
+  margin: 0 0 var(--s2);
+  font-size: var(--t-meta);
+  line-height: 1.5;
+}
+
+.set-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-block-size: var(--target);
+  padding-inline: var(--s3);
+  color: var(--danger);
+  font-size: var(--t-meta);
+  border-radius: var(--r-control);
+  transition: background var(--m-press) var(--ease);
+}
+
+.set-delete:hover {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.set-delete-confirm {
+  inline-size: 100%;
+  min-block-size: var(--target);
+  margin-block-start: var(--s3);
+  border-radius: var(--r-control);
+  background: var(--danger);
+  color: #1a0b0a;
+  font-weight: 700;
+}
+
+.set-danger .quiet {
+  inline-size: 100%;
+  margin-block-start: var(--s2);
+}

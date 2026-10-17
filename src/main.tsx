@@ -9,6 +9,7 @@ import "./ui/entry.css";
 import "./ui/atelier.css";
 import "./ui/brand-intro.css";
 import "./ui/profile-sheet.css";
+import "./ui/settings.css";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />

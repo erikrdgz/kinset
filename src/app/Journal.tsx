@@ -32,6 +32,7 @@ import Plans from "../PlanManager";
 import { Run } from "../features/running/Run";
 import { Sheet } from "../ui/Sheet";
 import { ProfileSheet } from "../features/profile/ProfileSheet";
+import { Settings } from "../features/profile/Settings";
 import { BrandArt } from "../ui/BrandArt";
 import { useSceneMotion } from "../ui/Motion";
 
@@ -282,6 +283,33 @@ export function Journal({
           />
         )}
 
+        {route.name === "settings" && (
+          <Settings
+            profile={profile}
+            email={email}
+            owner={owner}
+            data={data}
+            deleting={deleting}
+            onBack={back}
+            onProfileChange={(next) => void update({ ...data, profile: next })}
+            onExport={() => downloadRaw(data)}
+            onDeleteAccount={async () => {
+              if (!supabase) return;
+              setDeleting(true);
+              const { error } = await supabase.functions.invoke("delete-account", {
+                method: "POST",
+              });
+              if (error) {
+                setNotice("Account deletion failed. Your data has not been cleared.");
+                setDeleting(false);
+                return;
+              }
+              await journal.clear();
+              await exit();
+            }}
+          />
+        )}
+
         {route.name === "run" && (
           <Run owner={owner} unit={profile.unit === "kg" ? "km" : "mi"} />
         )}
@@ -440,36 +468,15 @@ export function Journal({
           profile={profile}
           email={email}
           owner={owner}
-          data={data}
           state={journal.state}
           status={journal.status}
-          deleting={deleting}
           onClose={() => setMenu(false)}
           onProfileChange={(next) => void update({ ...data, profile: next })}
-          onEditPreferences={() => {
+          onSettings={() => {
             setMenu(false);
-            setEditingProfile(true);
+            go({ name: "settings" });
           }}
-          onPlans={() => {
-            setMenu(false);
-            go({ name: "train" });
-          }}
-          onExport={() => downloadRaw(data)}
           onSignOut={() => void exit()}
-          onDeleteAccount={async () => {
-            if (!supabase) return;
-            setDeleting(true);
-            const { error } = await supabase.functions.invoke("delete-account", {
-              method: "POST",
-            });
-            if (error) {
-              setNotice("Account deletion failed. Your data has not been cleared.");
-              setDeleting(false);
-              return;
-            }
-            await journal.clear();
-            await exit();
-          }}
         />
       )}
     </div>
