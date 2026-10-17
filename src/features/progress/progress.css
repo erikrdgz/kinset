@@ -35,7 +35,7 @@
 .progress .prog-bars button { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; min-height: 44px; height: 100%; background: transparent; border: 0; border-radius: 6px; padding: 0; box-shadow: none; color: var(--muted); transform: none; }
 .progress .prog-bars button:hover, .progress .prog-bars button.is-active { background: #ffffff03; }
 .progress .prog-bar-column { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 115px; }
-.progress .prog-bar-column i { display: block; width: 48%; max-width: 24px; min-height: 2px; border-radius: 6px 0 0; background: linear-gradient(180deg, #f18449, #dd632b); transform-origin: bottom; animation: prog-bar-grow 700ms var(--ease) both; animation-delay: var(--bar-delay); transition: box-shadow 200ms, background 200ms; }
+.progress .prog-bar-column i { display: block; width: 48%; max-width: 24px; min-height: 2px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, #f18449, #dd632b); transform-origin: bottom; animation: prog-bar-grow 700ms var(--ease) both; animation-delay: var(--bar-delay); transition: box-shadow 200ms, background 200ms; }
 .progress .prog-bar-column i[data-empty="true"] { height: 2px !important; min-height: 2px; background: #53575b; }
 .progress .prog-bars button.is-active .prog-bar-column i:not([data-empty="true"]), .progress .prog-bars button:hover .prog-bar-column i:not([data-empty="true"]) { background: linear-gradient(180deg, #ffac71, var(--accent)); box-shadow: 0 0 15px #ff692b38; }
 .progress .prog-bar-label { display: block; width: 100%; height: 25px; padding-top: 9px; white-space: nowrap; font-size: 9px; color: #969a9e; text-align: center; }
@@ -187,7 +187,7 @@
 /* Secondary charts use fine instrumentation and open edges to keep the hierarchy varied. */
 .progress .prog-panel { border-radius: 6px; background: #17191b; box-shadow: none; border-color: #ffffff0d; }
 .progress .prog-frequency { background: linear-gradient(150deg, #1d2022, #131517); border-top-color: #ffffff25; }
-.progress .prog-bar-column i:not([data-empty="true"]) { position: relative; border-radius: 6px 0 0; width: 63%; max-width: 29px; mask-image: repeating-linear-gradient(0deg, #000 0 3px, transparent 3px 5px); }
+.progress .prog-bar-column i:not([data-empty="true"]) { position: relative; border-radius: 6px 6px 0 0; width: 63%; max-width: 29px; mask-image: repeating-linear-gradient(0deg, #000 0 3px, transparent 3px 5px); }
 .progress .prog-bar-column i[data-empty="true"] { border-radius: 0; }
 .progress .prog-bar-grid span::before { background: repeating-linear-gradient(90deg, #ffffff14 0 1px, transparent 1px 5px); }
 .progress .prog-metrics { gap: 0; padding: 20px 0; border-top: 1px solid #ffffff24; border-bottom: 1px solid #ffffff13; }
