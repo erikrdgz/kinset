@@ -61,9 +61,12 @@ export function Today({ journal, profile, go, onStart }: {
         {/* One control, straddling the seam between the poster and the lineup, so it
             reads as coming out of the card rather than floating over it. */}
         <div className="flow-joint">
-          <button className="flow-joint-button" onClick={onStart}>
-            <span>{active ? "Resume workout" : "Start workout"}</span>
-            <ArrowUpRight size={20} aria-hidden="true" />
+          <button
+            className="flow-joint-button"
+            onClick={onStart}
+            aria-label={active ? "Resume workout" : "Start workout"}
+          >
+            {active ? "Resume" : "Start"}
           </button>
         </div>
         <section className="session-lineup connected-lineup">

@@ -53,12 +53,13 @@
 .flow-joint { position:relative; height:0; z-index:3; }
 body .shell .flow-joint-button {
   position:absolute; top:0; left:50%; transform:translate(-50%,-50%);
-  display:inline-flex; align-items:center; justify-content:center; gap:10px;
-  min-height:56px; padding:0 26px; white-space:nowrap;
-  border:0; border-radius:var(--r-pill); color:var(--accent-ink);
+  display:grid; place-items:center;
+  width:84px; height:84px; min-height:84px; padding:0;
+  border:0; border-radius:50%; color:var(--accent-ink);
   background:var(--grad-accent,var(--accent));
-  font-size:15px; font-weight:700; letter-spacing:-.01em;
-  /* The dark ring punches it through the seam so it reads as part of the card. */
+  font-size:13px; font-weight:700; letter-spacing:-.01em; text-transform:none;
+  /* The ring in the page colour punches the circle through the seam between the
+     poster and the lineup, so it reads as joining them rather than sitting on top. */
   box-shadow:0 0 0 7px var(--canvas),0 10px 24px #0007,var(--glow-accent,none);
   transition:background 160ms var(--ease),transform 120ms var(--ease);
 }
