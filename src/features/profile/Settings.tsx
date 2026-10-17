@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronLeft, Download, Trash2 } from "lucide-react";
+import { ChevronLeft, Trash2 } from "lucide-react";
 import { Select } from "../../Select";
 import { profileSchema, type Journal, type Profile } from "../../domain";
 import "../../ui/settings.css";
@@ -8,7 +8,7 @@ import "../../ui/settings.css";
  * Settings.
  *
  * Everything the profile drawer should not carry: preferences that change twice a year,
- * data controls, account deletion, and the credits.
+ * account deletion, and the credits.
  *
  * Changes save as you make them. The old path sent people back through the onboarding
  * wizard to alter one answer, which is a form with a submit button pretending to be a
@@ -26,7 +26,6 @@ export function Settings({
   deleting,
   onBack,
   onProfileChange,
-  onExport,
   onDeleteAccount,
 }: {
   profile: Profile;
@@ -36,7 +35,6 @@ export function Settings({
   deleting: boolean;
   onBack: () => void;
   onProfileChange: (next: Profile) => void;
-  onExport: () => void;
   onDeleteAccount: () => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -155,25 +153,6 @@ export function Settings({
       </section>
 
       <section className="set-group">
-        <h2>Your data</h2>
-        <button className="set-action" onClick={onExport}>
-          <Download size={18} aria-hidden="true" />
-          <span>
-            <strong>Download a copy of everything</strong>
-            <small>
-              Your workouts, plans and settings in one file, yours to keep.
-            </small>
-          </span>
-        </button>
-        <p className="fine">
-          Workouts save to this device first and sync when you are connected.
-          {isDemo
-            ? " The demo journal never leaves this device."
-            : " Check the status in your profile before switching devices."}
-        </p>
-      </section>
-
-      <section className="set-group">
         <h2>About</h2>
         <dl className="set-facts">
           <div>
@@ -224,7 +203,7 @@ export function Settings({
               </p>
               <p className="muted">
                 This permanently removes your profile and every workout from the cloud.
-                It cannot be undone. Download a copy first if you want to keep it.
+                It cannot be undone.
               </p>
               <button
                 className="set-delete-confirm"

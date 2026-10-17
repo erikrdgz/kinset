@@ -7,26 +7,33 @@
  * scannable without turning every row into a card.
  */
 
+/**
+ * One rhythm, the same as the drawer's: 8px from a label to its control, 20px between
+ * fields, 32px between groups. Stated once here rather than chosen per element, which
+ * is how the spacing drifted the first time.
+ */
 .settings {
   padding-block-end: var(--s7);
 }
 
 .settings h1 {
-  margin-block-end: var(--s5);
+  margin-block-end: 28px;
 }
 
 .set-group {
-  padding-block: var(--s5);
+  padding-block-start: 32px;
+  margin-block-start: 32px;
   border-block-start: 1px solid var(--border);
 }
 
 .set-group:first-of-type {
   border-block-start: 0;
   padding-block-start: 0;
+  margin-block-start: 0;
 }
 
 .set-group h2 {
-  margin-block: 0 var(--s2);
+  margin-block: 0 8px;
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -35,26 +42,30 @@
 }
 
 .set-group > .fine {
-  margin-block: 0 var(--s4);
+  margin-block: 0 20px;
 }
 
 /* ---- fields ---- */
 
 .set-field {
   display: block;
-  margin-block-end: var(--s4);
+  margin-block-end: 20px;
+}
+
+.set-field:last-child {
+  margin-block-end: 0;
 }
 
 .set-field > span {
   display: block;
-  margin-block-end: var(--s2);
+  margin-block-end: 8px;
   font-size: var(--t-meta);
   color: var(--muted);
 }
 
 .set-field > small {
   display: block;
-  margin-block-start: var(--s2);
+  margin-block-start: 8px;
   font-size: var(--t-meta);
   color: var(--faint);
   line-height: 1.5;
@@ -62,7 +73,7 @@
 
 .set-field input {
   inline-size: 100%;
-  min-block-size: var(--target);
+  block-size: 52px;
   padding-inline: var(--s4);
   background: var(--grad-raised, var(--raised));
   border: 1px solid var(--border);
@@ -79,10 +90,14 @@
   color: var(--danger);
 }
 
-/* Radix trigger, matched to the inputs beside it. */
+/* Radix trigger, matched to the inputs beside it. The legacy sheet gives it a
+   min-height of 54 and a top margin, both of which have to be cleared or the selects
+   sit 2px taller than the text fields and the column stops lining up. */
 .set-field .kinset-select {
   inline-size: 100%;
-  min-block-size: var(--target);
+  block-size: 52px;
+  min-block-size: 0;
+  margin-block-start: 0;
   padding-inline: var(--s4);
   background: var(--grad-raised, var(--raised));
   border: 1px solid var(--border);
@@ -106,7 +121,7 @@
 
 .set-segmented button {
   min-inline-size: 64px;
-  min-block-size: 40px;
+  block-size: 40px;
   border-radius: var(--r-pill);
   color: var(--muted);
   font-size: var(--t-meta);
@@ -121,45 +136,6 @@
 .set-segmented button.selected {
   background: var(--accent);
   color: var(--accent-ink);
-}
-
-/* ---- actions ---- */
-
-.set-action {
-  inline-size: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding: var(--s4);
-  min-block-size: 68px;
-  background: var(--grad-raised, var(--raised));
-  border: 1px solid var(--border);
-  border-radius: var(--r-control);
-  text-align: start;
-  color: var(--ink);
-  transition: border-color var(--m-press) var(--ease);
-}
-
-.set-action:hover {
-  border-color: var(--border-strong);
-}
-
-.set-action svg {
-  color: var(--muted);
-  flex: none;
-}
-
-.set-action strong {
-  display: block;
-  font-weight: 600;
-}
-
-.set-action small {
-  display: block;
-  margin-block-start: 2px;
-  font-size: var(--t-meta);
-  color: var(--muted);
-  line-height: 1.4;
 }
 
 /* ---- about ---- */

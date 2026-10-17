@@ -292,7 +292,6 @@ export function Journal({
             deleting={deleting}
             onBack={back}
             onProfileChange={(next) => void update({ ...data, profile: next })}
-            onExport={() => downloadRaw(data)}
             onDeleteAccount={async () => {
               if (!supabase) return;
               setDeleting(true);
