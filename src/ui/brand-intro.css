@@ -8,11 +8,16 @@
  * than an idle loop. The card's scanline and tracking overlays are left out so the mark
  * stays solid white instead of striped.
  *
- * Timeline, kept tight — a cold open that outstays its welcome is just a delay:
- *   0–260ms    the K tears in, alone and centred
- *   260–480ms  the track slides while the full wordmark wipes out to the right
- *   480–620ms  hold
- *   620–860ms  the overlay fades, while the page beneath rises into place
+ * Timeline. The pacing is the point: a hard fast hit, a beat of stillness so the eye
+ * can read the K, then a long eased slide. Equal-speed beats read as one flash, which
+ * is what a 260/220 split did.
+ *   0–240ms     the K tears in — fast, hard steps, no easing
+ *   240–380ms   it holds still, which is what makes the slide feel deliberate
+ *   380–840ms   the track slides, smoothly decelerating
+ *   380–880ms   the wordmark wipes out alongside it, finishing a touch later so the
+ *               letters trail the movement instead of landing with it
+ *   880–1180ms  the finished mark holds
+ *   1180–1500ms the overlay fades while the page beneath rises into place
  *
  * The track starts shifted right by 30.7%: the K's centre sits at x≈181 in the 980-wide
  * box, the full wordmark's at x≈482, so that offset puts the K on the screen's centre
@@ -26,7 +31,7 @@
   display: grid;
   place-items: center;
   background: #0c0b0b;
-  animation: bi-exit 240ms cubic-bezier(0.22, 1, 0.36, 1) 620ms both;
+  animation: bi-exit 320ms cubic-bezier(0.4, 0, 0.2, 1) 1180ms both;
 }
 
 .brand-intro-stage {
@@ -42,7 +47,7 @@
   inset: 0;
   display: grid;
   transform: translateX(30.7%);
-  animation: bi-recentre 220ms cubic-bezier(0.16, 1, 0.3, 1) 260ms both;
+  animation: bi-recentre 460ms cubic-bezier(0.25, 1, 0.3, 1) 380ms both;
 }
 
 /* Every mark layer is a solid fill masked to the glyph shape. */
@@ -56,7 +61,7 @@
   -webkit-mask-position: center;
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
-  animation-duration: 260ms;
+  animation-duration: 240ms;
   animation-timing-function: steps(1, end);
   animation-fill-mode: both;
 }
@@ -69,10 +74,11 @@
 .bi-full {
   mask-image: var(--mark-full);
   -webkit-mask-image: var(--mark-full);
-  /* Beat two. Hidden until the wipe starts. */
-  animation-duration: 220ms;
-  animation-delay: 260ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Beat two. Hidden until the wipe starts, and it outruns the slide slightly so the
+     letters trail the movement rather than arriving with it. */
+  animation-duration: 500ms;
+  animation-delay: 380ms;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.3, 1);
 }
 
 /* ---- beat one: the K ---- */
@@ -112,8 +118,8 @@
 
 .brand-intro-stage .bi-k-base {
   animation-name: bi-shift, bi-handover;
-  animation-duration: 260ms, 1ms;
-  animation-delay: 0ms, 260ms;
+  animation-duration: 240ms, 1ms;
+  animation-delay: 0ms, 380ms;
   animation-timing-function: steps(1, end), linear;
 }
 
@@ -331,31 +337,31 @@
 }
 
 /**
- * Dev-only inspection speed (?introslow). Six times slower, so the tear, the handover
- * and the wipe can be looked at one at a time.
+ * Dev-only inspection speed (?introslow). Six times slower, so the tear, the hold, the
+ * slide and the wipe can be looked at one at a time.
  */
 .bi-slow {
-  animation-delay: 3720ms !important;
-  animation-duration: 1440ms !important;
+  animation-delay: 7080ms !important;
+  animation-duration: 1920ms !important;
 }
 
 .bi-slow .bi-track {
-  animation-delay: 1560ms !important;
-  animation-duration: 1320ms !important;
+  animation-delay: 2280ms !important;
+  animation-duration: 2760ms !important;
 }
 
 .bi-slow .bi-k {
-  animation-duration: 1560ms !important;
+  animation-duration: 1440ms !important;
 }
 
 .bi-slow .brand-intro-stage .bi-k-base {
-  animation-duration: 1560ms, 1ms !important;
-  animation-delay: 0ms, 1560ms !important;
+  animation-duration: 1440ms, 1ms !important;
+  animation-delay: 0ms, 2280ms !important;
 }
 
 .bi-slow .bi-full {
-  animation-duration: 1320ms !important;
-  animation-delay: 1560ms !important;
+  animation-duration: 3000ms !important;
+  animation-delay: 2280ms !important;
 }
 
 /**
@@ -367,13 +373,13 @@
 }
 
 .app-content[data-entering] {
-  animation: app-enter 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: app-enter 540ms cubic-bezier(0.25, 1, 0.3, 1) both;
 }
 
 @keyframes app-enter {
   from {
     opacity: 0;
-    transform: translateY(16px) scale(0.985);
+    transform: translateY(18px) scale(0.985);
   }
   to {
     opacity: 1;

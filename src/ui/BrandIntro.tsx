@@ -41,8 +41,8 @@ export function BrandIntro({
     const scale = slow ? 6 : 1;
     // The page starts arriving while the overlay is still fading, so the two overlap
     // rather than reading as two separate events.
-    const exitAt = reduced ? 160 : 620 * scale;
-    const doneAt = reduced ? 360 : 860 * scale;
+    const exitAt = reduced ? 160 : 1180 * scale;
+    const doneAt = reduced ? 360 : 1500 * scale;
     const exitTimer = window.setTimeout(() => onExitStart?.(), exitAt);
     const timer = window.setTimeout(finish, doneAt);
     const skip = (event: KeyboardEvent) => {
