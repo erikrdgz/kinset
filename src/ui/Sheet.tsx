@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { ChevronLeft, X } from "lucide-react";
 
 /**
@@ -30,6 +36,7 @@ export function Sheet({
   labelledBy?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const opener = useRef<Element | null>(null);
   const [closing, setClosing] = useState(false);
   const dismiss = () => {
@@ -37,6 +44,44 @@ export function Sheet({
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) onClose();
     else setClosing(true);
   };
+
+  /**
+   * Grow or shrink between views instead of snapping.
+   *
+   * Neither end is a fixed number — one view is auto, the other is 88dvh — and CSS
+   * cannot transition from `auto`. So the previous height is carried across renders in
+   * a ref: by the time an effect runs React has already applied the new size, so
+   * measuring both ends inside it would compare a height to itself. The start is
+   * pinned, the element animates to the measured end, then it is released back to its
+   * natural size so later content changes are not stuck at a stale pixel height.
+   */
+  const previousHeight = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const el = panel.current;
+    if (!el) return;
+    const to = el.getBoundingClientRect().height;
+    const from = previousHeight.current;
+    previousHeight.current = to;
+    if (from === null || Math.abs(to - from) < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    el.style.blockSize = `${from}px`;
+    void el.offsetHeight;
+    el.style.transition = "block-size 340ms cubic-bezier(0.25, 1, 0.3, 1)";
+    el.style.blockSize = `${to}px`;
+
+    const done = () => {
+      el.style.transition = "";
+      el.style.blockSize = "";
+      el.removeEventListener("transitionend", done);
+    };
+    el.addEventListener("transitionend", done);
+    return () => {
+      el.removeEventListener("transitionend", done);
+      el.style.transition = "";
+      el.style.blockSize = "";
+    };
+  }, [tall]);
 
   useEffect(() => {
     if (!closing) return;
@@ -74,7 +119,7 @@ export function Sheet({
         if (e.target === e.currentTarget) dismiss();
       }}
     >
-      <div className="sheet" role="document">
+      <div className="sheet" role="document" ref={panel}>
         <div className="sheet-grip" aria-hidden="true" />
         <header className="sheet-head">
           {onBack && (

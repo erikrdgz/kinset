@@ -111,7 +111,10 @@
 }
 
 .set-segmented {
-  display: inline-flex;
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 64px;
   gap: 2px;
   padding: 3px;
   background: var(--canvas);
@@ -119,8 +122,24 @@
   border-radius: var(--r-pill);
 }
 
+.set-thumb {
+  position: absolute;
+  inset-block: 3px;
+  inset-inline-start: 3px;
+  inline-size: 64px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: transform 260ms cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+.set-segmented[data-active="kg"] .set-thumb {
+  transform: translateX(66px);
+}
+
 .set-segmented button {
-  min-inline-size: 64px;
+  position: relative;
+  z-index: 1;
   block-size: 40px;
   border-radius: var(--r-pill);
   color: var(--muted);
@@ -128,14 +147,17 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  transition:
-    background var(--m-press) var(--ease),
-    color var(--m-press) var(--ease);
+  transition: color 180ms var(--ease);
 }
 
 .set-segmented button.selected {
-  background: var(--accent);
   color: var(--accent-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .set-thumb {
+    transition: none;
+  }
 }
 
 /* ---- about ---- */

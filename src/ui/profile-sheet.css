@@ -166,8 +166,13 @@
 
 /* ---- the inline unit switch ---- */
 
+/* A switch rather than two buttons: one thumb slides between the options, so the
+   change reads as a single movement instead of one fill appearing as another vanishes. */
 .ps-segmented {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 52px;
   gap: 2px;
   padding: 3px;
   background: var(--canvas);
@@ -176,8 +181,24 @@
   flex: none;
 }
 
+.ps-thumb {
+  position: absolute;
+  inset-block: 3px;
+  inset-inline-start: 3px;
+  inline-size: 52px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: transform 260ms cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+.ps-segmented[data-active="kg"] .ps-thumb {
+  transform: translateX(54px);
+}
+
 .ps-segmented button {
-  min-inline-size: 52px;
+  position: relative;
+  z-index: 1;
   block-size: 34px;
   border-radius: var(--r-pill);
   color: var(--muted);
@@ -185,14 +206,17 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  transition:
-    background var(--m-press) var(--ease),
-    color var(--m-press) var(--ease);
+  transition: color 180ms var(--ease);
 }
 
 .ps-segmented button.selected {
-  background: var(--accent);
   color: var(--accent-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-thumb {
+    transition: none;
+  }
 }
 
 /* ---- leaving ---- */

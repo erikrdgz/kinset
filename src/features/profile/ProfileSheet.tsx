@@ -53,14 +53,18 @@ export function ProfileSheet({
   const [view, setView] = useState<"home" | "settings">("home");
   const isDemo = owner === "demo";
 
-  if (view === "settings")
-    return (
-      <Sheet
-        title="Settings"
-        tall
-        onBack={() => setView("home")}
-        onClose={onClose}
-      >
+  const settings = view === "settings";
+
+  return (
+    /* One Sheet for both views. Returning a different element per view would unmount
+       and remount the dialog, so it would snap between sizes instead of growing. */
+    <Sheet
+      title={settings ? "Settings" : "Profile"}
+      tall={settings}
+      onBack={settings ? () => setView("home") : undefined}
+      onClose={onClose}
+    >
+      {settings ? (
         <SettingsPanel
           profile={profile}
           email={email}
@@ -70,11 +74,7 @@ export function ProfileSheet({
           onProfileChange={onProfileChange}
           onDeleteAccount={onDeleteAccount}
         />
-      </Sheet>
-    );
-
-  return (
-    <Sheet title="Profile" onClose={onClose}>
+      ) : (
       <div className="ps">
         <header className="ps-identity">
           <span className="ps-avatar" aria-hidden="true">
@@ -96,7 +96,14 @@ export function ProfileSheet({
           {/* The only preference that changes often enough to earn a place here. */}
           <div className="ps-row">
             <span className="ps-label">Units</span>
-            <div className="ps-segmented" role="group" aria-label="Weight units">
+            <div
+              className="ps-segmented"
+              role="group"
+              aria-label="Weight units"
+              data-active={profile.unit}
+            >
+              {/* The thumb slides between the two; the labels sit above it. */}
+              <span className="ps-thumb" aria-hidden="true" />
               {(["lb", "kg"] as const).map((unit) => (
                 <button
                   key={unit}
@@ -123,6 +130,7 @@ export function ProfileSheet({
           {isDemo ? "Leave the demo" : "Sign out"}
         </button>
       </div>
+      )}
     </Sheet>
   );
 }

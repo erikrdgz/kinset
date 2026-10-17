@@ -126,7 +126,13 @@ export function SettingsPanel({
 
         <div className="set-field">
           <span>Weight units</span>
-          <div className="set-segmented" role="group" aria-label="Weight units">
+          <div
+            className="set-segmented"
+            role="group"
+            aria-label="Weight units"
+            data-active={profile.unit}
+          >
+            <span className="set-thumb" aria-hidden="true" />
             {(["lb", "kg"] as const).map((unit) => (
               <button
                 key={unit}
