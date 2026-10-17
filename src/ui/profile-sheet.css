@@ -1,0 +1,319 @@
+/**
+ * Profile and settings sheet.
+ *
+ * The replaced version was a stack of identical cards, so nothing told you what
+ * mattered. Hierarchy here is carried by three things: an identity block with real
+ * presence at the top, quiet group labels that separate changing a setting from
+ * exporting your data from leaving, and destructive actions that look destructive
+ * instead of looking like the row above them.
+ */
+
+/* ---- identity ---- */
+
+.ps-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding-block-end: var(--s4);
+}
+
+.ps-avatar {
+  inline-size: 56px;
+  block-size: 56px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-pill);
+  background: var(--grad-accent, var(--accent));
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  box-shadow: var(--glow-accent, none);
+}
+
+.ps-who {
+  min-inline-size: 0;
+}
+
+.ps-who strong {
+  display: block;
+  font-size: 1.375rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.ps-who span {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--t-meta);
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- sync state, next to the account it describes ---- */
+
+.ps-status {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin: 0 0 var(--s4);
+  font-size: var(--t-meta);
+  color: var(--muted);
+}
+
+.ps-status i {
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: var(--r-pill);
+  background: var(--muted);
+  flex: none;
+}
+
+.ps-status[data-state="synced"] i {
+  background: var(--success);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--success) 70%, transparent);
+}
+
+.ps-status[data-state="saving"] i {
+  background: var(--warning);
+}
+
+.ps-status[data-state="storageFailed"],
+.ps-status[data-state="conflict"],
+.ps-status[data-state="quarantined"] {
+  color: var(--danger);
+}
+
+.ps-status[data-state="storageFailed"] i,
+.ps-status[data-state="conflict"] i,
+.ps-status[data-state="quarantined"] i {
+  background: var(--danger);
+}
+
+/* ---- stats ---- */
+
+.ps-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  padding: var(--s4) 0;
+  margin: 0 0 var(--s3);
+  border-block: 1px solid var(--border);
+}
+
+.ps-stats li {
+  text-align: center;
+  border-inline-start: 1px solid var(--border);
+}
+
+.ps-stats li:first-child {
+  border-inline-start: 0;
+}
+
+.ps-stats strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.ps-stats span {
+  display: block;
+  margin-block-start: var(--s1);
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+/* ---- groups ---- */
+
+.ps-group {
+  margin: var(--s5) 0 var(--s2);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+
+.ps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--s2);
+}
+
+.ps-row,
+.ps-list button {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3) var(--s4);
+  min-block-size: 64px;
+  background: var(--grad-raised, var(--raised));
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  text-align: start;
+  color: var(--ink);
+  transition:
+    border-color var(--m-press) var(--ease),
+    transform var(--m-press) var(--ease);
+}
+
+.ps-list button:hover {
+  border-color: var(--border-strong);
+}
+
+.ps-list button:active {
+  transform: scale(0.99);
+}
+
+.ps-list button > svg:first-child,
+.ps-row > svg:first-child {
+  color: var(--muted);
+  flex: none;
+}
+
+.ps-row-text {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.ps-row-text strong {
+  display: block;
+  font-weight: 600;
+}
+
+.ps-row-text small {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--t-meta);
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.ps-list button > svg:last-child {
+  color: var(--faint);
+  flex: none;
+}
+
+/* ---- the inline unit switch ---- */
+
+.ps-row-static {
+  margin-block-end: var(--s2);
+}
+
+.ps-segmented {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  flex: none;
+}
+
+.ps-segmented button {
+  min-inline-size: 48px;
+  min-block-size: 36px;
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition:
+    background var(--m-press) var(--ease),
+    color var(--m-press) var(--ease);
+}
+
+.ps-segmented button.selected {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.ps-note {
+  margin-block: var(--s2) 0;
+}
+
+/* ---- leaving ---- */
+
+.ps-signout {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  min-block-size: var(--target);
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  transition:
+    background var(--m-press) var(--ease),
+    border-color var(--m-press) var(--ease);
+}
+
+.ps-signout:hover {
+  background: var(--raised);
+  border-color: var(--border-strong);
+}
+
+/* ---- deleting ----
+   Set apart above a rule and rendered in the danger colour, so the control that ends
+   an account never reads like the rows above it. The confirmation is inline rather
+   than a window.confirm, so the consequence is stated in the product's own voice. */
+
+.ps-danger {
+  margin-block-start: var(--s6);
+  padding-block-start: var(--s4);
+  border-block-start: 1px solid var(--border);
+}
+
+.ps-danger p {
+  margin: 0 0 var(--s2);
+  font-size: var(--t-meta);
+  line-height: 1.5;
+}
+
+.ps-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-block-size: var(--target);
+  padding-inline: var(--s3);
+  color: var(--danger);
+  font-size: var(--t-meta);
+  border-radius: var(--r-control);
+  transition: background var(--m-press) var(--ease);
+}
+
+.ps-delete:hover {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.ps-delete-confirm {
+  inline-size: 100%;
+  min-block-size: var(--target);
+  margin-block-start: var(--s3);
+  border-radius: var(--r-control);
+  background: var(--danger);
+  color: #1a0b0a;
+  font-weight: 700;
+}
+
+.ps-danger .quiet {
+  inline-size: 100%;
+  margin-block-start: var(--s2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-list button:active {
+    transform: none;
+  }
+}

@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  CalendarDays,
+  ArrowUpRight,
   Dumbbell,
   House,
   Layers,
   LineChart,
-  LogOut,
   User,
 } from "lucide-react";
 import { supabase } from "../backend";
@@ -13,6 +12,8 @@ import { useJournal } from "../data/journal";
 import {
   applyCommand,
   CommandError,
+  completedSetCount,
+  plannedSetCount,
   type Command,
   type Journal as JournalData,
   type Profile,
@@ -30,6 +31,9 @@ import { buildSession, nextWorkout, advancePlan } from "../features/training/wor
 import Plans from "../PlanManager";
 import { Run } from "../features/running/Run";
 import { Sheet } from "../ui/Sheet";
+import { ProfileSheet } from "../features/profile/ProfileSheet";
+import { BrandArt } from "../ui/BrandArt";
+import { useSceneMotion } from "../ui/Motion";
 
 const tabs: Array<{ id: TabName; label: string; icon: typeof House; route: Route }> = [
   { id: "today", label: "Today", icon: House, route: { name: "today" } },
@@ -62,6 +66,8 @@ export function Journal({
   const [notice, setNotice] = useState("");
   const [menu, setMenu] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const scene = useRef<HTMLDivElement>(null);
+  useSceneMotion(scene, `${route.name}:${journal.ready && !!data.profile}:${editingProfile}`);
 
   // Each screen starts at the top; the session workspace manages its own scrolling.
   useEffect(() => {
@@ -204,12 +210,14 @@ export function Journal({
   return (
     <div
       className="shell"
+      data-route={route.name}
       data-session={inSession || undefined}
       data-resume={(data.active && !inSession) || undefined}
     >
       {!inSession && (
         <header className="topbar">
-          <Brand />
+          <button className="topbar-brand" onClick={() => go({ name: "today" })} aria-label="Kinset home"><Brand /></button>
+          <span className="topbar-label">TRAINING JOURNAL <i /> {activeTab === "library" ? "MOVEMENT LIBRARY" : activeTab?.toUpperCase()}</span>
           <div className="topbar-right">
             {owner !== "demo" && (
               <span className="sync-status" data-state={journal.state}>
@@ -255,6 +263,7 @@ export function Journal({
           </div>
         )}
 
+        <div className="route-stage" key={route.name} ref={scene}>
         {route.name === "today" && (
           <Today
             journal={data}
@@ -278,13 +287,17 @@ export function Journal({
         )}
 
         {route.name === "train" && (
-          <>
-            <button className="quiet run-entry" onClick={() => go({ name: "run" })}>
-              <span>
-                <strong>Go for a run</strong>
-                <small>Record a route, or add one by hand</small>
-              </span>
-            </button>
+          <div className="train-page">
+            <header className="editorial-heading"><div><h1>Train<span className="orange-dot">.</span></h1></div><span className="heading-date">{data.planDraft ? "Plan editor" : `${(data.plans?.length ?? 0) + 1} available routines`}</span></header>
+            {!data.planDraft && <div className="train-features">
+              <button className="train-feature strength-feature" onClick={() => go({ name: data.active ? "session" : "preview" })}>
+                <img src={`${import.meta.env.BASE_URL}images/editorial/lifting.jpg`} alt="" />
+                <span className="feature-copy"><small>{data.active ? "WORKOUT IN PROGRESS" : "NEXT STRENGTH SESSION"}</small><strong>{data.active?.name ?? nextWorkout(data, profile).name}</strong><span>{data.active ? "Resume workout" : "View workout"} <ArrowUpRight size={20}/></span></span>
+              </button>
+              <button className="train-feature run-feature" onClick={() => go({ name: "run" })}>
+                <BrandArt seed="running-terrain" density={0.8}/><span className="feature-copy"><small>OUTDOOR ACTIVITIES</small><strong>Run.<br/>Walk. Explore.</strong><span>Record an activity <ArrowUpRight size={20}/></span></span>
+              </button>
+            </div>}
           <Plans
             data={data}
             update={(next) => void update(next)}
@@ -309,7 +322,7 @@ export function Journal({
               go({ name: "session" });
             }}
             />
-          </>
+          </div>
         )}
 
         {route.name === "session" &&
@@ -367,6 +380,7 @@ export function Journal({
             // than undoing one keystroke at a time.
             onQuery={(q) => replace({ ...route, name: "library", query: q })}
             onGroup={(g) => replace({ ...route, name: "library", group: g })}
+            onClear={() => replace({ name: "library", group: "all" })}
             onSelect={(id) => go({ ...route, name: "library", exerciseId: id })}
             onClose={back}
           />
@@ -376,6 +390,7 @@ export function Journal({
           <Progress
             journal={data}
             profile={profile}
+            onProfileChange={(profile) => void update({ ...data, profile })}
             exerciseId={route.exerciseId}
             onSelectExercise={(id) =>
               replace({ name: "progress", exerciseId: id })
@@ -383,21 +398,27 @@ export function Journal({
             onOpenSession={(id) => go({ name: "summary", sessionId: id })}
           />
         )}
+        </div>
       </main>
 
       {/* Minimising a session leaves this behind, so it can always be found again. */}
       {data.active && !inSession && (
         <button className="resume-bar" onClick={() => go({ name: "session" })}>
-          <span>
+          <svg className="resume-progress" viewBox="0 0 40 40" aria-hidden="true"><circle className="resume-progress-track" cx="20" cy="20" r="16"/><circle className="resume-progress-fill" cx="20" cy="20" r="16" pathLength="100" strokeDasharray={`${Math.min(100, completedSetCount(data.active) / Math.max(1, plannedSetCount(data.active)) * 100)} 100`}/></svg>
+          <span className="resume-copy">
             <strong>{data.active.name}</strong>
-            <small>Workout in progress</small>
+            <small>{completedSetCount(data.active)} of {plannedSetCount(data.active)} sets logged</small>
           </span>
-          <span className="resume-cta">Resume</span>
+          <span className="resume-cta">Resume <ArrowUpRight size={19} aria-hidden="true"/></span>
         </button>
       )}
 
       {!inSession && (
-        <nav className="tabbar" aria-label="Main">
+        <nav className="tabbar" aria-label="Main" data-active={activeTab ?? "today"}>
+          <div className="nav-brand"><Brand /></div>
+
+          <div className="tabbar-items">
+          <i className="tab-indicator" aria-hidden="true"/>
           {tabs.map(({ id, label, icon: Icon, route: target }) => (
             <button
               key={id}
@@ -409,111 +430,47 @@ export function Journal({
               <span>{label}</span>
             </button>
           ))}
+          </div>
+          <button className="nav-profile" onClick={()=>setMenu(true)}><User size={18}/><span>Profile & settings</span></button>
         </nav>
       )}
 
       {menu && (
-        <Sheet title="Profile" onClose={() => setMenu(false)}>
-          <p className="muted">{email || "Demo account · this device only"}</p>
-          <ul className="settings-list">
-            <li>
-              <button
-                onClick={() => {
-                  setMenu(false);
-                  setEditingProfile(true);
-                }}
-              >
-                <User size={18} aria-hidden="true" />
-                <span>
-                  <strong>Training preferences</strong>
-                  <small>
-                    {profile.days} days · {profile.equipment} · {profile.unit}
-                  </small>
-                </span>
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => {
-                  setMenu(false);
-                  go({ name: "train" });
-                }}
-              >
-                <CalendarDays size={18} aria-hidden="true" />
-                <span>
-                  <strong>Plans</strong>
-                  <small>Build and choose your routine</small>
-                </span>
-              </button>
-            </li>
-            <li>
-              <button onClick={() => downloadRaw(data)}>
-                <Layers size={18} aria-hidden="true" />
-                <span>
-                  <strong>Export your journal</strong>
-                  <small>Everything, as JSON</small>
-                </span>
-              </button>
-            </li>
-            <li>
-              <button onClick={() => void exit()}>
-                <LogOut size={18} aria-hidden="true" />
-                <span>
-                  <strong>Sign out</strong>
-                  <small>
-                    {owner === "demo"
-                      ? "Your demo journal stays on this device"
-                      : "Sign out of this device"}
-                  </small>
-                </span>
-              </button>
-            </li>
-          </ul>
-
-          {owner !== "demo" && (
-            <div className="danger-zone">
-              <h3>Delete account</h3>
-              <p className="muted">
-                Permanently deletes your profile and cloud journal. Export a copy first
-                if you want to keep it.
-              </p>
-              <button
-                className="quiet danger"
-                disabled={deleting}
-                onClick={async () => {
-                  if (!supabase) return;
-                  if (
-                    !window.confirm(
-                      "Permanently delete your account and all cloud workouts?",
-                    )
-                  )
-                    return;
-                  setDeleting(true);
-                  const { error } = await supabase.functions.invoke(
-                    "delete-account",
-                    { method: "POST" },
-                  );
-                  if (error) {
-                    setNotice(
-                      "Account deletion failed. Your data has not been cleared.",
-                    );
-                    setDeleting(false);
-                    return;
-                  }
-                  await journal.clear();
-                  await exit();
-                }}
-              >
-                {deleting ? "Deleting…" : "Delete account"}
-              </button>
-            </div>
-          )}
-
-          <p className="fine">
-            Workouts save on this device first and sync when you are connected. Check
-            the save status before switching devices.
-          </p>
-        </Sheet>
+        <ProfileSheet
+          profile={profile}
+          email={email}
+          owner={owner}
+          data={data}
+          state={journal.state}
+          status={journal.status}
+          deleting={deleting}
+          onClose={() => setMenu(false)}
+          onProfileChange={(next) => void update({ ...data, profile: next })}
+          onEditPreferences={() => {
+            setMenu(false);
+            setEditingProfile(true);
+          }}
+          onPlans={() => {
+            setMenu(false);
+            go({ name: "train" });
+          }}
+          onExport={() => downloadRaw(data)}
+          onSignOut={() => void exit()}
+          onDeleteAccount={async () => {
+            if (!supabase) return;
+            setDeleting(true);
+            const { error } = await supabase.functions.invoke("delete-account", {
+              method: "POST",
+            });
+            if (error) {
+              setNotice("Account deletion failed. Your data has not been cleared.");
+              setDeleting(false);
+              return;
+            }
+            await journal.clear();
+            await exit();
+          }}
+        />
       )}
     </div>
   );
