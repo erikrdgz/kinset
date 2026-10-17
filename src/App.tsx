@@ -1,83 +1,107 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type { Session as AuthSession } from "@supabase/supabase-js";
-import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ChevronRight } from "lucide-react";
 import { supabase } from "./backend";
 import { Brand } from "./ui/Brand";
 import { Journal } from "./app/Journal";
+import { AuthTransition } from "./ui/AuthTransition";
+import { BrandIntro } from "./ui/BrandIntro";
+import { createAuthEntryGate } from "./ui/authEntry";
 
 // Password reset needs outgoing email (SMTP). Enable once it is configured.
 const PASSWORD_RESET_ENABLED = false;
 
 export default function App() {
-  const [session, setSession] = useState<AuthSession | null>(null),
-    // A signed-in session is restored by Supabase, but the demo had nothing to restore
-    // from: reloading mid-workout returned to the sign-in screen, even though the demo
-    // journal was safe on the device. Remembering the choice for the tab means an
-    // interruption resumes where it left off.
-    [demo, setDemo] = useState(
-      () => sessionStorage.getItem("kinset:demo") === "1",
-    ),
-    [loading, setLoading] = useState(!!supabase),
-    [recover, setRecover] = useState(false);
+  const [session, setSession] = useState<AuthSession | null>(null);
+  const [demo, setDemo] = useState(() => {
+    try { return sessionStorage.getItem("kinset:demo") === "1"; }
+    catch { return false; }
+  });
+  const [loading, setLoading] = useState(!!supabase);
+  const [recover, setRecover] = useState(false);
+  const [entry, setEntry] = useState<number | null>(null);
+  // The cold open plays once per tab, before sign-in only. A returning signed-in user
+  // goes straight to their journal rather than sitting through it.
+  const [intro, setIntro] = useState(() => {
+    try { return sessionStorage.getItem("kinset:intro") !== "1"; }
+    catch { return true; }
+  });
+  const endIntro = useCallback(() => {
+    try { sessionStorage.setItem("kinset:intro", "1"); } catch { /* ignore */ }
+    setIntro(false);
+  }, []);
+  const entrySequence = useRef(0);
+  const authGate = useRef(createAuthEntryGate<AuthSession>());
+  const finishEntry = useCallback(() => setEntry(null), []);
+  const revealEntry = () => setEntry(++entrySequence.current);
   const enterDemo = (on: boolean) => {
     try {
       if (on) sessionStorage.setItem("kinset:demo", "1");
       else sessionStorage.removeItem("kinset:demo");
-    } catch {
-      // Private browsing can refuse session storage; the demo still works in-memory.
-    }
+    } catch { /* The demo still works when storage is unavailable. */ }
+    if (on && !demo) revealEntry();
+    if (!on) setEntry(null);
     setDemo(on);
+  };
+  const settleAuth = (attempt: number, confirmed?: AuthSession) => {
+    const result = authGate.current.settle(attempt, confirmed);
+    if (!result) return;
+    if (result.session !== undefined) setSession(result.session);
+    if (result.reveal) revealEntry();
   };
   useEffect(() => {
     if (!supabase) return;
+    let live = true;
+    let receivedAuthEvent = false;
     supabase.auth.getSession().then(({ data, error }) => {
+      if (!live || receivedAuthEvent) return;
       setSession(data.session);
       setLoading(false);
       if (error) console.warn("Session could not be restored.");
     });
-    const { data } = supabase.auth.onAuthStateChange((event, s) => {
-      setSession(s);
+    const { data } = supabase.auth.onAuthStateChange((event, next) => {
+      if (!live) return;
+      receivedAuthEvent = true;
       setLoading(false);
-      if (event === "PASSWORD_RECOVERY") setRecover(true);
+      // The successful request response owns the reveal; refresh/restore events never do.
+      if (authGate.current.defer(event, next)) return;
+      setSession(next);
+      if (event === "PASSWORD_RECOVERY") {
+        authGate.current.cancel();
+        setEntry(null);
+        setRecover(true);
+      }
     });
-    return () => data.subscription.unsubscribe();
+    return () => { live = false; data.subscription.unsubscribe(); };
   }, []);
-  if (loading)
-    return (
-      <div className="loading">
-        <Brand />
-        <p>Opening your training journal…</p>
-      </div>
-    );
-  if (recover && session)
-    return (
-      <Auth
-        recovery
-        onRecovered={() => setRecover(false)}
-        onDemo={() => enterDemo(true)}
-      />
-    );
-  if (!session && !demo) return <Auth onDemo={() => enterDemo(true)} />;
-  return (
-    <Journal
-      key={session?.user.id || "demo"}
-      owner={session?.user.id || "demo"}
-      email={session?.user.email}
-      onExit={async () => {
-        if (session) await supabase?.auth.signOut();
-        enterDemo(false);
-      }}
-    />
-  );
+
+  const auth = <Auth onDemo={() => enterDemo(true)}
+    recovery={recover && !!session} onRecovered={() => setRecover(false)}
+    onAuthenticating={() => authGate.current.begin()} onAuthSettled={settleAuth} />;
+  const content = loading ? <div className="loading"><Brand /><p>Opening your training journal…</p></div>
+    : (recover && session) || (!session && !demo) ? auth
+    : <Journal key={session?.user.id || "demo"} owner={session?.user.id || "demo"} email={session?.user.email}
+        onExit={async () => { if (session) await supabase?.auth.signOut(); enterDemo(false); }} />;
+  const showIntro = intro && !loading && !session && !demo;
+  return <>
+    <div inert={entry !== null || showIntro || undefined} style={{ display: "contents" }}>{content}</div>
+    {showIntro && <BrandIntro onComplete={endIntro} />}
+    {entry !== null && <AuthTransition key={entry} onComplete={finishEntry} />}
+  </>;
 }
+
 function Auth({
   onDemo,
   recovery = false,
   onRecovered,
+  onAuthenticating,
+  onAuthSettled,
 }: {
   onDemo: () => void;
   recovery?: boolean;
   onRecovered?: () => void;
+  onAuthenticating: () => number;
+  onAuthSettled: (attempt: number, session?: AuthSession) => void;
 }) {
   const [mode, setMode] = useState<"login" | "signup" | "reset">("login"),
     [email, setEmail] = useState(""),
@@ -90,6 +114,7 @@ function Auth({
     if (!supabase) return;
     setBusy(true);
     setMessage("");
+    const attempt = !recovery && mode !== "reset" ? onAuthenticating() : undefined;
     try {
       const redirect = window.location.origin + import.meta.env.BASE_URL;
       const result = recovery
@@ -106,6 +131,8 @@ function Auth({
               })
             : await supabase.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
+      if (attempt !== undefined && "session" in result.data && result.data.session)
+        onAuthSettled(attempt, result.data.session as AuthSession);
       if (recovery) onRecovered?.();
       else if (
         mode === "signup" &&
@@ -119,6 +146,7 @@ function Auth({
         e instanceof Error ? e.message : "Unable to connect. Please try again.",
       );
     } finally {
+      if (attempt !== undefined) onAuthSettled(attempt);
       setBusy(false);
     }
   }
@@ -132,44 +160,25 @@ function Auth({
         <Brand />
       </header>
       <main className="auth-grid page-enter">
-        <section className="auth-story">
-          <div className="auth-edition">
-            <span>STRENGTH, ON YOUR TERMS.</span>
-          </div>
+        <section className="auth-story" aria-label="Kinset training journal">
+          <img className="auth-photograph" src={`${import.meta.env.BASE_URL}images/editorial/strength.jpg`} alt="" />
+          <div className="auth-edition"><span>Personal training journal</span><span>Strength + running</span></div>
           <div className="auth-mast">
             <h1 className="kinset-brand-display">
               <span className="kinset-mast-wordmark" role="img" aria-label="Kinset" style={{ maskImage: `url(${import.meta.env.BASE_URL}kinset-wordmark.svg)`, WebkitMaskImage: `url(${import.meta.env.BASE_URL}kinset-wordmark.svg)` }} />
             </h1>
           </div>
-          <div className="auth-manifesto">
-            <h2>
-              Show up.
-              <br />
-              Get better.
-            </h2>
-          </div>
-          <p className="auth-pillars">Plan. Train. Progress.</p>
+          <div className="auth-areas"><span>Strength</span><span>Running</span><span>Progress</span></div>
         </section>
         <section className="auth-card">
-          <h2>
-            {recovery
-              ? "Set a new password"
-              : mode === "signup"
-                ? "Your next chapter."
-                : mode === "reset"
-                  ? "Reset your password"
-                  : "Welcome to Kinset."}
-          </h2>
+          <p className="entry-eyebrow">{recovery ? "Account recovery" : mode === "signup" ? "Create an account" : "Your training journal"}</p>
+          <h2>{recovery ? "New password" : mode === "signup" ? "Join Kinset" : mode === "reset" ? "Reset access" : !supabase ? "Explore Kinset" : "Sign in"}<span className="entry-period">.</span></h2>
           <p className="muted">
-            {recovery
-              ? "Choose a new password for your account."
-              : mode === "signup"
-                ? "Start your journey. Your progress goes wherever you do."
-                : mode === "reset"
-                  ? "We’ll send a link to your email."
-                  : !supabase
-                    ? "Explore the exercises, build your own plan, and log a workout."
-                    : "Sign in and pick up right where you left off."}
+            {recovery ? "Choose a new password for your account."
+              : mode === "signup" ? "Keep your plan, training history and progress together."
+              : mode === "reset" ? "We’ll send a password reset link to your email."
+              : !supabase ? "Build a plan, explore movements and log a workout. Your demo journal stays on this device."
+              : "Return to your plan, sessions and progress."}
           </p>
           {supabase && (
             <form onSubmit={submit}>
@@ -258,6 +267,7 @@ function Auth({
                 className={
                   supabase ? "secondary full" : "primary full preview-start"
                 }
+                disabled={busy}
                 onClick={onDemo}
               >
                 Try the demo <ChevronRight size={18} />

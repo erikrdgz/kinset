@@ -1,0 +1,371 @@
+/**
+ * Cold-open brand animation.
+ *
+ * The tear is lifted from the portfolio card's Kinset feature: solid-colour spans masked
+ * to the mark, shoved apart in hard `steps(1)` jumps, with a ghost offset behind, dark
+ * slices cutting through the middle and a warm echo. Colours are inverted for
+ * white-on-black and the burst runs at the front, since here it is an entrance rather
+ * than an idle loop. The card's scanline and tracking overlays are left out so the mark
+ * stays solid white instead of striped.
+ *
+ * Timeline:
+ *   0–900ms     the K tears in, alone and centred
+ *   900–1500ms  the stage recentres while the full wordmark wipes out to the right
+ *   1500–1900ms hold
+ *   1900–2250ms the overlay lifts
+ *
+ * The stage starts shifted right by 30.7%: the K's centre sits at x≈181 in the 980-wide
+ * box, the full wordmark's at x≈482, so that offset puts the K on the screen's centre
+ * line and the recentre slides it home.
+ */
+
+.brand-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: #0c0b0b;
+  animation: bi-exit 350ms cubic-bezier(0.22, 1, 0.36, 1) 1900ms both;
+}
+
+/* The stage zooms: the K fills the screen on its own, then settles back as the rest
+   of the wordmark arrives beside it. */
+.brand-intro-stage {
+  position: relative;
+  isolation: isolate;
+  inline-size: min(78vw, 520px);
+  aspect-ratio: 98 / 27;
+  transform: scale(2.6);
+  animation: bi-zoom 600ms cubic-bezier(0.16, 1, 0.3, 1) 900ms both;
+}
+
+/* The track slides: K centred, then wordmark centred. */
+.bi-track {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  transform: translateX(30.7%);
+  animation: bi-recentre 600ms cubic-bezier(0.16, 1, 0.3, 1) 900ms both;
+}
+
+/* Every mark layer is a solid fill masked to the glyph shape. */
+.bi-layer {
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  block-size: 100%;
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  animation-duration: 900ms;
+  animation-timing-function: steps(1, end);
+  animation-fill-mode: both;
+}
+
+.bi-k {
+  mask-image: var(--mark-k);
+  -webkit-mask-image: var(--mark-k);
+}
+
+.bi-full {
+  mask-image: var(--mark-full);
+  -webkit-mask-image: var(--mark-full);
+  /* Beat two. Hidden until the wipe starts. */
+  animation-duration: 620ms;
+  animation-delay: 900ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- beat one: the K ---- */
+
+.bi-k-base {
+  z-index: 3;
+  background: #fff;
+  animation-name: bi-shift;
+}
+
+.bi-k-ghost {
+  z-index: 2;
+  background: #ff692b;
+  animation-name: bi-ghost;
+}
+
+/* Dark slices cut across the mark, which is what reads as the tear. */
+.bi-k-tear {
+  z-index: 4;
+  background: #0c0b0b;
+  animation-name: bi-tear;
+}
+
+.bi-k-echo {
+  z-index: 4;
+  background: #ff9a62;
+  animation-name: bi-echo;
+}
+
+/* The K hands over to the full mark once the wipe begins. */
+.bi-k-base,
+.bi-k-ghost,
+.bi-k-tear,
+.bi-k-echo {
+  animation-composition: replace;
+}
+
+.brand-intro-stage .bi-k-base {
+  animation-name: bi-shift, bi-handover;
+  animation-duration: 900ms, 1ms;
+  animation-delay: 0ms, 900ms;
+  animation-timing-function: steps(1, end), linear;
+}
+
+.brand-intro-stage :is(.bi-k-ghost, .bi-k-tear, .bi-k-echo) {
+  animation-composition: replace;
+}
+
+/* ---- beat two: the wordmark slides out ---- */
+
+.bi-full-base {
+  z-index: 3;
+  background: #fff;
+  /* Wipes open left to right, so the letters appear to slide out behind the K. */
+  animation-name: bi-wipe;
+}
+
+.bi-full-echo {
+  z-index: 2;
+  background: #ff692b;
+  animation-name: bi-wipe-echo;
+}
+
+/* ---- keyframes: the card's burst, run at the front ---- */
+
+@keyframes bi-shift {
+  0% {
+    opacity: 0;
+    transform: translateX(-3px) skewX(2deg);
+  }
+  6% {
+    opacity: 1;
+    transform: translateX(-2px) skewX(1deg);
+  }
+  14% {
+    transform: translateX(1px);
+  }
+  22% {
+    transform: translateX(-1px) skewX(-1deg);
+  }
+  30% {
+    transform: none;
+  }
+  38% {
+    transform: translateX(2px);
+  }
+  46%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bi-ghost {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  6% {
+    opacity: 0.55;
+    transform: translateX(7px);
+  }
+  16% {
+    opacity: 0.3;
+    transform: translateX(-6px);
+  }
+  26% {
+    opacity: 0.45;
+    transform: translateX(4px);
+  }
+  36% {
+    opacity: 0.2;
+    transform: translateX(-3px);
+  }
+  46%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes bi-tear {
+  0% {
+    opacity: 1;
+    transform: translateX(13px);
+    clip-path: inset(28% 0 65%);
+  }
+  9% {
+    opacity: 1;
+    transform: translateX(-10px);
+    clip-path: inset(42% 0 51%);
+  }
+  18% {
+    opacity: 1;
+    transform: translateX(8px);
+    clip-path: inset(71% 0 24%);
+  }
+  27% {
+    opacity: 1;
+    transform: translateX(-5px);
+    clip-path: inset(50% 0 47%);
+  }
+  36% {
+    opacity: 1;
+    transform: translateX(4px);
+    clip-path: inset(14% 0 80%);
+  }
+  44%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes bi-echo {
+  0%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  8% {
+    opacity: 0.65;
+    transform: translateX(-10px);
+  }
+  20% {
+    opacity: 0.4;
+    transform: translateX(7px);
+  }
+  32% {
+    opacity: 0.25;
+    transform: translateX(-4px);
+  }
+  42% {
+    opacity: 0;
+  }
+}
+
+/* The K layer steps aside the instant the wordmark takes over. */
+@keyframes bi-handover {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes bi-wipe {
+  from {
+    opacity: 1;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes bi-wipe-echo {
+  from {
+    opacity: 0.5;
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(6px);
+  }
+  70% {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0;
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+
+@keyframes bi-recentre {
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes bi-zoom {
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes bi-exit {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/**
+ * Reduced motion: the whole mark, still, then the overlay lifts. No tearing, no
+ * channel split, no rolling bands.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .brand-intro {
+    animation: bi-exit 160ms linear 260ms both;
+  }
+
+  .brand-intro-stage,
+  .bi-track {
+    transform: none;
+    animation: none;
+  }
+
+  .bi-k {
+    display: none;
+  }
+
+  .bi-full {
+    animation: none;
+  }
+
+  .bi-full-base {
+    opacity: 1;
+    clip-path: none;
+  }
+
+  .bi-full-echo {
+    display: none;
+  }
+}
+
+/**
+ * Dev-only inspection speed (?introslow). Scales every beat by six so the tear, the
+ * handover and the wipe can be looked at individually.
+ */
+.bi-slow {
+  animation-delay: 11400ms !important;
+  animation-duration: 2100ms !important;
+}
+
+.bi-slow .brand-intro-stage,
+.bi-slow .bi-track {
+  animation-delay: 5400ms !important;
+  animation-duration: 3600ms !important;
+}
+
+.bi-slow .bi-k {
+  animation-duration: 5400ms !important;
+}
+
+.bi-slow .brand-intro-stage .bi-k-base {
+  animation-duration: 5400ms, 1ms !important;
+  animation-delay: 0ms, 5400ms !important;
+}
+
+.bi-slow .bi-full {
+  animation-duration: 3720ms !important;
+  animation-delay: 5400ms !important;
+}
+
