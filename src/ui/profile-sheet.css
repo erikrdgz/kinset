@@ -220,9 +220,43 @@
   border-color: var(--border-strong);
 }
 
-/* The drawer is short, so it does not need the tall bottom padding a full sheet gets. */
+/* The first view is short, so it does not need the tall bottom padding a full sheet
+   gets. The settings view sets its own. */
 .sheet:has(.ps) {
   padding-block-end: calc(24px + env(safe-area-inset-bottom));
+}
+
+/* Drilling into settings grows the same drawer rather than opening a screen. */
+.sheet-backdrop[data-tall] .sheet {
+  block-size: 88dvh;
+  max-block-size: 88dvh;
+}
+
+.sheet-back {
+  inline-size: 36px;
+  block-size: 36px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  margin-inline-start: -8px;
+  border-radius: var(--r-control);
+  color: var(--muted);
+  transition:
+    color var(--m-press) var(--ease),
+    background var(--m-press) var(--ease);
+}
+
+.sheet-back:hover {
+  color: var(--ink);
+  background: var(--raised);
+}
+
+.sheet-head {
+  gap: 10px;
+}
+
+.sheet-head h2 {
+  flex: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

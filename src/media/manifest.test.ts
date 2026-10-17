@@ -74,6 +74,15 @@ describe("media manifest", () => {
     // The supplier's terms permit playback buffers only.
     expect(cacheable).not.toContain("https://cdn.example.com/rdl.mp4");
   });
+
+  it("resolves and deduplicates static positions for permitted offline use", () => {
+    setManifest({ version: 1, basePath: "/app/movements/", entries: [{
+      exerciseId: "plank", kind: "image", src: "one.png", poster: "one.png", frames: ["one.png", "two.png"],
+      licenseId: "example-2026", deliveryMode: "owned", offlineAllowed: true,
+    }] });
+    expect(mediaFor("plank")!.resolvedFrames).toEqual(["/app/movements/one.png", "/app/movements/two.png"]);
+    expect(cacheableAssets()).toEqual(["/app/movements/one.png", "/app/movements/two.png"]);
+  });
 });
 
 describe("manifest validation", () => {
@@ -147,5 +156,21 @@ describe("manifest validation", () => {
       known,
     );
     expect(problems.map((p) => p.problem)).toContain("duplicate entry");
+  });
+
+  it("requires visible attribution, source, licence and change notes for CC assets", () => {
+    const entry = { ...base.entries[0], licenseId: "CC-BY-SA-4.0" };
+    expect(validateManifest({ version: 1, entries: [entry] }, known).map((problem) => problem.problem)).toEqual([
+      "missing attribution for Creative Commons media", "missing sourceUrl for Creative Commons media",
+      "missing licenseUrl for Creative Commons media", "missing changes for Creative Commons media",
+    ]);
+    expect(validateManifest({ version: 1, entries: [{ ...entry,
+      attribution: "Artist", sourceUrl: "https://example.com/source", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/", changes: "Resized.",
+    }] }, known)).toEqual([]);
+  });
+
+  it("requires a still frame so GIF playback can stop", () => {
+    const { poster: _poster, ...gif } = base.entries[0];
+    expect(validateManifest({ version: 1, entries: [gif] }, known).map((problem) => problem.problem)).toContain("GIF needs a static poster so motion can be paused");
   });
 });

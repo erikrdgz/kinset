@@ -24,6 +24,7 @@ import { exercises as legacyExercises } from "./legacy";
 import { guides, type ExerciseGuide } from "../guides";
 import { authoredStrength } from "./expansion";
 import { authoredMobility, authoredConditioning } from "./mobility";
+import { balancedExpansion } from "./balancedExpansion";
 
 /** Precise muscles. Deliberately finer than the six browse groups. */
 export type MuscleId =
@@ -110,6 +111,7 @@ export type MovementPattern =
   | "hipAbduction"
   | "ankleExtension"
   | "horizontalPush"
+  | "horizontalAdduction"
   | "verticalPush"
   | "horizontalPull"
   | "verticalPull"
@@ -131,6 +133,7 @@ export const patternNames: Record<MovementPattern, string> = {
   hipAbduction: "Hip abduction",
   ankleExtension: "Calf raise",
   horizontalPush: "Horizontal push",
+  horizontalAdduction: "Chest fly",
   verticalPush: "Vertical push",
   horizontalPull: "Horizontal pull",
   verticalPull: "Vertical pull",
@@ -157,6 +160,8 @@ export type EquipmentItem =
   | "elevatedSurface"
   | "seatWithBack"
   | "latPulldownMachine"
+  | "shoulderPressMachine"
+  | "backExtensionBench"
   | "legPressMachine"
   | "flatBench"
   | "inclineBench"
@@ -185,6 +190,8 @@ export const equipmentNames: Record<EquipmentItem, string> = {
   elevatedSurface: "A stable elevated surface",
   seatWithBack: "A seat with back support",
   latPulldownMachine: "Lat pulldown machine",
+  shoulderPressMachine: "Shoulder press machine",
+  backExtensionBench: "A 45-degree back-extension bench",
   legPressMachine: "Leg press machine",
   flatBench: "A flat bench",
   inclineBench: "An adjustable incline bench",
@@ -658,6 +665,7 @@ const withRole = (
 
 const authoredDefinitions: ExerciseDefinition[] = [
   ...withRole(authoredStrength, "strength"),
+  ...withRole(balancedExpansion, "strength"),
   ...withRole(authoredMobility, "mobility"),
   ...withRole(authoredConditioning, "conditioning"),
 ].map((e) => ({
@@ -723,6 +731,34 @@ export const conditioningExercises = publishedExercises.filter(
   (e) => e.role === "conditioning",
 );
 
+/** One primary shelf per movement; training patterns remain separate from browsing. */
+export const libraryGroups = [
+  { id: "chest", label: "Chest" },
+  { id: "back", label: "Back" },
+  { id: "shoulders", label: "Shoulders" },
+  { id: "arms", label: "Arms" },
+  { id: "core", label: "Core" },
+  { id: "legs", label: "Legs" },
+  { id: "mobility", label: "Mobility" },
+  { id: "conditioning", label: "Conditioning" },
+] as const;
+
+export type LibraryGroup = (typeof libraryGroups)[number]["id"];
+
+export function libraryGroupFor(exercise: ExerciseDefinition): LibraryGroup {
+  return exercise.role === "strength"
+    ? exercise.browseGroup.toLowerCase() as LibraryGroup
+    : exercise.role;
+}
+
+/** Existing Push/Pull links keep working while new navigation names body regions. */
+export function matchesLibraryGroup(exercise: ExerciseDefinition, group: string) {
+  if (!group || group === "all") return true;
+  if (group === "push") return exercise.role === "strength" && exercise.patterns.some((p) => p === "horizontalPush" || p === "verticalPush");
+  if (group === "pull") return exercise.role === "strength" && exercise.patterns.some((p) => p === "horizontalPull" || p === "verticalPull");
+  return libraryGroupFor(exercise) === group;
+}
+
 /** Every piece of equipment the user would need to run this list, deduplicated. */
 export function equipmentUnion(ids: string[]): EquipmentItem[] {
   const union = new Set<EquipmentItem>();
@@ -774,6 +810,8 @@ export function assumedEquipment(
     "benchOrSupport",
     "seatWithBack",
     "latPulldownMachine",
+    "shoulderPressMachine",
+    "backExtensionBench",
     "legPressMachine",
     "flatBench",
     "inclineBench",

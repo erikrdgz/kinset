@@ -1,7 +1,7 @@
 import { Select } from "./Select";
 import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2, ChevronRight } from "lucide-react";
-import { exercises, type Journal } from "./domain";
+import { strengthExercises, type Journal } from "./domain";
 import {
   newPlan,
   foundationPlan,
@@ -11,6 +11,15 @@ import {
   type PlanDay,
   targetReps,
 } from "./plans";
+
+// The editor uses the same catalog as workout generation and the movement library.
+const exercises = strengthExercises.map((exercise) => ({
+  id: exercise.id,
+  name: exercise.name,
+  muscle: exercise.browseGroup,
+  equipment: exercise.browseEquipment,
+  kind: exercise.measurement.kind,
+}));
 export default function Plans({
   data,
   update,
@@ -75,7 +84,7 @@ export default function Plans({
       <section className="plan-builder">
         <div className="page-heading">
           <div>
-            <h1>Make it yours.</h1>
+            <h1>Build your plan.</h1>
             <p className="muted">
               Your draft saves as you go. Save the plan when it’s ready to
               train.
@@ -194,7 +203,7 @@ export default function Plans({
                     className="text-button"
                     onClick={() => onPreview(exercise.id)}
                   >
-                    Watch demo
+                    Movement guide
                   </button>
                 </div>
                 <div className="plan-prescription">
@@ -298,7 +307,7 @@ export default function Plans({
             {exercises
               .filter(
                 (e) =>
-                  (equipment === "All" || e.equipment === equipment) &&
+                  e.kind === "reps" && (equipment === "All" || e.equipment === equipment) &&
                   `${e.name} ${e.muscle}`
                     .toLowerCase()
                     .includes(query.toLowerCase()),
@@ -313,7 +322,7 @@ export default function Plans({
                     >
                       <strong>{e.name}</strong>
                       <small>
-                        {e.muscle} · {e.equipment} · Watch demo
+                        {e.muscle} · {e.equipment} · View guide
                       </small>
                     </button>
                     <button
@@ -357,13 +366,10 @@ export default function Plans({
       </section>
     );
   return (
-    <section>
+    <section className="plan-collection">
       <div className="page-heading">
         <div>
-          <h1>Workout plans.</h1>
-          <p className="muted">
-            Build your own rotation. Completed workouts advance to the next day.
-          </p>
+          <h2>Your plans</h2>
         </div>
       </div>
       <div className="plan-actions">
@@ -383,7 +389,7 @@ export default function Plans({
           finish or discard that session before starting another day.
         </p>
       )}
-      <article className="saved-plan">
+      <article className="saved-plan" data-active={!data.activePlanId || undefined}>
         <div className="saved-plan-heading">
           <div>
             <span className="eyebrow">
@@ -404,7 +410,7 @@ export default function Plans({
         </div>
       </article>
       {plans.map((plan) => (
-        <article className="saved-plan" key={plan.id}>
+        <article className="saved-plan" key={plan.id} data-active={data.activePlanId === plan.id || undefined}>
           <div className="saved-plan-heading">
             <div>
               <span className="eyebrow">

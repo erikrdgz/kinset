@@ -20,11 +20,12 @@ if (!existsSync(manifestPath)) {
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 const source = readFileSync(resolve(root, "src/domain/legacy.ts"), "utf8");
 const expansion = readFileSync(resolve(root, "src/domain/expansion.ts"), "utf8");
+const balanced = readFileSync(resolve(root, "src/domain/balancedExpansion.ts"), "utf8");
 const mobility = readFileSync(resolve(root, "src/domain/mobility.ts"), "utf8");
 const extra = readFileSync(resolve(root, "src/extraExercises.ts"), "utf8");
 
 const ids = new Set(
-  [source, expansion, mobility, extra]
+  [source, expansion, balanced, mobility, extra]
     .flatMap((text) => [...text.matchAll(/\bid:\s*"([a-z0-9]+)"/g)].map((m) => m[1]))
     .concat(
       [...extra.matchAll(/\[\s*"([a-z0-9]+)",\s*"/g)].map((m) => m[1]),
@@ -33,6 +34,8 @@ const ids = new Set(
 
 const problems = [];
 const seen = new Set();
+if (manifest.version !== 1 || !Array.isArray(manifest.entries))
+  problems.push("manifest must have version 1 and an entries array");
 
 for (const entry of manifest.entries ?? []) {
   const id = entry.exerciseId;
@@ -41,15 +44,22 @@ for (const entry of manifest.entries ?? []) {
   seen.add(id);
   if (!entry.src) problems.push(`${id}: missing src`);
   if (!entry.licenseId) problems.push(`${id}: missing licenseId`);
+  if (entry.licenseId?.startsWith("CC-")) {
+    for (const field of ["attribution", "sourceUrl", "licenseUrl", "changes"])
+      if (!entry[field]) problems.push(`${id}: missing ${field} for Creative Commons media`);
+  }
+  if (entry.kind === "gif" && !entry.poster)
+    problems.push(`${id}: GIF requires a static poster for paused playback`);
   if (entry.deliveryMode === "streamOnly" && entry.offlineAllowed)
     problems.push(
       `${id}: stream-only assets cannot be offlineAllowed — that would cache media the licence forbids storing`,
     );
   if (entry.expiresAt && Number.isNaN(Date.parse(entry.expiresAt)))
     problems.push(`${id}: expiresAt is not a date`);
-  if (entry.src && !/^https?:\/\//.test(entry.src)) {
-    const file = resolve(root, "public/movements", entry.src);
-    if (!existsSync(file)) problems.push(`${id}: ${entry.src} is not in public/movements`);
+  for (const asset of [entry.src, entry.poster, ...(entry.frames ?? [])].filter(Boolean)) {
+    if (/^https?:\/\//.test(asset)) continue;
+    const file = resolve(root, "public/movements", asset);
+    if (!existsSync(file)) problems.push(`${id}: ${asset} is not in public/movements`);
   }
 }
 

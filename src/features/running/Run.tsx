@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Footprints, Info, Pause, Play, Square, Trash2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, Footprints, Info, LockKeyhole, MapPin, Pause, Pencil, Play, Plus, Square, Trash2 } from "lucide-react";
 import {
   activeSeconds,
   averagePace,
@@ -17,6 +17,8 @@ import {
 import { useRunRecorder, recorderErrorText } from "./useRecorder";
 import { commitRun, deleteRun, loadRuns } from "../../data/runs";
 import { RouteMap } from "../../ui/RouteMap";
+import { Sheet } from "../../ui/Sheet";
+import "./running.css";
 
 /** One ticking clock for the screen rather than one per metric. */
 function useNow(active: boolean) {
@@ -52,6 +54,7 @@ export function Run({
   const [history, setHistory] = useState<RunActivity[]>([]);
   const [viewing, setViewing] = useState<RunActivity | null>(null);
   const [manual, setManual] = useState(false);
+  const [activityType, setActivityType] = useState<RunActivity["type"]>("run");
 
   useEffect(() => {
     void loadRuns(owner).then(setHistory);
@@ -80,14 +83,28 @@ export function Run({
     const paused = recorder.state === "paused";
 
     return (
-      <div className="run-live">
-        <p className="eyebrow">{paused ? "Paused" : activity.title}</p>
+      <div className="run-live running-studio running-active">
+        <header className="running-live-header">
+          <div><h1>{activity.title}<span className="orange-dot">.</span></h1></div>
+          <span className="running-status" data-paused={paused}><i aria-hidden="true" />{paused ? "Paused" : recorder.state === "acquiring" ? "Finding GPS" : recorder.error ? "GPS unavailable" : "Recording"}</span>
+        </header>
 
         {/* Distance is the headline; everything else is support. */}
+        <div className="running-live-instrument">
+        <div className="running-distance-surface">
+        <div className="running-distance-label">Distance covered</div>
         <p className="run-figure tabular" aria-live="off">
           {(track.distance / (unit === "km" ? 1000 : 1609.344)).toFixed(2)}
           <small>{unit.toUpperCase()}</small>
         </p>
+        </div>
+
+        <div className="running-seam">
+          <span>{paused ? "Resume recording" : "Pause recording"}</span>
+          <button className="running-seam-control" onClick={paused ? recorder.resume : recorder.pause} aria-label={paused ? "Resume recording" : "Pause recording"}>
+            {paused ? <Play size={24} fill="currentColor" aria-hidden="true" /> : <Pause size={24} fill="currentColor" aria-hidden="true" />}
+          </button>
+        </div>
 
         <dl className="run-metrics">
           <div>
@@ -107,6 +124,11 @@ export function Run({
             </dd>
           </div>
         </dl>
+        </div>
+
+        {recorder.error && (
+          <p className="notice-inline" role="alert"><Info size={18} aria-hidden="true" /><span>{recorderErrorText[recorder.error]}</span></p>
+        )}
 
         {recorder.state === "acquiring" && (
           <p className="notice-inline" role="status">
@@ -132,23 +154,14 @@ export function Run({
           </p>
         )}
 
+        <div className="running-route-heading"><span><MapPin size={14} aria-hidden="true" /> Your route</span><small>{paused ? "PAUSED" : recorder.error ? "GPS UNAVAILABLE" : "LIVE RECORDING"}</small></div>
         <RouteMap samples={activity.samples} className="run-live-map" />
+        <p className="running-live-note">Keep Kinset open and your screen on while recording.</p>
 
         <div className="run-controls">
-          {paused ? (
-            <button className="primary big" onClick={recorder.resume}>
-              <Play size={20} aria-hidden="true" />
-              Resume
-            </button>
-          ) : (
-            <button className="quiet big" onClick={recorder.pause}>
-              <Pause size={20} aria-hidden="true" />
-              Pause
-            </button>
-          )}
           {/* Finish is deliberately separated from pause. */}
           <button
-            className={paused ? "quiet" : "quiet"}
+            className="quiet running-finish"
             onClick={async () => {
               const finished = await recorder.finish();
               if (finished) {
@@ -158,7 +171,7 @@ export function Run({
             }}
           >
             <Square size={18} aria-hidden="true" />
-            Finish
+              Finish {activity.type}
           </button>
         </div>
         <button className="quiet danger run-discard" onClick={recorder.discard}>
@@ -169,21 +182,18 @@ export function Run({
   }
 
   return (
-    <div className="run">
-      <h1>Run</h1>
+    <div className="run running-studio">
+      <header className="editorial-heading"><div><h1>Run<span className="orange-dot">.</span></h1></div></header>
 
-      <section className="notice-inline" role="note">
-        <Info size={18} aria-hidden="true" />
-        <div>
-          <strong>Recording needs the app open and on screen.</strong>
-          <p>
-            Browsers are allowed to stop sending location to a hidden page, so a locked
-            phone in a pocket will not record reliably. Screen-locked tracking needs a
-            native app, which is not built yet. Until then, keep Kinset in front of you
-            or enter the run by hand afterwards.
-          </p>
+      <div className="running-launch">
+        <div className="running-editorial">
+          <img src={`${import.meta.env.BASE_URL}images/editorial/running.jpg`} alt="Runner training outdoors" />
+          <div className="running-editorial-copy"><h2>{activityType === "run" ? "Run" : "Walk"}<br />outside<span>.</span></h2><p>Distance. Time. Pace.</p></div>
         </div>
-      </section>
+
+        <div className="running-seam running-start-seam"><span>Start {activityType}</span><button className="running-seam-control" onClick={() => recorder.start(activityType)} aria-label={`Start a ${activityType} with GPS`}><Play size={25} fill="currentColor" aria-hidden="true" /></button></div>
+        <div className="running-launch-panel">
+          <div className="running-mode" role="group" aria-label="Activity type"><button aria-pressed={activityType === "run"} onClick={() => setActivityType("run")}>Run</button><button aria-pressed={activityType === "walk"} onClick={() => setActivityType("walk")}>Walk</button></div>
 
       {recorder.error && (
         <p className="notice-inline" role="alert">
@@ -192,23 +202,10 @@ export function Run({
         </p>
       )}
 
-      <div className="run-start-options">
-        <button className="primary big" onClick={() => recorder.start("run")}>
-          <Footprints size={20} aria-hidden="true" />
-          Start a run
-        </button>
-        <button className="quiet" onClick={() => recorder.start("walk")}>
-          Start a walk
-        </button>
-        <button className="quiet" onClick={() => setManual(true)}>
-          Add a run by hand
-        </button>
+          <div className="running-recording-note" role="note"><Info size={15} aria-hidden="true" /><p>Keep Kinset open and your screen on while recording. Locking the phone can interrupt your route.</p></div>
+          <p className="running-privacy"><LockKeyhole size={13} aria-hidden="true" /><span>Location starts when you do. Routes stay on this device.</span></p>
+        </div>
       </div>
-
-      <p className="fine">
-        Location is only requested when you start, never during sign-up. Routes stay on
-        this device unless you choose to share one.
-      </p>
 
       {manual && (
         <ManualRun
@@ -222,19 +219,13 @@ export function Run({
         />
       )}
 
-      <h2>Your runs</h2>
+      <div className="running-history-heading"><div><h2>Activity <span className="tabular">{String(history.length).padStart(2, "0")}</span></h2></div><button className="quiet" onClick={() => setManual(true)}><Plus size={17} aria-hidden="true" /> Add a run</button></div>
       {history.length === 0 ? (
-        <div className="empty-inline">
-          <p>
-            <strong>No runs recorded yet.</strong>
-          </p>
-          <p className="muted">
-            Recorded and hand-entered runs both appear here, alongside your strength
-            sessions in Progress.
-          </p>
+        <div className="empty-inline running-empty">
+          <div><strong>No activities yet.</strong><p>Record a run or walk, or add one you have finished.</p></div>
         </div>
       ) : (
-        <ul className="rule-list">
+        <ul className="rule-list running-history">
           {history.map((activity) => {
             const metres = runDistance(activity);
             const seconds = activeSeconds(activity);
@@ -242,7 +233,7 @@ export function Run({
               <li key={activity.id}>
                 <button onClick={() => setViewing(activity)}>
                   <span className="rule-index tabular">
-                    {activity.source === "manual" ? "⌨" : "▸"}
+                    {activity.source === "manual" ? <Pencil size={16} aria-label="Entered by hand" /> : <Footprints size={18} aria-label="Recorded" />}
                   </span>
                   <span className="rule-name">
                     <strong>{activity.title}</strong>
@@ -255,8 +246,9 @@ export function Run({
                     </small>
                   </span>
                   <span className="rule-value tabular">
-                    {formatDistance(metres, unit)} · {formatClock(seconds)}
+                    <strong>{formatDistance(metres, unit)}</strong><small>{formatClock(seconds)}</small>
                   </span>
+                  <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </li>
             );
@@ -287,9 +279,9 @@ function RunSummary({
   const rejected = Object.values(activity.rejected).reduce((n, v) => n + (v ?? 0), 0);
 
   return (
-    <div className="run-summary">
+    <div className="run-summary running-studio running-record">
       <button className="quiet back" onClick={onBack}>
-        Back
+        <ArrowLeft size={15} aria-hidden="true" /> All activity
       </button>
       <h1>{activity.title}</h1>
       <p className="muted">
@@ -300,7 +292,7 @@ function RunSummary({
         })}
       </p>
 
-      <dl className="summary-stats">
+      <dl className="summary-stats running-summary-stats">
         <div>
           <dt>Distance</dt>
           <dd className="tabular">{formatDistance(metres, unit)}</dd>
@@ -324,6 +316,7 @@ function RunSummary({
         </p>
       ) : (
         <>
+          <div className="running-route-heading"><span><MapPin size={14} aria-hidden="true" /> Your route</span><small>{trim ? "ENDS HIDDEN" : "FULL ROUTE"}</small></div>
           <RouteMap
             samples={
               trim ? trimForSharing(activity.samples, 150) : activity.samples
@@ -339,9 +332,7 @@ function RunSummary({
             <span>
               Hide the area around my start and finish
               <small>
-                Removes every point within 150 m of either end, including where the route
-                passes back through them. This reduces what a shared route reveals; it
-                cannot make it anonymous.
+                Hides points within 150 m of either end, including return passes. This reduces location exposure; it does not make your route anonymous.
               </small>
             </span>
           </label>
@@ -432,13 +423,14 @@ function ManualRun({
   const [error, setError] = useState("");
 
   return (
-    <section className="card">
-      <h2>Add a run by hand</h2>
+    <Sheet title="Add a run" onClose={onClose}>
+    <section className="running-manual">
+      <p className="running-manual-intro">Log a completed run using its distance and time.</p>
       <label className="field">
         <span>Title</span>
         <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={60} />
       </label>
-      <label className="field">
+      <div className="running-manual-numbers"><label className="field">
         <span>Distance ({unit})</span>
         <input
           type="number"
@@ -458,15 +450,14 @@ function ManualRun({
           value={minutes}
           onChange={(e) => setMinutes(e.target.value)}
         />
-      </label>
+      </label></div>
       {error && (
         <p role="alert" className="session-error">
           {error}
         </p>
       )}
       <p className="fine">
-        A hand-entered run has no route and no measured pace beyond what these two
-        numbers imply. It is kept separate from recorded runs in your history.
+        Pace is calculated from your distance and time. No route is added.
       </p>
       <button
         className="primary"
@@ -494,6 +485,7 @@ function ManualRun({
         Cancel
       </button>
     </section>
+    </Sheet>
   );
 }
 

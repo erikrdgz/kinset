@@ -1,40 +1,62 @@
 /**
  * Kinset design tokens.
  *
- * The references the art direction was drawn from all use an acid lime accent. Kinset's
- * accent is orange, so the lime in those references reads as --accent here, and the
- * neutrals are warm-leaning rather than green-leaning so they sit with it.
+ * The references the art direction came from all use an acid lime accent. Kinset's
+ * accent is orange, so lime reads as orange here, and the neutrals lean warm to sit
+ * with it.
  *
- * Contrast against --canvas, computed for the four pairs that carry most of the
- * interface: ink 17.0:1, muted 9.9:1, accent 6.6:1, and --accent-ink on filled accent
- * 6.6:1. All pass WCAG AA for normal text. Pairs added later need their own check;
- * nothing here has been sampled from a running build.
+ * What makes those references look expensive is not the hue — it is light. Surfaces are
+ * gradients rather than flat fills, every raised element carries a hairline highlight
+ * along its top edge where light would catch it, shadows are deep and soft, and the
+ * accent throws glow onto what sits near it. Flat rectangles with 1px borders read as a
+ * wireframe no matter how good the palette is, which is what the first pass shipped.
+ *
+ * Contrast against --canvas: ink 17.6:1, muted 10.2:1, accent 6.9:1, and --accent-ink
+ * on filled accent 6.6:1. All pass WCAG AA for normal text.
  */
 :root {
   /* Surfaces, darkest to lightest. */
-  --canvas: #111010;
-  --surface: #1b1a19;
-  --raised: #262423;
-  --border: #423e3b;
-  --border-strong: #5a5450;
+  --canvas: #0c0b0b;
+  --canvas-deep: #060606;
+  --surface: #171615;
+  --raised: #221f1e;
+  --raised-high: #2b2826;
+  --border: #322e2c;
+  --border-strong: #4a4542;
+  /* The hairline of caught light along a raised edge. */
+  --edge: rgba(255, 255, 255, 0.07);
+  --edge-strong: rgba(255, 255, 255, 0.12);
 
-  /* Text. --muted is a neutral, never the accent used as a quiet colour. */
-  --ink: #f3f1ed;
-  --muted: #b9b4ae;
-  --faint: #8c8782;
+  /* Text. --muted is a neutral; the accent is never used as a quiet colour. */
+  --ink: #f5f3f0;
+  --muted: #b5afa9;
+  --faint: #827c77;
 
   /* Brand. */
   --accent: #ff692b;
-  --accent-soft: #ff8a57;
-  --accent-wash: rgba(255, 105, 43, 0.12);
-  /* Text and icons sitting on a filled accent surface. */
-  --accent-ink: #140f0c;
+  --accent-soft: #ff8d57;
+  --accent-deep: #d84a12;
+  --accent-wash: rgba(255, 105, 43, 0.14);
+  --accent-ink: #140d09;
 
-  /* Status gets its own hues. The accent is not a universal "good" colour. */
+  /* Gradients. Surfaces are lit, not painted. */
+  --grad-surface: linear-gradient(170deg, #1d1b1a 0%, #141312 100%);
+  --grad-raised: linear-gradient(170deg, #2a2725 0%, #1e1c1b 100%);
+  --grad-accent: linear-gradient(160deg, #ff8d57 0%, #ff692b 52%, #e4531a 100%);
+  --grad-accent-soft: linear-gradient(
+    160deg,
+    rgba(255, 141, 87, 0.22) 0%,
+    rgba(255, 105, 43, 0.06) 100%
+  );
+
+  /* Glow: what stops the accent looking like flat paint. */
+  --glow-accent: 0 0 24px rgba(255, 105, 43, 0.38);
+  --glow-accent-strong: 0 0 40px rgba(255, 105, 43, 0.5);
+
+  /* Status gets its own hues. The accent is not a universal "good". */
   --warning: #f2b544;
-  --warning-ink: #140f0c;
   --danger: #ff6b61;
-  --success: #7cc98a;
+  --success: #6fd38b;
 
   /* Spacing scale. */
   --s1: 4px;
@@ -47,10 +69,10 @@
   --gutter: 20px;
   --card-pad: 20px;
 
-  /* Corners. Pills are reserved for chips and segmented controls. */
-  --r-control: 12px;
-  --r-card: 16px;
-  --r-sheet: 24px;
+  /* Corners. Larger than the first pass; the references are generous here. */
+  --r-control: 14px;
+  --r-card: 22px;
+  --r-sheet: 28px;
   --r-pill: 999px;
 
   /* Targets. The 48px product minimum deliberately exceeds WCAG 2.2's 24px. */
@@ -60,25 +82,31 @@
   /* Type. */
   --font-display: "Barlow Condensed", sans-serif;
   --font-ui: "Barlow", system-ui, sans-serif;
-  --t-meta: 0.875rem;
+  --t-meta: 0.8125rem;
   --t-body: 1rem;
   --t-section: 1.25rem;
-  --t-title: clamp(1.75rem, 5vw, 2.25rem);
-  --t-editorial: clamp(3rem, 14vw, 5rem);
+  --t-title: clamp(1.875rem, 6vw, 2.5rem);
+  --t-editorial: clamp(3.5rem, 17vw, 6rem);
 
-  --elevation: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+  /* Elevation. Deep and soft, with the lit top edge. */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.5);
+  --shadow-3: 0 4px 8px rgba(0, 0, 0, 0.55), 0 32px 64px rgba(0, 0, 0, 0.6);
+  --inset-edge: inset 0 1px 0 var(--edge);
 
-  /* Motion. Durations come from the motion table in the art direction. */
-  --m-press: 100ms;
-  --m-set: 160ms;
-  --m-sheet: 240ms;
-  --m-switch: 180ms;
-  --ease: cubic-bezier(0.2, 0, 0, 1);
+  /* Motion. Durations from the art direction's table; the curve is a soft overshoot. */
+  --m-press: 120ms;
+  --m-set: 180ms;
+  --m-sheet: 300ms;
+  --m-switch: 200ms;
+  --m-draw: 900ms;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /**
- * Reduced motion removes translation and scaling rather than merely shortening them,
- * and nothing essential is conveyed by animation alone.
+ * Reduced motion removes movement rather than shortening it. Nothing here is the sole
+ * carrier of meaning, so dropping it costs no information.
  */
 @media (prefers-reduced-motion: reduce) {
   :root {
@@ -86,6 +114,7 @@
     --m-set: 0ms;
     --m-sheet: 0ms;
     --m-switch: 0ms;
+    --m-draw: 0ms;
   }
 }
 

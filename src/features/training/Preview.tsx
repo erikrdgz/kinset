@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUpRight, HelpCircle, Info } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, BookOpen, Info } from "lucide-react";
 import {
   equipmentNames,
   equipmentUnion,
@@ -17,6 +17,7 @@ import {
 } from "./workout";
 import { MuscleMap } from "../../ui/MuscleMap";
 import { HowTo } from "../library/HowTo";
+import "./session.css";
 
 /**
  * The workout preview: what this session is, before committing to it.
@@ -51,43 +52,23 @@ export function Preview({
   }
 
   return (
-    <div className="preview">
+    <div className="preview training-preview">
       <button className="quiet back" onClick={onBack}>
-        Back
+        <ArrowLeft size={15} aria-hidden="true" /> Back to training
       </button>
 
       <header className="preview-head">
         <p className="eyebrow">{workout.planName}</p>
         <h1>{workout.name}</h1>
-        <p className="preview-facts tabular">
-          <span>{durationText(duration)}</span>
-          <span aria-hidden="true">·</span>
-          <span>{workout.entries.length} movements</span>
-          <span aria-hidden="true">·</span>
-          <span>
-            {workout.entries.reduce((n, e) => n + e.sets, 0)} sets
-          </span>
-        </p>
-        <p className="fine">
-          Rep-based lifting has no exact length. The range comes from the prescription
-          and your rest setting, not from a measured session.
+        <div className="preview-facts tabular">
+          <div className="preview-fact" aria-label={durationText(duration)}><strong>{duration.min === duration.max ? duration.min : `${duration.min}–${duration.max}`}</strong><small>Minutes · estimated</small></div>
+          <div className="preview-fact"><strong>{String(workout.entries.length).padStart(2, "0")}</strong><small>Movements</small></div>
+          <div className="preview-fact"><strong>{String(workout.entries.reduce((n, e) => n + e.sets, 0)).padStart(2, "0")}</strong><small>Working sets</small></div>
+        </div>
+        <p className="preview-estimate">
+          Estimated from your planned sets and rest intervals.
         </p>
       </header>
-
-      <section>
-        <h2>What you need</h2>
-        <ul className="chip-row">
-          {equipment.length ? (
-            equipment.map((e) => (
-              <li key={e} className="chip">
-                {equipmentNames[e]}
-              </li>
-            ))
-          ) : (
-            <li className="chip">Nothing but space</li>
-          )}
-        </ul>
-      </section>
 
       {workout.unmet.length > 0 && (
         <section className="notice-inline" role="note">
@@ -101,8 +82,9 @@ export function Preview({
         </section>
       )}
 
-      <section>
-        <h2>The session</h2>
+      <div className="preview-body">
+      <section className="preview-lineup">
+        <div className="training-section-heading"><h2>The session</h2><span className="tabular">{workout.entries.length} movements</span></div>
         <ol className="rule-list preview-list">
           {workout.entries.map((entry, i) => {
             const def = findExercise(entry.exerciseId);
@@ -125,11 +107,12 @@ export function Preview({
                     {entry.sets} × {prescriptionText(entry)}
                   </span>
                   <button
-                    className="icon-button"
-                    aria-label={`How to do ${def?.name ?? entry.exerciseId}`}
+                    className="preview-guide"
+                    aria-label={`Guide for ${def?.name ?? entry.exerciseId}`}
                     onClick={() => setHelpFor(entry.exerciseId)}
                   >
-                    <HelpCircle size={18} />
+                    <BookOpen size={16} aria-hidden="true" />
+                    <span>Guide</span>
                   </button>
                 </div>
               </li>
@@ -138,16 +121,26 @@ export function Preview({
         </ol>
       </section>
 
-      <section>
-        <h2>What it trains</h2>
+      <aside className="preview-preparation" aria-label="Workout preparation">
+      <section className="preview-equipment">
+        <div className="training-section-heading"><h2>Equipment</h2></div>
+        <ul className="preview-equipment-list">
+          {equipment.length ? equipment.map((e) => <li key={e}>{equipmentNames[e]}</li>) : <li>Bodyweight · no equipment</li>}
+        </ul>
+      </section>
+      <section className="preview-anatomy">
+        <div className="training-section-heading"><h2>Training focus</h2></div>
         <MuscleMap
           primaryMuscles={[...primary]}
           supportingMuscles={[...supporting].filter((m) => !primary.has(m))}
         />
       </section>
+      </aside>
+      </div>
 
       {/* Fixed above the safe area, so starting never requires scrolling back up. */}
       <div className="sticky-action">
+        <span className="preview-start-copy"><strong>{workout.name}</strong><small>{workout.entries.length} movements · {durationText(duration)}</small></span>
         <button className="primary big" onClick={onStart}>
           Start workout
           <ArrowUpRight size={20} aria-hidden="true" />

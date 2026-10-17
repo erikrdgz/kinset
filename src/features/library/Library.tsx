@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Search, Dumbbell, MoveUpRight, Play } from "lucide-react";
 import {
   equipmentNames,
   patternNames,
   publishedExercises,
+  libraryGroups,
+  libraryGroupFor,
+  matchesLibraryGroup,
   type ExerciseDefinition,
-  type MovementPattern,
 } from "../../domain";
 import { HowTo } from "./HowTo";
 import { loadManifest, mediaFor } from "../../media/manifest";
@@ -20,14 +22,7 @@ import { loadManifest, mediaFor } from "../../media/manifest";
  *
  * Search covers reviewed aliases, so "RDL" finds the Romanian deadlift.
  */
-const groups: Array<{ id: string; label: string; patterns: MovementPattern[] }> = [
-  { id: "push", label: "Push", patterns: ["horizontalPush", "verticalPush"] },
-  { id: "pull", label: "Pull", patterns: ["horizontalPull", "verticalPull"] },
-  { id: "legs", label: "Legs", patterns: ["squat", "hinge", "lunge", "hipExtension", "hipAbduction", "ankleExtension"] },
-  { id: "core", label: "Core", patterns: ["antiExtension", "antiRotation", "carry"] },
-  { id: "arms", label: "Arms", patterns: ["elbowFlexion", "elbowExtension"] },
-  { id: "shoulders", label: "Shoulders", patterns: ["shoulderAbduction", "shoulderFlexion"] },
-];
+const groups = libraryGroups;
 
 export function Library({
   query,
@@ -35,6 +30,7 @@ export function Library({
   exerciseId,
   onQuery,
   onGroup,
+  onClear,
   onSelect,
   onClose,
 }: {
@@ -43,6 +39,7 @@ export function Library({
   exerciseId?: string;
   onQuery: (next: string) => void;
   onGroup: (next: string) => void;
+  onClear: () => void;
   onSelect: (id: string) => void;
   onClose: () => void;
 }) {
@@ -57,14 +54,7 @@ export function Library({
   const matches = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return publishedExercises.filter((e) => {
-      if (group && group !== "all") {
-        const definition = groups.find((g) => g.id === group);
-        if (
-          definition &&
-          !e.patterns.some((p) => definition.patterns.includes(p))
-        )
-          return false;
-      }
+      if (!matchesLibraryGroup(e, group)) return false;
       if (!needle) return true;
       return (
         e.name.toLowerCase().includes(needle) ||
@@ -78,17 +68,17 @@ export function Library({
       return [
         {
           id: "results",
-          label: alphabetical ? "A–Z" : "Results",
+          label: alphabetical ? "A–Z" : query.trim() ? "Search results" : groups.find((g) => g.id === group)?.label ?? "Results",
           items: [...matches].sort((a, b) => a.name.localeCompare(b.name)),
         },
       ];
-    // Grouped by training role, so the catalog's shape is visible at a glance.
+    // Every result appears once; presses and rear-delt work belong to Shoulders too.
     return groups
       .map((g) => ({
         id: g.id,
         label: g.label,
         items: matches
-          .filter((e) => e.patterns.some((p) => g.patterns.includes(p)))
+          .filter((e) => libraryGroupFor(e) === g.id)
           .sort((a, b) => a.name.localeCompare(b.name)),
       }))
       .filter((s) => s.items.length);
@@ -96,13 +86,15 @@ export function Library({
 
   return (
     <div className="library">
-      <header className="library-head">
-        <h1>Library</h1>
-        <p className="muted tabular">
-          {matches.length} of {publishedExercises.length} movements
-        </p>
-      </header>
+      <header className="editorial-heading"><div><h1>Movement library<span className="orange-dot">.</span></h1></div><span className="heading-date">{publishedExercises.length} exercise guides</span></header>
+      <div className={`library-discovery ${!query.trim() && (!group || group === "all") ? "has-feature" : ""}`}>
+      {!query.trim() && (!group || group === "all") && <button className="library-editorial library-feature" data-reveal onClick={() => onSelect("lateral")}>
+        <img src={`${import.meta.env.BASE_URL}movements/wger/lateral.jpg`} alt=""/>
+        <span className="library-feature-copy"><span className="kicker">Filmed movement guide</span><strong>Dumbbell<br/>lateral raise.</strong><span className="library-feature-action"><Play size={14} fill="currentColor" aria-hidden="true"/> View technique & muscles</span></span>
+        <MoveUpRight className="library-feature-arrow" size={24} aria-hidden="true"/>
+      </button>}
 
+      <div className="library-query">
       <div className="search-row">
         <Search size={18} aria-hidden="true" />
         <input
@@ -115,25 +107,27 @@ export function Library({
         />
       </div>
 
-      <div className="filters" role="group" aria-label="Filter by training role">
+      <div className="filters" role="group" aria-label="Filter by body region or activity">
         <button
           className={!group || group === "all" ? "chip selected" : "chip"}
+          aria-pressed={!group || group === "all"}
           onClick={() => onGroup("all")}
         >
-          All
+          All <span className="filter-count">{publishedExercises.length}</span>
         </button>
         {groups.map((g) => (
           <button
             key={g.id}
             className={group === g.id ? "chip selected" : "chip"}
+            aria-pressed={group === g.id}
             onClick={() => onGroup(g.id)}
           >
-            {g.label}
+            {g.label} <span className="filter-count">{publishedExercises.filter((exercise) => libraryGroupFor(exercise) === g.id).length}</span>
           </button>
         ))}
       </div>
 
-      <div className="library-controls">
+      <div className="library-controls"><span className="library-result-count">{matches.length} {matches.length === 1 ? "movement" : "movements"}</span>
         <button
           className="quiet"
           aria-pressed={alphabetical}
@@ -144,20 +138,19 @@ export function Library({
         {(query.trim() || (group && group !== "all")) && (
           <button
             className="quiet"
-            onClick={() => {
-              onQuery("");
-              onGroup("all");
-            }}
+            onClick={onClear}
           >
             Clear filters
           </button>
         )}
       </div>
+      </div>
+      </div>
 
       {sections.length ? (
-        sections.map((section) => (
-          <section key={section.id}>
-            <h2>{section.label}</h2>
+        sections.map((section, sectionIndex) => (
+          <section key={section.id} className="library-group">
+            <div className="library-group-title"><span>{String(sectionIndex+1).padStart(2,"0")}</span><h2>{section.label}</h2><small>{section.items.length} {section.items.length === 1 ? "movement" : "movements"}</small></div>
             <ul className="exercise-list">
               {section.items.map((e) => (
                 <li key={e.id}>
@@ -223,10 +216,7 @@ function Poster({ exercise }: { exercise: ExerciseDefinition }) {
     );
   return (
     <span className="poster" aria-hidden="true">
-      {exercise.name
-        .replace(/^(Dumbbell|Bodyweight|Standing|Seated|Alternating) /, "")
-        .slice(0, 2)
-        .toUpperCase()}
+      {exercise.requires.length ? <Dumbbell size={21} strokeWidth={1.3}/> : <MoveUpRight size={21} strokeWidth={1.3}/>}
     </span>
   );
 }

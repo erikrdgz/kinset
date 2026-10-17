@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { ChevronRight, LogOut, Settings as SettingsIcon } from "lucide-react";
 import { Sheet } from "../../ui/Sheet";
-import type { Profile } from "../../domain";
+import { SettingsPanel } from "./Settings";
+import type { Journal, Profile } from "../../domain";
 import type { SaveState } from "../../data/journal";
 import "../../ui/profile-sheet.css";
 
@@ -18,29 +20,58 @@ import "../../ui/profile-sheet.css";
  *
  * The save state is folded into the identity line rather than given its own row,
  * because it describes the account rather than standing alone.
+ *
+ * Settings lives in here too, as a second view the same drawer grows into, rather than
+ * a route. Going to a full screen to change one dropdown and then navigating back is
+ * heavier than the task deserves.
  */
 export function ProfileSheet({
   profile,
   email,
   owner,
+  data,
   state,
   status,
+  deleting,
   onClose,
   onProfileChange,
-  onSettings,
+  onDeleteAccount,
   onSignOut,
 }: {
   profile: Profile;
   email?: string;
   owner: string;
+  data: Journal;
   state: SaveState;
   status: string;
+  deleting: boolean;
   onClose: () => void;
   onProfileChange: (next: Profile) => void;
-  onSettings: () => void;
+  onDeleteAccount: () => void;
   onSignOut: () => void;
 }) {
+  const [view, setView] = useState<"home" | "settings">("home");
   const isDemo = owner === "demo";
+
+  if (view === "settings")
+    return (
+      <Sheet
+        title="Settings"
+        tall
+        onBack={() => setView("home")}
+        onClose={onClose}
+      >
+        <SettingsPanel
+          profile={profile}
+          email={email}
+          owner={owner}
+          data={data}
+          deleting={deleting}
+          onProfileChange={onProfileChange}
+          onDeleteAccount={onDeleteAccount}
+        />
+      </Sheet>
+    );
 
   return (
     <Sheet title="Profile" onClose={onClose}>
@@ -66,7 +97,7 @@ export function ProfileSheet({
           <div className="ps-row">
             <span className="ps-label">Units</span>
             <div className="ps-segmented" role="group" aria-label="Weight units">
-              {(["kg", "lb"] as const).map((unit) => (
+              {(["lb", "kg"] as const).map((unit) => (
                 <button
                   key={unit}
                   type="button"
@@ -80,7 +111,7 @@ export function ProfileSheet({
             </div>
           </div>
 
-          <button className="ps-row ps-row-link" onClick={onSettings}>
+          <button className="ps-row ps-row-link" onClick={() => setView("settings")}>
             <SettingsIcon size={18} aria-hidden="true" />
             <span className="ps-label">Settings</span>
             <ChevronRight size={18} aria-hidden="true" />

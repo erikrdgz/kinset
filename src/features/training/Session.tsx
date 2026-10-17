@@ -3,22 +3,22 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  ArrowUpRight,
   HelpCircle,
   List,
   Minimize2,
   Plus,
   Repeat,
   SkipForward,
-  Undo2,
+  Timer,
 } from "lucide-react";
 import {
   activeDuration,
-  applyCommand,
   assumedEquipment,
   CommandError,
   completedSetCount,
+  DEFAULT_REST_SECONDS,
   findExercise,
-  formatDuration,
   loadLabel,
   plannedSetCount,
   restRemaining,
@@ -31,6 +31,8 @@ import {
 import { previousPerformance } from "./workout";
 import { Sheet } from "../../ui/Sheet";
 import { HowTo } from "../library/HowTo";
+import { SlideToFinish } from "./SlideToFinish";
+import "./session.css";
 
 /** One timer for the whole screen, so rows do not each run their own interval. */
 function useNow(active: boolean, ms = 500) {
@@ -67,6 +69,22 @@ export function SessionWorkspace({
   const [confirmFinish, setConfirmFinish] = useState(false);
   const [error, setError] = useState("");
   const now = useNow(true);
+  const [setFeedback, setSetFeedback] = useState(false);
+  const doneSets = completedSetCount(session);
+  const plannedSets = plannedSetCount(session);
+  const lastDoneCount = useRef(doneSets);
+
+  useEffect(() => {
+    const justCompleted = doneSets > lastDoneCount.current;
+    lastDoneCount.current = doneSets;
+    if (!justCompleted) {
+      setSetFeedback(false);
+      return;
+    }
+    setSetFeedback(true);
+    const timeout = setTimeout(() => setSetFeedback(false), 2200);
+    return () => clearTimeout(timeout);
+  }, [doneSets]);
 
   const entries = session.entries;
   const entry = entries[Math.min(index, entries.length - 1)];
@@ -74,12 +92,20 @@ export function SessionWorkspace({
   const rest = restRemaining(session, now);
   const elapsed = activeDuration(session, now);
   const bodyweightOnly = definition?.measurement.load === "none";
+  const completion = plannedSets ? Math.round((doneSets / plannedSets) * 100) : 0;
+  const entryDone = entry?.sets.filter((s) => s.done).length ?? 0;
+  const nextSetIndex = entry?.sets.findIndex((s) => !s.done) ?? -1;
+  const nextEntry = [...entries.slice(index + 1), ...entries.slice(0, index)]
+    .find((e) => !e.skipped && e.sets.some((s) => !s.done));
+  const nextLabel = nextSetIndex >= 0 && !entry?.skipped
+    ? `Set ${nextSetIndex + 1} · ${entry?.exerciseName}`
+    : nextEntry?.exerciseName ?? "Session ready to finish";
 
   // Typing must never be interrupted by the screen moving underneath the keyboard.
   const typing = useRef(false);
 
   const exercisesDone = entries.filter(
-    (e) => e.skipped || e.sets.every((s) => s.done),
+    (e) => !e.skipped && e.sets.every((s) => s.done),
   ).length;
 
   const dispatch = (command: Command) => {
@@ -95,7 +121,7 @@ export function SessionWorkspace({
 
   if (!entry)
     return (
-      <div className="session">
+      <div className="session training-console">
         <p className="muted">This session has no movements left.</p>
         <button className="primary" onClick={onDiscard}>
           Close session
@@ -104,7 +130,7 @@ export function SessionWorkspace({
     );
 
   return (
-    <div className="session">
+    <div className="session training-console">
       <header className="session-bar">
         <button
           className="icon-button"
@@ -114,12 +140,8 @@ export function SessionWorkspace({
           <Minimize2 size={20} />
         </button>
         <div className="session-bar-title">
+          <span className="console-live"><i aria-hidden="true" /> IN SESSION</span>
           <strong>{session.name}</strong>
-          <span className="tabular">
-            {formatDuration(elapsed.ms)}
-            {!elapsed.exact && <abbr title="Approximate"> ~</abbr>} ·{" "}
-            {exercisesDone} of {entries.length} movements
-          </span>
         </div>
         <button
           className="icon-button"
@@ -129,6 +151,29 @@ export function SessionWorkspace({
           <List size={20} />
         </button>
       </header>
+
+      <div className="console-telemetry">
+        <div className="console-elapsed">
+          <span>Elapsed time</span>
+          <strong className="tabular">
+            {formatClock(Math.floor(elapsed.ms / 1000))}
+            {!elapsed.exact && <abbr title="Approximate"> ~</abbr>}
+          </strong>
+        </div>
+        <div className="console-completion">
+          <span className="console-completion-copy">
+            <strong className="tabular">{doneSets}<span> / {plannedSets}</span></strong>
+            <small>sets logged</small>
+          </span>
+          <div className="console-progress-ring" role="progressbar" aria-label="Sets logged" aria-valuenow={doneSets} aria-valuemin={0} aria-valuemax={plannedSets}>
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <circle className="console-ring-track" cx="32" cy="32" r="27" />
+              <circle className="console-ring-value" cx="32" cy="32" r="27" pathLength="100" strokeDasharray={`${completion} 100`} />
+            </svg>
+            <span className="tabular">{completion}<small>%</small></span>
+          </div>
+        </div>
+      </div>
 
       <div
         className="session-progress"
@@ -160,17 +205,18 @@ export function SessionWorkspace({
         </p>
       )}
 
-      <div className="session-exercise">
+      <div className="session-exercise" key={entry.entryId}>
         <div className="exercise-head">
           <div>
             <p className="eyebrow tabular">
+              <span className="console-movement-index">{String(index + 1).padStart(2, "0")}</span>
               Movement {index + 1} of {entries.length}
             </p>
             <h1>{entry.exerciseName}</h1>
-            <p className="muted">
-              Target {entry.targetReps ?? "—"}
-              {definition && !bodyweightOnly && ` · ${loadLabel(definition)}`}
-            </p>
+            <div className="console-prescription">
+              <span><strong>{entry.targetReps ?? "—"}</strong> target reps</span>
+              {definition && !bodyweightOnly && <span>{loadLabel(definition)}</span>}
+            </div>
             {entry.substitutedFrom && (
               <p className="fine">
                 Replaced {entry.substitutedFrom.exerciseName} for this session.
@@ -185,6 +231,13 @@ export function SessionWorkspace({
             <HelpCircle size={18} aria-hidden="true" />
             How to
           </button>
+        </div>
+
+        <div className="console-set-heading">
+          <span>Working sets</span>
+          <span className="tabular" data-complete={entryDone === entry.sets.length}>
+            {entry.skipped ? "Skipped today" : `${entryDone} / ${entry.sets.length} complete`}
+          </span>
         </div>
 
         <table className="set-table">
@@ -216,9 +269,9 @@ export function SessionWorkspace({
               const value = set.done ? set.performed : set.input;
               const suggested = !set.done && !set.input?.reps && set.planned?.reps;
               return (
-                <tr key={set.id} className={set.done ? "done" : ""}>
+                <tr key={set.id} className={set.done ? "done" : ""} data-current={!entry.skipped && si === nextSetIndex ? "true" : undefined}>
                   <th scope="row" className="tabular">
-                    {si + 1}
+                    <span className="console-set-number">{String(si + 1).padStart(2, "0")}</span>
                   </th>
                   <td className="previous tabular">
                     {previous ? (
@@ -297,7 +350,7 @@ export function SessionWorkspace({
                       className={`check ${set.done ? "checked" : ""}`}
                       aria-pressed={set.done}
                       aria-label={`${set.done ? "Undo" : "Complete"} ${entry.exerciseName} set ${si + 1}`}
-                      onClick={() => {
+                      onClick={(event) => {
                         if (set.done)
                           dispatch({
                             type: "uncompleteSet",
@@ -305,6 +358,11 @@ export function SessionWorkspace({
                             setId: set.id,
                           });
                         else {
+                          if (!Number.isInteger(set.input?.reps) || (set.input?.reps ?? 0) < 1) {
+                            setError("Enter the reps you completed before logging this set.");
+                            event.currentTarget.closest("tr")?.querySelector<HTMLInputElement>('input[inputmode="numeric"]')?.focus();
+                            return;
+                          }
                           // Bodyweight needs no typed zero: fill the load implicitly.
                           if (bodyweightOnly)
                             dispatch({
@@ -321,7 +379,7 @@ export function SessionWorkspace({
                         }
                       }}
                     >
-                      {set.done ? <Undo2 size={18} /> : <Check size={20} />}
+                      <Check size={20} />
                     </button>
                   </td>
                 </tr>
@@ -330,9 +388,13 @@ export function SessionWorkspace({
           </tbody>
         </table>
 
+        <div className="console-set-feedback" data-visible={setFeedback} role="status" aria-live="polite">
+          {setFeedback ? <><Check size={14} aria-hidden="true" /> Set logged. Keep building.</> : <span>Confirm each set when you finish.</span>}
+        </div>
+
         <div className="set-actions">
           <button
-            className="quiet"
+            className="primary session-add-set"
             onClick={() =>
               dispatch({
                 type: "addSet",
@@ -341,9 +403,10 @@ export function SessionWorkspace({
               })
             }
           >
-            <Plus size={16} aria-hidden="true" />
+            <Plus size={20} aria-hidden="true" />
             Add set
           </button>
+          <div className="session-secondary-actions">
           <button className="quiet" onClick={() => setReplacing(entry.entryId)}>
             <Repeat size={16} aria-hidden="true" />
             Replace
@@ -361,6 +424,7 @@ export function SessionWorkspace({
             <SkipForward size={16} aria-hidden="true" />
             {entry.skipped ? "Unskip" : "Skip for today"}
           </button>
+          </div>
         </div>
       </div>
 
@@ -378,44 +442,40 @@ export function SessionWorkspace({
           disabled={index >= entries.length - 1}
           onClick={() => setIndex((i) => Math.min(entries.length - 1, i + 1))}
         >
-          Next
+          Next movement
           <ChevronRight size={18} aria-hidden="true" />
         </button>
       </nav>
 
-      {/* Rest is a strip, not a takeover: the interface stays usable throughout. */}
+      {/* The timer stays in reach while the set inputs remain available. */}
       {rest > 0 && (
         <div className="rest-strip" role="timer" aria-label={`Rest, ${rest} seconds left`}>
-          <strong className="tabular">{formatClock(rest)}</strong>
-          <span className="rest-next">
-            Next: set{" "}
-            {entry.sets.findIndex((s) => !s.done) + 1 || entry.sets.length} of{" "}
-            {entry.exerciseName}
-          </span>
-          <button
-            className="quiet"
-            onClick={() => dispatch({ type: "adjustRest", deltaSeconds: -15 })}
-          >
-            −15
-          </button>
-          <button
-            className="quiet"
-            onClick={() => dispatch({ type: "adjustRest", deltaSeconds: 15 })}
-          >
-            +15
-          </button>
-          <button className="quiet" onClick={() => dispatch({ type: "skipRest" })}>
-            Skip
-          </button>
+          <div className="console-rest-heading"><Timer size={14} aria-hidden="true" /> RECOVER</div>
+          <div className="console-rest-main">
+            <strong className="tabular">{formatClock(rest)}</strong>
+            <div className="console-rest-actions">
+              <button className="quiet" aria-label="Shorten rest by 15 seconds" onClick={() => dispatch({ type: "adjustRest", deltaSeconds: -15 })}>−15s</button>
+              <button className="quiet" aria-label="Extend rest by 15 seconds" onClick={() => dispatch({ type: "adjustRest", deltaSeconds: 15 })}>+15s</button>
+              <button className="quiet" onClick={() => dispatch({ type: "skipRest" })}>Skip <SkipForward size={13} aria-hidden="true" /></button>
+            </div>
+          </div>
+          <span className="rest-next"><span>UP NEXT</span> {nextLabel}</span>
+          <div className="console-rest-track" aria-hidden="true"><span style={{ width: `${Math.min(100, (rest / (session.restSeconds ?? DEFAULT_REST_SECONDS)) * 100)}%` }} /></div>
         </div>
       )}
 
       <div className="session-foot">
-        <button className="primary" onClick={() => setConfirmFinish(true)}>
+        <button className="quiet session-desktop-finish" onClick={() => setConfirmFinish(true)}>
           Finish workout
+          <ArrowUpRight size={19} aria-hidden="true" />
         </button>
+        <div className="session-mobile-finish">
+          {doneSets > 0
+            ? <SlideToFinish key={session.id} onComplete={onFinish} />
+            : <button className="quiet session-empty-finish" onClick={() => setConfirmFinish(true)}>End session <ArrowUpRight size={19} aria-hidden="true" /></button>}
+        </div>
         <p className="muted tabular">
-          {completedSetCount(session)} of {plannedSetCount(session)} sets logged
+          {doneSets} of {plannedSets} sets logged · Your session saves as you go
         </p>
       </div>
 

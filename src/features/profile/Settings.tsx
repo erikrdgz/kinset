@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { ChevronLeft, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Select } from "../../Select";
 import { profileSchema, type Journal, type Profile } from "../../domain";
 import "../../ui/settings.css";
 
 /**
- * Settings.
+ * Settings, rendered as the drawer's second view.
  *
- * Everything the profile drawer should not carry: preferences that change twice a year,
+ * Everything the drawer's first view should not carry: preferences that change twice a year,
  * account deletion, and the credits.
  *
  * Changes save as you make them. The old path sent people back through the onboarding
@@ -18,13 +18,12 @@ import "../../ui/settings.css";
  * requires attribution to travel with the work, so it has to be reachable from inside
  * the app rather than sitting in a repository file.
  */
-export function Settings({
+export function SettingsPanel({
   profile,
   email,
   owner,
   data,
   deleting,
-  onBack,
   onProfileChange,
   onDeleteAccount,
 }: {
@@ -33,7 +32,6 @@ export function Settings({
   owner: string;
   data: Journal;
   deleting: boolean;
-  onBack: () => void;
   onProfileChange: (next: Profile) => void;
   onDeleteAccount: () => void;
 }) {
@@ -54,13 +52,6 @@ export function Settings({
 
   return (
     <div className="settings">
-      <button className="quiet back" onClick={onBack}>
-        <ChevronLeft size={18} aria-hidden="true" />
-        Back
-      </button>
-
-      <h1>Settings</h1>
-
       <section className="set-group">
         <h2>Training</h2>
         <p className="fine">
@@ -136,7 +127,7 @@ export function Settings({
         <div className="set-field">
           <span>Weight units</span>
           <div className="set-segmented" role="group" aria-label="Weight units">
-            {(["kg", "lb"] as const).map((unit) => (
+            {(["lb", "kg"] as const).map((unit) => (
               <button
                 key={unit}
                 type="button"
@@ -232,4 +223,4 @@ export function Settings({
   );
 }
 
-export default Settings;
+export default SettingsPanel;

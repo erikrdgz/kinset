@@ -1,0 +1,110 @@
+/**
+ * The shared picker, restyled onto the current system.
+ *
+ * The legacy sheet gives it square corners, a 2px grey border, an orange divider rule
+ * beside the chevron and a hard offset drop shadow — a different component language
+ * from everything around it. These rules load after styles.css and override it
+ * wherever the picker appears, so onboarding and the plan editor pick the change up
+ * too rather than drifting further apart.
+ *
+ * The menu is portalled to the body, so it cannot be scoped to a parent and has to be
+ * styled globally.
+ */
+
+.kinset-select {
+  min-block-size: 52px;
+  margin-block-start: 0;
+  padding: 0 16px;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  background: var(--grad-raised, var(--raised));
+  color: var(--ink);
+  font-size: var(--t-body);
+  font-weight: 500;
+  transition:
+    border-color var(--m-press) var(--ease),
+    background var(--m-press) var(--ease);
+}
+
+.kinset-select:hover {
+  border-color: var(--border-strong);
+}
+
+.kinset-select[data-state="open"] {
+  border-color: var(--accent);
+}
+
+/* No divider rule: the chevron is an affordance, not a second control. */
+.kinset-select-icon {
+  padding-inline-start: 0;
+  border-inline-start: 0;
+  color: var(--muted);
+  transition: transform var(--m-switch) var(--ease);
+}
+
+.kinset-select[data-state="open"] .kinset-select-icon {
+  color: var(--accent);
+}
+
+.kinset-select-menu {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-control);
+  background: var(--raised-high, var(--raised));
+  box-shadow: var(--shadow-2, 0 16px 40px rgba(0, 0, 0, 0.5));
+  padding: 6px;
+  overflow: hidden;
+  animation: select-in var(--m-switch) var(--ease);
+}
+
+.kinset-select-option {
+  min-block-size: 46px;
+  padding: 10px 12px;
+  border-block-end: 0;
+  border-radius: 10px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.kinset-select-option[data-state="checked"] {
+  color: var(--ink);
+  font-weight: 600;
+  background: var(--accent-wash);
+}
+
+.kinset-select-option[data-state="checked"] svg {
+  color: var(--accent);
+}
+
+/* Keyboard and pointer highlight read the same, and neither inverts to a solid slab. */
+.kinset-select-option[data-highlighted] {
+  background: var(--raised);
+  color: var(--ink);
+}
+
+.kinset-select-option[data-state="checked"][data-highlighted] {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.kinset-select-scroll {
+  block-size: 24px;
+  background: transparent;
+  color: var(--muted);
+}
+
+@keyframes select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kinset-select-menu {
+    animation: none;
+  }
+
+  .kinset-select-icon {
+    transition: none;
+  }
+}

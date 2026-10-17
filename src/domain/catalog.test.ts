@@ -5,6 +5,9 @@ import {
   equipmentUnion,
   exerciseDefinitions,
   findExercise,
+  libraryGroups,
+  libraryGroupFor,
+  matchesLibraryGroup,
   publishedExercises,
 } from "./exercises";
 import { buildLineup, substitutionsFor, fullBodySlots } from "./selection";
@@ -52,6 +55,44 @@ describe("structured catalog", () => {
   it("has a unique ID for every movement", () => {
     const ids = exerciseDefinitions.map((e) => e.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("gives every published movement exactly one library section", () => {
+    const grouped = libraryGroups.flatMap((group) =>
+      publishedExercises.filter((exercise) => matchesLibraryGroup(exercise, group.id)),
+    );
+    expect(grouped).toHaveLength(publishedExercises.length);
+    expect(new Set(grouped.map((exercise) => exercise.id)).size).toBe(grouped.length);
+    expect(new Set(grouped.map((exercise) => exercise.id))).toEqual(new Set(publishedExercises.map((exercise) => exercise.id)));
+  });
+
+  it("shows shoulder presses, rear-deltoid work and rotation in Shoulders", () => {
+    const shoulderIds = publishedExercises.filter((exercise) => matchesLibraryGroup(exercise, "shoulders")).map((exercise) => exercise.id);
+    expect(shoulderIds).toEqual(expect.arrayContaining([
+      "seatedpress", "lateral", "reversefly", "facepull", "bandexternalrotation",
+      "machineshoulderpress", "bandlateral", "bandpullapart", "seatedreversefly",
+    ]));
+    expect(shoulderIds).not.toContain("shouldercircles");
+  });
+
+  it("keeps stretches and cardio separate from strength coverage", () => {
+    expect(libraryGroupFor(findExercise("hipflexorstretch")!)).toBe("mobility");
+    expect(libraryGroupFor(findExercise("outdoorrun")!)).toBe("conditioning");
+    for (const group of libraryGroups.filter((group) => !["mobility", "conditioning"].includes(group.id))) {
+      const movements = publishedExercises.filter((exercise) => matchesLibraryGroup(exercise, group.id));
+      expect(movements.length, group.label).toBeGreaterThanOrEqual(12);
+      expect(movements.every((exercise) => exercise.role === "strength"), group.label).toBe(true);
+    }
+    const strength = publishedExercises.filter((exercise) => exercise.role === "strength");
+    expect(strength.filter((exercise) => exercise.browseGroup === "Legs").length / strength.length).toBeLessThan(0.25);
+  });
+
+  it("does not offer the new machine movements without their equipment", () => {
+    const available = assumedEquipment("Bodyweight");
+    expect(canPerform(findExercise("machineshoulderpress")!, available)).toBe(false);
+    expect(canPerform(findExercise("backextension")!, available)).toBe(false);
+    expect(canPerform(findExercise("bandlateral")!, available)).toBe(false);
+    expect(canPerform(findExercise("bandlateral")!, new Set([...available, "resistanceBand"]))).toBe(true);
   });
 
   it("covers every movement pattern the selector can ask for", () => {

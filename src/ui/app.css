@@ -1205,50 +1205,70 @@ button.back {
 
 .muscle-figures {
   display: flex;
-  gap: var(--s4);
+  gap: var(--s3);
   justify-content: center;
+  padding: var(--s4) 0;
 }
 
 .muscle-figure {
   margin: 0;
-  flex: 0 1 160px;
+  flex: 1 1 0;
+  max-inline-size: 190px;
   text-align: center;
 }
 
 .muscle-figure svg {
   inline-size: 100%;
   block-size: auto;
-  max-block-size: 260px;
+  max-block-size: 320px;
+  overflow: visible;
 }
 
 .muscle-figure figcaption {
-  font-size: var(--t-meta);
-  color: var(--muted);
-  margin-block-start: var(--s1);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  margin-block-start: var(--s3);
 }
 
-.map-body {
-  fill: var(--raised);
-  stroke: var(--border);
+/* The figure reads as a form, not a flat cut-out. */
+.map-body-top {
+  stop-color: #2e2b29;
+}
+
+.map-body-bottom {
+  stop-color: #1d1b1a;
+}
+
+.map-body path {
+  stroke: #3b3734;
   stroke-width: 1;
 }
 
+.map-active-top {
+  stop-color: var(--accent-soft);
+}
+
+.map-active-bottom {
+  stop-color: var(--accent);
+}
+
+/* Inactive anatomy stays visible, a step above the body tone. */
+.map-inactive path {
+  fill: #37332f;
+}
+
+.map-supporting-group path {
+  fill: color-mix(in srgb, var(--accent) 26%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 65%, transparent);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 2.5;
+}
+
 .map-primary {
-  fill: var(--accent);
-}
-
-.map-supporting {
-  stroke: var(--accent-soft);
-  stroke-width: 0.5;
-}
-
-.map-support-bg {
-  fill: color-mix(in srgb, var(--accent) 18%, transparent);
-}
-
-.map-support-line {
-  stroke: var(--accent-soft);
-  stroke-width: 1.4;
+  stroke: color-mix(in srgb, var(--accent-soft) 85%, white);
+  stroke-width: 0.8;
 }
 
 .muscle-key {
@@ -1257,6 +1277,7 @@ button.back {
   gap: var(--s2) var(--s3);
   margin-block: var(--s4);
   font-size: var(--t-meta);
+  align-items: start;
 }
 
 .muscle-key dt {
@@ -1264,11 +1285,31 @@ button.back {
   text-transform: uppercase;
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
-  padding-block-start: 2px;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  white-space: nowrap;
 }
 
 .muscle-key dd {
   margin: 0;
+}
+
+.key-dot {
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 3px;
+  flex: none;
+}
+
+.key-primary {
+  background: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.key-support {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--accent) 65%, transparent);
 }
 
 /* ------------------------------------------------------ lists in sheets */

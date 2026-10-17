@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { ArrowUpRight, Check } from "lucide-react";
 import {
   activeDuration,
   exerciseBest,
@@ -10,6 +10,7 @@ import {
   type Session2,
   type Unit,
 } from "../../domain";
+import "./session.css";
 
 /**
  * The session summary.
@@ -55,18 +56,24 @@ export function Summary({
   }>;
 
   return (
-    <div className="summary">
-      <div className="summary-mark" aria-hidden="true">
-        <Check size={28} />
-      </div>
-      <h1>{session.name}</h1>
-      <p className="muted">
-        {new Date(session.finishedAt ?? session.startedAt).toLocaleDateString(
-          undefined,
-          { weekday: "long", month: "long", day: "numeric" },
-        )}
-      </p>
+    <div className="summary training-summary">
+      <header className="summary-hero">
+        <div className="summary-save-state">
+        <div className="summary-mark" aria-hidden="true">
+          <Check size={17} />
+        </div>
+        <p className="eyebrow">Session saved</p>
+        </div>
+        <h1>{session.name}</h1>
+        <p className="muted">
+          {new Date(session.finishedAt ?? session.startedAt).toLocaleDateString(
+            undefined,
+            { weekday: "long", month: "long", day: "numeric" },
+          )}
+        </p>
+      </header>
 
+      <div className="summary-performance">
       <dl className="summary-stats">
         <div>
           <dt>Sets logged</dt>
@@ -94,17 +101,24 @@ export function Summary({
           </dd>
         </div>
       </dl>
+      <div className="summary-completion-track" role="progressbar" aria-label="Planned sets logged" aria-valuemin={0} aria-valuemax={planned.length} aria-valuenow={completed.length}>
+        <span style={{ width: `${planned.length ? completed.length / planned.length * 100 : 0}%` }} />
+      </div>
+      </div>
 
       {volume.excludedSets > 0 && (
-        <p className="fine">
+        <details className="summary-volume-note">
+          <summary>About your load total</summary>
+          <p className="fine">
           {volume.excludedSets} set{volume.excludedSets === 1 ? " is" : "s are"} left
           out of that total. {volume.convention}
-        </p>
+          </p>
+        </details>
       )}
 
       {records.length > 0 && (
-        <section>
-          <h2>Best so far</h2>
+        <section className="summary-records">
+          <div className="training-section-heading"><h2>Best so far</h2><span className="tabular">{records.length} {records.length === 1 ? "record" : "records"}</span></div>
           <ul className="record-list">
             {records.map((r) => (
               <li key={r.name}>
@@ -120,13 +134,15 @@ export function Summary({
         </section>
       )}
 
-      <section>
-        <h2>What you did</h2>
+      <section className="summary-breakdown">
+        <div className="training-section-heading"><h2>The work</h2><span>{session.unit.toUpperCase()} · reps</span></div>
         <ul className="summary-list">
-          {session.entries.map((entry) => {
+          {session.entries.map((entry, i) => {
             const done = entry.sets.filter((s) => s.done);
             return (
-              <li key={entry.entryId}>
+              <li key={entry.entryId} data-logged={done.length > 0}>
+                <span className="summary-movement-index tabular" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <div className="summary-movement-content">
                 <div className="summary-row">
                   <strong>{entry.exerciseName}</strong>
                   <span className="tabular muted">
@@ -140,12 +156,13 @@ export function Summary({
                     {done
                       .map((s) =>
                         s.performed?.load
-                          ? `${s.performed.load}×${s.performed.reps}`
-                          : `${s.performed?.reps ?? 0} reps`,
+                          ? `${formatLoad(s.performed.load, unit)} × ${s.performed.reps}`
+                          : `${s.performed?.reps ?? 0} ${s.performed?.reps === 1 ? "rep" : "reps"}`,
                       )
                       .join("  ·  ")}
                   </p>
                 )}
+                </div>
               </li>
             );
           })}
@@ -162,9 +179,10 @@ export function Summary({
       <div className="summary-actions">
         <button className="primary" onClick={onDone}>
           Done
+          <Check size={18} aria-hidden="true" />
         </button>
         <button className="quiet" onClick={onViewHistory}>
-          View all history
+          View history <ArrowUpRight size={18} aria-hidden="true" />
         </button>
       </div>
     </div>

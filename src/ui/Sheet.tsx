@@ -1,5 +1,5 @@
-import { useEffect, useRef, type ReactNode } from "react";
-import { X } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { ChevronLeft, X } from "lucide-react";
 
 /**
  * A bottom sheet.
@@ -16,15 +16,33 @@ export function Sheet({
   title,
   children,
   onClose,
+  onBack,
+  tall = false,
   labelledBy,
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
+  /** Shown as a back control when the sheet has drilled into a second view. */
+  onBack?: () => void;
+  /** Lets a sheet that holds a whole screen take most of the viewport and scroll. */
+  tall?: boolean;
   labelledBy?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const opener = useRef<Element | null>(null);
+  const [closing, setClosing] = useState(false);
+  const dismiss = () => {
+    if (closing) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) onClose();
+    else setClosing(true);
+  };
+
+  useEffect(() => {
+    if (!closing) return;
+    const timeout = window.setTimeout(onClose, 240);
+    return () => window.clearTimeout(timeout);
+  }, [closing, onClose]);
 
   useEffect(() => {
     // Remember where focus was before the sheet took it.
@@ -44,24 +62,37 @@ export function Sheet({
     <dialog
       ref={ref}
       className="sheet-backdrop"
+      data-closing={closing || undefined}
+      data-tall={tall || undefined}
       aria-label={labelledBy ? undefined : title}
+      aria-labelledby={labelledBy}
       onCancel={(e) => {
         e.preventDefault();
-        onClose();
+        dismiss();
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) dismiss();
       }}
     >
       <div className="sheet" role="document">
         <div className="sheet-grip" aria-hidden="true" />
         <header className="sheet-head">
+          {onBack && (
+            <button
+              type="button"
+              className="sheet-back"
+              aria-label="Back to profile"
+              onClick={onBack}
+            >
+              <ChevronLeft size={20} />
+            </button>
+          )}
           <h2 id={labelledBy}>{title}</h2>
           <button
             type="button"
             className="sheet-close"
             aria-label={`Close ${title}`}
-            onClick={onClose}
+            onClick={dismiss}
           >
             <X size={20} />
           </button>

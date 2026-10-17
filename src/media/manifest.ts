@@ -6,10 +6,8 @@
  * IDs, and a manifest entry maps one of those IDs onto whatever asset you end up
  * licensing — a local GIF, a local short video, or a remote URL from a supplier.
  *
- * What it does not do is invent sources. The manifest ships empty, because no media is
- * licensed yet, and every screen degrades to the written guide rather than to a broken
- * image. Populate `public/movements/manifest.json` and the players light up with no
- * further code changes.
+ * Source records, original URLs, licences, and adaptation notes for the shipped
+ * collection live in public/movements. Uncovered movements use their written guide.
  *
  * The rights fields are not decoration. `offlineAllowed` decides whether the service
  * worker may cache an asset, and several candidate suppliers' terms forbid storing video
@@ -28,11 +26,18 @@ export type MediaEntry = {
   src: string;
   /** Still frame shown before playback, and the Library row thumbnail. */
   poster?: string;
+  /** Static positions, advanced by the user. These are not an animation. */
+  frames?: string[];
   width?: number;
   height?: number;
   /** Who made it and under what licence. Rendered wherever the asset is shown. */
   attribution?: string;
   licenseId?: string;
+  licenseUrl?: string;
+  sourceUrl?: string;
+  /** Retained with each asset, including extracted posters. */
+  changes?: string;
+  variantNote?: string;
   provider?: string;
   providerAssetId?: string;
   /** `owned` may be cached and packaged offline; `streamOnly` may not. */
@@ -83,7 +88,14 @@ export function loadManifest(): Promise<MediaManifest> {
 function isManifest(value: unknown): value is MediaManifest {
   if (!value || typeof value !== "object") return false;
   const m = value as MediaManifest;
-  return m.version === 1 && Array.isArray(m.entries);
+  return m.version === 1 && Array.isArray(m.entries) && m.entries.every((entry) =>
+    entry && typeof entry === "object" && typeof entry.exerciseId === "string" &&
+    typeof entry.src === "string" && ["gif", "video", "image"].includes(entry.kind) &&
+    ["owned", "streamOnly"].includes(entry.deliveryMode) && typeof entry.offlineAllowed === "boolean" &&
+    (entry.frames === undefined || (Array.isArray(entry.frames) && entry.frames.every((frame) => typeof frame === "string"))) &&
+    [entry.poster, entry.attribution, entry.licenseId, entry.licenseUrl, entry.sourceUrl, entry.changes, entry.variantNote, entry.expiresAt]
+      .every((field) => field === undefined || typeof field === "string"),
+  );
 }
 
 /** Replace the manifest directly. Used by tests and by the validation script. */
@@ -101,10 +113,11 @@ function resolve(path: string, basePath?: string) {
 export type ResolvedMedia = MediaEntry & {
   resolvedSrc: string;
   resolvedPoster?: string;
+  resolvedFrames?: string[];
   expired: boolean;
 };
 
-/** The media for one movement, or null when there is none — the normal case today. */
+/** The media for one movement, or null when that exact variation is not covered. */
 export function mediaFor(
   exerciseId: string,
   now = new Date(),
@@ -121,16 +134,17 @@ export function mediaFor(
     resolvedPoster: entry.poster
       ? resolve(entry.poster, manifest.basePath)
       : undefined,
+    resolvedFrames: entry.frames?.map((frame) => resolve(frame, manifest.basePath)),
   };
 }
 
 /** Assets the service worker is permitted to cache. Stream-only never qualifies. */
 export function cacheableAssets(): string[] {
-  return manifest.entries
+  return [...new Set(manifest.entries
     .filter((e) => e.deliveryMode === "owned" && e.offlineAllowed)
     .flatMap((e) =>
-      [e.src, e.poster].filter(Boolean).map((p) => resolve(p!, manifest.basePath)),
-    );
+      [e.src, e.poster, ...(e.frames ?? [])].filter(Boolean).map((p) => resolve(p!, manifest.basePath)),
+    ))];
 }
 
 export type ManifestProblem = { exerciseId: string; problem: string };
@@ -161,6 +175,14 @@ export function validateManifest(
         exerciseId: id,
         problem: "missing licenseId — provenance is required before an asset ships",
       });
+    if (entry.licenseId?.startsWith("CC-")) {
+      for (const field of ["attribution", "sourceUrl", "licenseUrl", "changes"] as const)
+        if (!entry[field]) problems.push({ exerciseId: id, problem: `missing ${field} for Creative Commons media` });
+    }
+    if (entry.frames && (entry.kind !== "image" || !entry.frames.length || entry.frames.some((frame) => !frame)))
+      problems.push({ exerciseId: id, problem: "frames must be a non-empty list of static image paths" });
+    if (entry.kind === "gif" && !entry.poster)
+      problems.push({ exerciseId: id, problem: "GIF needs a static poster so motion can be paused" });
     if (entry.deliveryMode === "streamOnly" && entry.offlineAllowed)
       problems.push({
         exerciseId: id,
