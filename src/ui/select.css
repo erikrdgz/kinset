@@ -130,3 +130,30 @@ body .kinset-select-option[data-state="checked"][data-highlighted] {
     transition: none;
   }
 }
+
+/**
+ * The legacy sheet paints the highlight with a pseudo-element:
+ *
+ *   body .kinset-select-option::before { inset: 0; background: linear-gradient(...) }
+ *   body .kinset-select-option:hover::before { opacity: 1 }
+ *
+ * That is why every background rule above looked correct in the inspector and changed
+ * nothing on screen — the gradient was never on the element, so overriding its
+ * background could not reach it. It also carries no radius, so it squared off the
+ * corners of a row that measured as rounded.
+ *
+ * Removed rather than restyled. The highlight is a background on the option now, which
+ * is one thing to reason about instead of two stacked layers.
+ */
+body .kinset-select-option::before {
+  content: none;
+}
+
+/**
+ * The tick goes white the moment the row is highlighted. Against the accent wash an
+ * accent-coloured tick bleeds into its own background and stops reading as a mark.
+ */
+body .kinset-select-option[data-state="checked"]:hover svg,
+body .kinset-select-option[data-state="checked"][data-highlighted] svg {
+  color: var(--ink);
+}
