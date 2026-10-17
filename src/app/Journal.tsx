@@ -206,6 +206,16 @@ export function Journal({
 
   const activeTab = tabFor(route);
   const inSession = route.name === "session";
+  const resumeControl = data.active && !inSession ? (
+    <button className="resume-bar" onClick={() => go({ name: "session" })}>
+      <svg className="resume-progress" viewBox="0 0 40 40" aria-hidden="true"><circle className="resume-progress-track" cx="20" cy="20" r="16"/><circle className="resume-progress-fill" cx="20" cy="20" r="16" pathLength="100" strokeDasharray={`${Math.min(100, completedSetCount(data.active) / Math.max(1, plannedSetCount(data.active)) * 100)} 100`}/></svg>
+      <span className="resume-copy">
+        <strong>{data.active.name}</strong>
+        <small>{completedSetCount(data.active)} of {plannedSetCount(data.active)} sets logged</small>
+      </span>
+      <span className="resume-cta">Resume <ArrowUpRight size={19} aria-hidden="true"/></span>
+    </button>
+  ) : null;
 
   return (
     <div
@@ -401,17 +411,7 @@ export function Journal({
         </div>
       </main>
 
-      {/* Minimising a session leaves this behind, so it can always be found again. */}
-      {data.active && !inSession && (
-        <button className="resume-bar" onClick={() => go({ name: "session" })}>
-          <svg className="resume-progress" viewBox="0 0 40 40" aria-hidden="true"><circle className="resume-progress-track" cx="20" cy="20" r="16"/><circle className="resume-progress-fill" cx="20" cy="20" r="16" pathLength="100" strokeDasharray={`${Math.min(100, completedSetCount(data.active) / Math.max(1, plannedSetCount(data.active)) * 100)} 100`}/></svg>
-          <span className="resume-copy">
-            <strong>{data.active.name}</strong>
-            <small>{completedSetCount(data.active)} of {plannedSetCount(data.active)} sets logged</small>
-          </span>
-          <span className="resume-cta">Resume <ArrowUpRight size={19} aria-hidden="true"/></span>
-        </button>
-      )}
+      {resumeControl && <div className="mobile-resume">{resumeControl}</div>}
 
       {!inSession && (
         <nav className="tabbar" aria-label="Main" data-active={activeTab ?? "today"}>
@@ -431,6 +431,7 @@ export function Journal({
             </button>
           ))}
           </div>
+          {resumeControl && <div className="sidebar-resume">{resumeControl}</div>}
           <button className="nav-profile" onClick={()=>setMenu(true)}><User size={18}/><span>Profile & settings</span></button>
         </nav>
       )}

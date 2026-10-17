@@ -141,3 +141,49 @@ body .shell[data-resume] .tabbar {
   border-start-start-radius: 0;
   border-start-end-radius: 0;
 }
+
+
+/* Desktop resume belongs in the sidebar, above the profile divider. */
+.sidebar-resume { display: none; }
+
+@media (min-width: 1000px) {
+  .mobile-resume { display: none; }
+  body .shell .tabbar { overflow-y: auto; }
+  .nav-brand, .tabbar-items, .nav-profile { flex-shrink: 0; }
+  .sidebar-resume {
+    display: block;
+    margin-top: auto;
+    padding-top: 28px;
+    padding-bottom: 20px;
+    flex-shrink: 0;
+  }
+  body .shell .sidebar-resume + .nav-profile { margin-top: 0; }
+  body .shell .sidebar-resume .resume-bar {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    min-width: 0;
+    max-inline-size: none;
+    margin: 0;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    border: 1px solid #7e909b40;
+    border-radius: var(--r-card);
+    box-shadow: inset 0 1px 0 #ffffff10, 0 8px 20px #0003;
+    backdrop-filter: none;
+    line-height: 1.4;
+  }
+  body .shell .sidebar-resume .resume-progress { width: 40px; height: 40px; }
+  .sidebar-resume .resume-copy { width: 100%; flex: none; }
+  .sidebar-resume .resume-copy strong { white-space: normal; overflow-wrap: anywhere; }
+  .sidebar-resume .resume-copy small { display: block; }
+  body .shell .sidebar-resume .resume-cta {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  body .shell[data-resume] { padding-bottom: 0; }
+}
