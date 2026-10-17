@@ -55,12 +55,16 @@ export function Today({ journal, profile, go, onStart }: {
               <div><strong>{active?total:`${duration.min}–${duration.max}`}</strong><span>{active?"total sets":"min · estimated"}</span></div>
             </div>
             {active && <div className="poster-progress" role="progressbar" aria-label="Workout completion" aria-valuenow={completed} aria-valuemin={0} aria-valuemax={total}><i style={{width:`${progress*100}%`}} /></div>}
-            <button className="primary workout-launch" onClick={onStart}><span>{active?"Resume workout":"Start workout"}</span><ArrowUpRight size={23} aria-hidden="true"/></button>
           </div>
           {!active && <span className="sr-only">{durationText(duration)}</span>}
         </section>
+        {/* One control, straddling the seam between the poster and the lineup, so it
+            reads as coming out of the card rather than floating over it. */}
         <div className="flow-joint">
-          <button className="flow-joint-button" onClick={()=>active ? onStart() : go({name:"preview"})} aria-label={active ? "Open active workout" : "View workout details"}><ArrowUpRight size={26} aria-hidden="true"/></button>
+          <button className="flow-joint-button" onClick={onStart}>
+            <span>{active ? "Resume workout" : "Start workout"}</span>
+            <ArrowUpRight size={20} aria-hidden="true" />
+          </button>
         </div>
         <section className="session-lineup connected-lineup">
           <div className="section-title"><h2>Movement lineup</h2><span className="lineup-count">{String(entries.length).padStart(2,"0")}</span></div>

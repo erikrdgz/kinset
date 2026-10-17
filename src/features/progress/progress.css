@@ -7,14 +7,14 @@
 .progress .prog-heading h1 { margin: 0; font-family: var(--font-display); font-size: clamp(32px, 8vw, 42px); line-height: 1.06; font-weight: 600; letter-spacing: -.055em; text-transform: none; }
 .progress .prog-heading h1 span { color: var(--accent); }
 .progress .prog-heading-mark { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 2px; color: var(--accent); border-radius: 50%; border: 1px solid rgba(255, 105, 43, .21); background: radial-gradient(circle at 30% 10%, rgba(255,105,43,.1), transparent 80%); }
-.progress .prog-period { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); padding: 4px; border-radius: 13px; background: #121416; border: 1px solid var(--prog-line); box-shadow: inset 0 2px 7px #0006; }
-.progress .prog-period-indicator { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 4); transform: translateX(calc(var(--period-index) * 100%)); border-radius: 9px; background: linear-gradient(180deg, #323436, #27292b); box-shadow: inset 0 1px 0 #ffffff16, 0 2px 4px #0004; transition: transform 350ms var(--ease); }
-.progress .prog-period button { position: relative; min-width: 0; min-height: 40px; padding: 8px 4px; background: transparent; color: var(--muted); border: 0; box-shadow: none; font-size: 12px; font-weight: 500; border-radius: 8px; transition: color 200ms; }
+.progress .prog-period { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); padding: 4px; border-radius: var(--r-sm); background: #121416; border: 1px solid var(--prog-line); box-shadow: inset 0 2px 7px #0006; }
+.progress .prog-period-indicator { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 4); transform: translateX(calc(var(--period-index) * 100%)); border-radius: var(--r-sm); background: linear-gradient(180deg, #323436, #27292b); box-shadow: inset 0 1px 0 #ffffff16, 0 2px 4px #0004; transition: transform 350ms var(--ease); }
+.progress .prog-period button { position: relative; min-width: 0; min-height: 40px; padding: 8px 4px; background: transparent; color: var(--muted); border: 0; box-shadow: none; font-size: 12px; font-weight: 500; border-radius: var(--r-sm); transition: color 200ms; }
 .progress .prog-period button:hover { background: #ffffff05; color: var(--ink); }
 .progress .prog-period button[aria-pressed="true"] { color: var(--ink); }
 .progress .prog-window { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; color: var(--faint); padding: 13px 2px 20px; }
 .progress .prog-content { display: grid; gap: 14px; animation: prog-reveal 450ms var(--ease) both; }
-.progress .prog-panel { padding: 22px 20px 16px; border: 1px solid var(--prog-line); border-radius: 19px; background: linear-gradient(145deg, #1c1e20 0%, #17191b 50%, #141618 100%); box-shadow: inset 0 1px 0 #ffffff03, 0 12px 30px #0002; overflow: hidden; min-width: 0; }
+.progress .prog-panel { padding: 22px 20px 16px; border: 1px solid var(--prog-line); border-radius: var(--r-card); background: linear-gradient(145deg, #1c1e20 0%, #17191b 50%, #141618 100%); box-shadow: inset 0 1px 0 #ffffff03, 0 12px 30px #0002; overflow: hidden; min-width: 0; }
 .progress .prog-panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .progress .prog-panel-heading h2 { margin: 0; font-family: var(--font-ui); font-size: 14px; line-height: 1.35; font-weight: 500; letter-spacing: -.01em; text-transform: none; }
 .progress .prog-panel-code, .progress .prog-mini-label { font-size: 10px; letter-spacing: .08em; font-weight: 500; color: var(--faint); text-align: right; }
@@ -23,7 +23,7 @@
 .progress .prog-value { display: flex; align-items: center; gap: 13px; }
 .progress .prog-value > strong { font-size: 65px; line-height: 1; font-weight: 500; letter-spacing: -.07em; font-variant-numeric: tabular-nums; }
 .progress .prog-value > span { font-size: 11px; color: var(--muted); line-height: 1.5; }
-.progress .prog-comparison { display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 3px; max-width: 115px; padding: 7px 8px; border-radius: 7px; background: rgba(255,105,43,.055); color: var(--accent-soft); font-size: 12px; }
+.progress .prog-comparison { display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 3px; max-width: 115px; padding: 7px 8px; border-radius: var(--r-sm); background: rgba(255,105,43,.055); color: var(--accent-soft); font-size: 12px; }
 .progress .prog-comparison > span { width: 100%; text-align: right; font-size: 10px; color: var(--muted); }
 .progress .prog-chart-inspection { display: flex; align-items: center; gap: 9px; height: 35px; padding-top: 7px; font-size: 10px; color: var(--faint); }
 .progress .prog-chart-inspection strong { font-size: 10px; font-weight: 500; color: var(--accent-soft); }
@@ -32,15 +32,15 @@
 .progress .prog-bar-grid span { display: flex; align-items: center; justify-content: flex-end; gap: 7px; font-size: 9px; line-height: 0; color: #85898d; }
 .progress .prog-bar-grid span::before { content: ""; width: calc(100% - 22px); position: absolute; left: 0; height: 1px; background: #ffffff08; }
 .progress .prog-bars { position: relative; display: flex; justify-content: space-between; gap: 4px; height: 100%; }
-.progress .prog-bars button { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; min-height: 44px; height: 100%; background: transparent; border: 0; border-radius: 5px; padding: 0; box-shadow: none; color: var(--muted); transform: none; }
+.progress .prog-bars button { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; min-height: 44px; height: 100%; background: transparent; border: 0; border-radius: 6px; padding: 0; box-shadow: none; color: var(--muted); transform: none; }
 .progress .prog-bars button:hover, .progress .prog-bars button.is-active { background: #ffffff03; }
 .progress .prog-bar-column { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 115px; }
-.progress .prog-bar-column i { display: block; width: 48%; max-width: 24px; min-height: 2px; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, #f18449, #dd632b); transform-origin: bottom; animation: prog-bar-grow 700ms var(--ease) both; animation-delay: var(--bar-delay); transition: box-shadow 200ms, background 200ms; }
+.progress .prog-bar-column i { display: block; width: 48%; max-width: 24px; min-height: 2px; border-radius: 6px 0 0; background: linear-gradient(180deg, #f18449, #dd632b); transform-origin: bottom; animation: prog-bar-grow 700ms var(--ease) both; animation-delay: var(--bar-delay); transition: box-shadow 200ms, background 200ms; }
 .progress .prog-bar-column i[data-empty="true"] { height: 2px !important; min-height: 2px; background: #53575b; }
 .progress .prog-bars button.is-active .prog-bar-column i:not([data-empty="true"]), .progress .prog-bars button:hover .prog-bar-column i:not([data-empty="true"]) { background: linear-gradient(180deg, #ffac71, var(--accent)); box-shadow: 0 0 15px #ff692b38; }
 .progress .prog-bar-label { display: block; width: 100%; height: 25px; padding-top: 9px; white-space: nowrap; font-size: 9px; color: #969a9e; text-align: center; }
 .progress .prog-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.progress .prog-mini-stat { position: relative; padding: 15px 11px 14px; border-radius: 14px; border: 1px solid var(--prog-line); background: linear-gradient(145deg, #1c1e20, #141618); }
+.progress .prog-mini-stat { position: relative; padding: 15px 11px 14px; border-radius: var(--r-control); border: 1px solid var(--prog-line); background: linear-gradient(145deg, #1c1e20, #141618); }
 .progress .prog-mini-stat > svg { color: #8e9296; display: block; margin-bottom: 17px; }
 .progress .prog-mini-stat > strong { font-size: clamp(24px, 6vw, 32px); line-height: 1.15; letter-spacing: -.055em; font-weight: 500; font-variant-numeric: tabular-nums; display: block; }
 .progress .prog-mini-stat strong small { display: inline; font-size: 13px; font-weight: 400; letter-spacing: -.02em; color: var(--faint); margin-left: 2px; }
@@ -61,7 +61,7 @@
 .progress .prog-definition[open] summary svg { transform: rotate(180deg); }
 .progress .prog-definition > p { margin: 0 0 10px; font-size: 11px; line-height: 1.7; color: var(--muted); }
 .progress .prog-movement-select { display: flex; align-items: center; position: relative; margin-top: 16px; }
-.progress .prog-movement-select select { appearance: none; width: 100%; min-height: 44px; font-size: 13px; font-weight: 500; background: #ffffff04; border: 1px solid var(--prog-line); border-radius: 9px; color: var(--ink); padding: 10px 36px 10px 12px; }
+.progress .prog-movement-select select { appearance: none; width: 100%; min-height: 44px; font-size: 13px; font-weight: 500; background: #ffffff04; border: 1px solid var(--prog-line); border-radius: var(--r-sm); color: var(--ink); padding: 10px 36px 10px 12px; }
 .progress .prog-movement-select select option { background: #202224; color: var(--ink); }
 .progress .prog-movement-select > svg { position: absolute; right: 12px; pointer-events: none; color: var(--faint); }
 .progress .prog-trend-readout { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 19px 0 11px; }
@@ -80,7 +80,7 @@
 .progress .prog-scrubber { display: flex; align-items: center; gap: 18px; min-height: 44px; margin-top: 10px; }
 .progress .prog-scrubber span { font-size: 10px; color: var(--muted); flex: none; }
 .progress .prog-scrubber input { flex: 1; min-width: 0; min-height: 32px; width: 100%; appearance: none; background: transparent; padding: 0; border: 0; cursor: pointer; accent-color: var(--accent); }
-.progress .prog-scrubber input::-webkit-slider-runnable-track { height: 2px; background: #ffffff20; border-radius: 2px; }
+.progress .prog-scrubber input::-webkit-slider-runnable-track { height: 2px; background: #ffffff20; border-radius: 6px; }
 .progress .prog-scrubber input::-webkit-slider-thumb { appearance: none; width: 10px; height: 10px; margin-top: -4px; background: var(--accent-soft); border: 2px solid #1a1c1e; box-shadow: 0 0 0 1px #ffad6355; border-radius: 50%; }
 .progress .prog-scrubber input::-moz-range-track { height: 2px; background: #ffffff20; }
 .progress .prog-scrubber input::-moz-range-thumb { width: 8px; height: 8px; background: var(--accent-soft); border: 2px solid #1a1c1e; border-radius: 50%; }
@@ -98,7 +98,7 @@
 .progress .prog-coverage-list { display: grid; gap: 17px; list-style: none; padding: 0; margin: 23px 0 21px; }
 .progress .prog-coverage-list li > div { display: flex; justify-content: space-between; gap: 15px; font-size: 11px; margin-bottom: 8px; }
 .progress .prog-coverage-list small { display: inline; font-size: 10px; color: var(--faint); }
-.progress .prog-coverage-track { display: block; height: 4px; border-radius: 2px; background: #ffffff07; }
+.progress .prog-coverage-track { display: block; height: 4px; border-radius: 6px; background: #ffffff07; }
 .progress .prog-coverage-track i { display: block; height: 100%; background: linear-gradient(90deg, #c85a2c, #ee844c); border-radius: inherit; transform-origin: left; animation: prog-coverage-grow 750ms var(--ease) both; animation-delay: var(--bar-delay); }
 .progress .prog-coverage-list li:first-child .prog-coverage-track i { background: linear-gradient(90deg, var(--accent-deep), var(--accent-soft)); }
 .progress .prog-history { padding-top: 19px; }
@@ -179,15 +179,15 @@
 .progress .prog-weight-form label { display: block; max-width: 160px; flex: 1; min-width: 110px; margin: 0; }
 .progress .prog-weight-form label > span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 7px; }
 .progress .prog-weight-form input { width: 100%; height: 46px; min-height: 46px; margin: 0; font-size: 16px; padding: 9px 12px; }
-.progress .prog-weight-form > button { min-height: 46px; padding: 0 13px; font-size: 11px; border-radius: 3px; }
+.progress .prog-weight-form > button { min-height: 46px; padding: 0 13px; font-size: 11px; border-radius: 6px; }
 .progress .prog-save-weight { background: var(--accent); color: var(--accent-ink); }
 .progress .prog-save-weight:hover { background: var(--accent-soft); color: var(--canvas); }
 .progress .prog-cancel-weight { color: var(--muted); background: transparent; }
 .progress .prog-weight-form > p { flex-basis: 100%; font-size: 11px; color: var(--danger); margin: 0; }
 /* Secondary charts use fine instrumentation and open edges to keep the hierarchy varied. */
-.progress .prog-panel { border-radius: 4px; background: #17191b; box-shadow: none; border-color: #ffffff0d; }
+.progress .prog-panel { border-radius: 6px; background: #17191b; box-shadow: none; border-color: #ffffff0d; }
 .progress .prog-frequency { background: linear-gradient(150deg, #1d2022, #131517); border-top-color: #ffffff25; }
-.progress .prog-bar-column i:not([data-empty="true"]) { position: relative; border-radius: 1px 1px 0 0; width: 63%; max-width: 29px; mask-image: repeating-linear-gradient(0deg, #000 0 3px, transparent 3px 5px); }
+.progress .prog-bar-column i:not([data-empty="true"]) { position: relative; border-radius: 6px 0 0; width: 63%; max-width: 29px; mask-image: repeating-linear-gradient(0deg, #000 0 3px, transparent 3px 5px); }
 .progress .prog-bar-column i[data-empty="true"] { border-radius: 0; }
 .progress .prog-bar-grid span::before { background: repeating-linear-gradient(90deg, #ffffff14 0 1px, transparent 1px 5px); }
 .progress .prog-metrics { gap: 0; padding: 20px 0; border-top: 1px solid #ffffff24; border-bottom: 1px solid #ffffff13; }
@@ -234,7 +234,7 @@
 .progress .prog-energy-setup { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 25px; padding: 23px 0 20px; }
 .progress .prog-energy-setup > p { flex: 1; min-width: 180px; max-width: 43ch; margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted); }
 .progress .prog-energy-setup > span { flex-basis: 100%; font-size: 12px; color: var(--muted); }
-.progress .prog-energy-setup-action { display: flex; align-items: center; gap: 20px; justify-content: space-between; min-height: 48px; padding: 12px 18px; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 4px; font-size: 12px; font-weight: 650; box-shadow: none; }
+.progress .prog-energy-setup-action { display: flex; align-items: center; gap: 20px; justify-content: space-between; min-height: 48px; padding: 12px 18px; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; font-size: 12px; font-weight: 650; box-shadow: none; }
 .progress .prog-energy-setup-action:hover { background: var(--accent-soft); color: var(--accent-ink); }
 .progress .prog-energy-facts { margin-top: 24px; }
 @media (max-width: 499px) {
@@ -262,7 +262,7 @@
 /* Frequency and its totals share a single instrument, joined at the comparison control. */
 .progress .prog-training-suite { grid-column: 1 / -1; min-width: 0; margin-block: 12px 18px; }
 .progress .prog-training-body { position: relative; }
-.progress .prog-training-suite .prog-frequency { padding: 29px 25px 43px; margin-bottom: 8px; border: 0; border-radius: 30px 30px 10px 30px; background: radial-gradient(ellipse at 0 0, #393e42, transparent 68%), #202427; mask-image: radial-gradient(circle at 78% 100%, transparent 37px, #000 38px); }
+.progress .prog-training-suite .prog-frequency { padding: 29px 25px 43px; margin-bottom: 8px; border: 0; border-radius: var(--r-sheet); background: radial-gradient(ellipse at 0 0, #393e42, transparent 68%), #202427; mask-image: radial-gradient(circle at 78% 100%, transparent 37px, #000 38px); }
 .progress .prog-training-suite .prog-panel-heading h2 { font-size: clamp(29px, 5vw, 42px); line-height: 1.01; font-weight: 500; letter-spacing: -.065em; }
 .progress .prog-training-suite .prog-panel-heading h2 > span { color: var(--accent); }
 .progress .prog-training-suite .prog-frequency-intro { padding-top: 25px; }
@@ -284,14 +284,14 @@
 .shell .progress .prog-seam-control:active:not(:disabled) { transform: translateX(-50%) scale(.96); }
 .progress .prog-seam-control > svg { transition: transform 320ms var(--ease); }
 .progress .prog-seam-control[aria-expanded="true"] > svg { transform: rotate(45deg); }
-.progress .prog-training-suite .prog-metrics { padding: 46px 24px 28px; border: 0; border-radius: 10px 30px 30px 30px; background: linear-gradient(135deg, #1d2022, #141719 80%); mask-image: radial-gradient(circle at 78% 0%, transparent 37px, #000 38px); }
+.progress .prog-training-suite .prog-metrics { padding: 46px 24px 28px; border: 0; border-radius: var(--r-sheet); background: linear-gradient(135deg, #1d2022, #141719 80%); mask-image: radial-gradient(circle at 78% 0%, transparent 37px, #000 38px); }
 .progress .prog-training-suite .prog-mini-stat { padding-block: 0; padding-inline: 13px; }
 .progress .prog-training-suite .prog-mini-stat:first-child { padding-left: 0; }
 .progress .prog-training-suite .prog-mini-stat:last-child { padding-right: 0; }
 .progress .prog-training-suite .prog-mini-stat > strong { font-size: clamp(27px, 6.4vw, 50px); }
 .progress .prog-training-suite .prog-mini-stat strong small { font-size: 12px; }
 .progress .prog-training-suite .prog-mini-stat > span:last-child { font-size: 11px; margin-top: 9px; color: #aeb2b6; }
-.progress .prog-period-breakdown { margin-top: 8px; padding: 25px; border-radius: 22px; background: #191c1e; animation: prog-reveal 260ms var(--ease) both; }
+.progress .prog-period-breakdown { margin-top: 8px; padding: 25px; border-radius: var(--r-card); background: #191c1e; animation: prog-reveal 260ms var(--ease) both; }
 .progress .prog-period-breakdown[hidden] { display: none; }
 .progress .prog-period-breakdown table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .progress .prog-period-breakdown caption { text-align: left; font-size: 21px; font-weight: 500; letter-spacing: -.04em; padding-bottom: 20px; }
@@ -302,7 +302,7 @@
 .progress .prog-period-breakdown td:nth-child(2) { color: var(--accent-soft); }
 .progress .prog-period-breakdown tbody tr:last-child > * { border-bottom: 0; }
 .progress .prog-period-breakdown > p { font-size: 11px; color: var(--muted); margin-bottom: 0; line-height: 1.7; }
-.progress .prog-movement { padding: 27px 25px 19px; border-radius: 28px 28px 8px 28px; background: linear-gradient(145deg, #252a2e, #171b1e); border: 0; }
+.progress .prog-movement { padding: 27px 25px 19px; border-radius: var(--r-sheet); background: linear-gradient(145deg, #252a2e, #171b1e); border: 0; }
 .progress .prog-movement .prog-panel-heading h2 { font-size: 23px; letter-spacing: -.045em; }
 .progress .prog-movement-select select { border-radius: 0; border-width: 0 0 1px; padding-inline: 0 28px; background: transparent; font-size: 14px; }
 .progress .prog-trend-readout > div > strong { font-size: 43px; font-weight: 450; }

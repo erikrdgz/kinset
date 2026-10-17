@@ -189,7 +189,7 @@ body {
   text-transform:none;
   letter-spacing:0;
   border:1px solid #ff956233;
-  border-radius:10px;
+  border-radius:var(--r-sm);
   min-height:50px;
   clip-path:none
 }
@@ -201,7 +201,7 @@ body {
 .shell button.quiet,.shell button.secondary {
   background:linear-gradient(160deg,#222426,#191b1d);
   border:1px solid #ffffff10;
-  border-radius:10px;
+  border-radius:var(--r-sm);
   box-shadow:inset 0 1px 0 #ffffff05;
   color:var(--ink);
   text-transform:none;
@@ -217,7 +217,7 @@ body {
 .shell :is(input,select) {
   background:#101214;
   border:1px solid #34373b;
-  border-radius:9px;
+  border-radius:var(--r-sm);
   box-shadow:inset 0 2px 3px #0002;
   color:var(--ink);
   font-size:14px
@@ -257,7 +257,7 @@ body {
   display:block;
   background:#1b1d20ec;
   border:1px solid #ffffff12;
-  border-radius:20px;
+  border-radius:var(--r-card);
   box-shadow:0 14px 36px #0007,inset 0 1px 0 #ffffff06;
   backdrop-filter:blur(26px)
 }
@@ -273,7 +273,7 @@ body {
   padding:6px 0;
   color:#8d9094;
   gap:5px;
-  border-radius:12px;
+  border-radius:var(--r-sm);
   z-index:1;
   position:relative;
   background:none;
@@ -296,7 +296,7 @@ body {
   height:50px;
   background:#ff692b0b;
   border:1px solid #ff692b12;
-  border-radius:13px;
+  border-radius:var(--r-sm);
   transition:transform .4s cubic-bezier(.22,1,.36,1)
 }
 .tabbar[data-active=train] .tab-indicator {
@@ -318,7 +318,7 @@ body {
   box-shadow:var(--shadow-2);
   color:var(--ink);
   padding:14px 18px;
-  border-radius:14px;
+  border-radius:var(--r-control);
   font-size:12px
 }
 .shell .resume-bar .resume-cta {
@@ -339,7 +339,7 @@ body {
   isolation:isolate;
   overflow:hidden;
   border:1px solid #ffffff16;
-  border-radius:22px;
+  border-radius:var(--r-card);
   min-height:465px;
   display:flex;
   flex-direction:column;
@@ -380,7 +380,7 @@ body {
   border:1px solid #ffffff26;
   background:#0f101055;
   backdrop-filter:blur(16px);
-  border-radius:30px;
+  border-radius:var(--r-sheet);
   padding:8px 12px;
   display:flex;
   align-items:center;
@@ -458,7 +458,7 @@ body {
   width:50px;
   min-height:50px;
   border:1px solid #ffffff25;
-  border-radius:10px;
+  border-radius:var(--r-sm);
   display:grid;
   place-items:center;
   background:#ffffff09;
@@ -470,7 +470,7 @@ body {
 .poster-progress {
   height:3px;
   background:#ffffff20;
-  border-radius:3px;
+  border-radius:6px;
   margin:-10px 0 22px;
   overflow:hidden
 }
@@ -489,7 +489,7 @@ body {
 .week-panel {
   background:linear-gradient(145deg,#1d1f21,#141618);
   border:1px solid #ffffff0c;
-  border-radius:22px;
+  border-radius:var(--r-card);
   padding:23px 21px 0;
   box-shadow:inset 0 1px 0 #ffffff05,0 8px 24px #0002
 }
@@ -591,7 +591,7 @@ body {
   align-items:center;
   gap:10px;
   padding:7px 0;
-  border-radius:9px;
+  border-radius:var(--r-sm);
   font-variant-numeric:tabular-nums
 }
 .atelier-week li>span:first-child {
@@ -647,7 +647,7 @@ body {
   align-items:flex-end;
   text-align:left;
   padding:20px 22px;
-  border-radius:18px;
+  border-radius:var(--r-control);
   border:1px solid #ffffff12;
   background:#1b1d1f
 }
@@ -740,7 +740,7 @@ body {
   text-align:left;
   width:100%;
   padding:18px 0;
-  border-radius:8px
+  border-radius:var(--r-sm)
 }
 .lineup-index {
   font-size:9px;
@@ -753,7 +753,7 @@ body {
   width:40px;
   height:43px;
   flex:none;
-  border-radius:9px;
+  border-radius:var(--r-sm);
   background:linear-gradient(145deg,#24272a,#181a1c);
   border:1px solid #ffffff09;
   color:#b3b7bb
@@ -838,7 +838,7 @@ body {
   isolation:isolate;
   min-height:160px;
   width:100%;
-  border-radius:16px;
+  border-radius:var(--r-control);
   overflow:hidden;
   text-align:left;
   padding:22px;
@@ -900,7 +900,7 @@ body {
   overflow:hidden;
   background:var(--surface);
   border:1px solid #ffffff14;
-  border-radius:20px;
+  border-radius:var(--r-card);
   padding:28px;
   display:flex;
   align-items:flex-end
@@ -986,7 +986,7 @@ body {
 .shell .saved-plan {
   background:linear-gradient(130deg,#1c1e20,#141618);
   border:1px solid #ffffff10;
-  border-radius:18px;
+  border-radius:var(--r-control);
   padding:24px;
   margin-bottom:18px;
   box-shadow:inset 0 1px 0 #ffffff05
@@ -1045,7 +1045,7 @@ body {
 }
 .shell .plan-empty {
   border:1px dashed #ffffff1a;
-  border-radius:14px;
+  border-radius:var(--r-control);
   font-size:12px;
   background:transparent
 }
@@ -1059,17 +1059,17 @@ body {
   font-size:12px
 }
 .shell .plan-days button {
-  border-radius:10px;
+  border-radius:var(--r-sm);
   background:var(--surface);
   font-size:12px
 }
 .shell .plan-exercise {
-  border-radius:14px;
+  border-radius:var(--r-control);
   background:var(--surface)
 }
 .library-editorial {
   height:210px;
-  border-radius:20px;
+  border-radius:var(--r-card);
   border:1px solid #ffffff12;
   position:relative;
   isolation:isolate;
@@ -1144,7 +1144,7 @@ body {
 }
 .shell .filters .chip {
   font-size:10px;
-  border-radius:8px;
+  border-radius:var(--r-sm);
   padding:0 15px;
   min-height:37px;
   background:#151719;
@@ -1215,7 +1215,7 @@ body {
 .shell .library .poster {
   width:45px;
   height:49px;
-  border-radius:10px;
+  border-radius:var(--r-sm);
   background:linear-gradient(145deg,#282b2e,#191b1d);
   border:1px solid #ffffff08;
   color:#bcc0c4
@@ -1266,12 +1266,12 @@ body {
   background:#0e1012;
   border:1px solid #ffffff08;
   padding:4px;
-  border-radius:11px;
+  border-radius:var(--r-sm);
   margin:20px 0
 }
 .howto-tabs button {
   font-size:11px;
-  border-radius:8px!important
+  border-radius:var(--r-sm)!important
 }
 .howto-tabs button.selected {
   background:#2d3033;
@@ -1289,13 +1289,13 @@ body {
   font-size:11px;
   background:#ffffff03;
   padding:16px;
-  border-radius:12px
+  border-radius:var(--r-sm)
 }
 .media-poster {
   background:linear-gradient(130deg,#282c30,#141719);
   min-height:150px;
   border:1px solid #ffffff0b;
-  border-radius:14px
+  border-radius:var(--r-control)
 }
 .media-poster>svg {
   color:var(--accent)
@@ -1389,7 +1389,7 @@ body {
     top:0;
     border:1px solid #ff692b0c;
     background:linear-gradient(90deg,#ff692b14,#ff692b04);
-    border-radius:9px
+    border-radius:var(--r-sm)
   }
   .tabbar[data-active=train] .tab-indicator {
     transform:translateY(55px)
@@ -1519,7 +1519,7 @@ body {
   }
   .training-poster {
     min-height:455px;
-    border-radius:20px
+    border-radius:var(--r-card)
   }
   .training-poster-top {
     padding:21px
@@ -1834,7 +1834,7 @@ body {
 /* Override the older global underline inputs on the new form surfaces. */
 body .shell input:not([type="range"]):not([type="checkbox"]):not([type="radio"]) {
   border:1px solid #34373b;
-  border-radius:9px;
+  border-radius:var(--r-sm);
   background:#101214;
   box-shadow:inset 0 2px 3px #0002
 }
@@ -1850,7 +1850,7 @@ body .shell .search-row input.search {
 }
 body .shell .training-console .set-table input {
   border:1px solid #34373b;
-  border-radius:10px;
+  border-radius:var(--r-sm);
   background:linear-gradient(155deg,#202326,#17191b);
   box-shadow:inset 0 1px 0 #ffffff05,0 4px 12px #0002
 }

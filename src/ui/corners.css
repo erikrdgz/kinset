@@ -114,3 +114,30 @@ body .shell .rule-list button,
 body .shell .running-history button {
   border-radius: var(--r-control);
 }
+
+/**
+ * The resume bar belongs to the nav.
+ *
+ * It was floating as its own island above the tab bar, which read as a second,
+ * competing surface. It now sits flush on top of the nav and shares its width and
+ * inset: square where the two meet, rounded where they do not, so the pair reads as
+ * one stacked component rather than two things that happen to be near each other.
+ */
+body .shell .resume-bar {
+  inset-inline: 16px;
+  max-inline-size: 560px;
+  margin-inline: auto;
+  /* Flush to the nav: the tab bar sits 14px from the bottom and measures 67px tall
+     before the safe area, so the two meet with no seam. */
+  inset-block-end: calc(14px + 66px + env(safe-area-inset-bottom));
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+  border-block-end: 0;
+  box-shadow: 0 -8px 28px #0007;
+}
+
+/* No doubled hairline where the two surfaces touch. */
+body .shell[data-resume] .tabbar {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}

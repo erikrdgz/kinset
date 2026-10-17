@@ -70,6 +70,7 @@
   --card-pad: 20px;
 
   /* Corners. Larger than the first pass; the references are generous here. */
+  --r-sm: 12px;
   --r-control: 14px;
   --r-card: 22px;
   --r-sheet: 28px;
