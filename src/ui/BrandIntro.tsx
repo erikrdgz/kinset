@@ -14,7 +14,14 @@ import "./brand-intro.css";
  * tears, whereas here the tear is the entrance; and the scanline and tracking overlays
  * are dropped, so the mark reads as solid white rather than striped.
  */
-export function BrandIntro({ onComplete }: { onComplete: () => void }) {
+export function BrandIntro({
+  onExitStart,
+  onComplete,
+}: {
+  /** Fires as the overlay begins fading, so the page beneath can enter underneath it. */
+  onExitStart?: () => void;
+  onComplete: () => void;
+}) {
   const done = useRef(false);
   /** Dev-only: ?introslow runs the timeline at a sixth speed for inspection. */
   const slow =
@@ -30,10 +37,14 @@ export function BrandIntro({ onComplete }: { onComplete: () => void }) {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     // Reduced motion gets the mark, still, and a short fade. Nothing is lost: the
     // animation carries nothing the sign-in screen does not.
-    const timer = window.setTimeout(
-      finish,
-      motion.matches ? 360 : slow ? 9000 : 1100,
-    );
+    const reduced = motion.matches;
+    const scale = slow ? 6 : 1;
+    // The page starts arriving while the overlay is still fading, so the two overlap
+    // rather than reading as two separate events.
+    const exitAt = reduced ? 160 : 620 * scale;
+    const doneAt = reduced ? 360 : 860 * scale;
+    const exitTimer = window.setTimeout(() => onExitStart?.(), exitAt);
+    const timer = window.setTimeout(finish, doneAt);
     const skip = (event: KeyboardEvent) => {
       if (event.key === "Escape" || event.key === "Enter" || event.key === " ")
         finish();
@@ -44,11 +55,12 @@ export function BrandIntro({ onComplete }: { onComplete: () => void }) {
     document.addEventListener("keydown", skip);
     motion.addEventListener("change", preferenceChanged);
     return () => {
+      window.clearTimeout(exitTimer);
       window.clearTimeout(timer);
       document.removeEventListener("keydown", skip);
       motion.removeEventListener("change", preferenceChanged);
     };
-  }, [onComplete, slow]);
+  }, [onComplete, onExitStart, slow]);
 
   const marks = {
     "--mark-k": `url(${import.meta.env.BASE_URL}kinset-k.svg)`,
@@ -64,6 +76,7 @@ export function BrandIntro({ onComplete }: { onComplete: () => void }) {
       onClick={() => {
         if (done.current) return;
         done.current = true;
+        onExitStart?.();
         onComplete();
       }}
     >

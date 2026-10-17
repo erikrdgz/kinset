@@ -9,10 +9,10 @@
  * stays solid white instead of striped.
  *
  * Timeline, kept tight — a cold open that outstays its welcome is just a delay:
- *   0–380ms    the K tears in, alone and centred
- *   380–680ms  the track slides while the full wordmark wipes out to the right
- *   680–860ms  hold
- *   860–1100ms the overlay lifts
+ *   0–260ms    the K tears in, alone and centred
+ *   260–480ms  the track slides while the full wordmark wipes out to the right
+ *   480–620ms  hold
+ *   620–860ms  the overlay fades, while the page beneath rises into place
  *
  * The track starts shifted right by 30.7%: the K's centre sits at x≈181 in the 980-wide
  * box, the full wordmark's at x≈482, so that offset puts the K on the screen's centre
@@ -26,7 +26,7 @@
   display: grid;
   place-items: center;
   background: #0c0b0b;
-  animation: bi-exit 240ms cubic-bezier(0.22, 1, 0.36, 1) 860ms both;
+  animation: bi-exit 240ms cubic-bezier(0.22, 1, 0.36, 1) 620ms both;
 }
 
 .brand-intro-stage {
@@ -42,7 +42,7 @@
   inset: 0;
   display: grid;
   transform: translateX(30.7%);
-  animation: bi-recentre 300ms cubic-bezier(0.16, 1, 0.3, 1) 380ms both;
+  animation: bi-recentre 220ms cubic-bezier(0.16, 1, 0.3, 1) 260ms both;
 }
 
 /* Every mark layer is a solid fill masked to the glyph shape. */
@@ -56,7 +56,7 @@
   -webkit-mask-position: center;
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
-  animation-duration: 380ms;
+  animation-duration: 260ms;
   animation-timing-function: steps(1, end);
   animation-fill-mode: both;
 }
@@ -70,8 +70,8 @@
   mask-image: var(--mark-full);
   -webkit-mask-image: var(--mark-full);
   /* Beat two. Hidden until the wipe starts. */
-  animation-duration: 300ms;
-  animation-delay: 380ms;
+  animation-duration: 220ms;
+  animation-delay: 260ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -112,8 +112,8 @@
 
 .brand-intro-stage .bi-k-base {
   animation-name: bi-shift, bi-handover;
-  animation-duration: 380ms, 1ms;
-  animation-delay: 0ms, 380ms;
+  animation-duration: 260ms, 1ms;
+  animation-delay: 0ms, 260ms;
   animation-timing-function: steps(1, end), linear;
 }
 
@@ -335,25 +335,63 @@
  * and the wipe can be looked at one at a time.
  */
 .bi-slow {
-  animation-delay: 5160ms !important;
+  animation-delay: 3720ms !important;
   animation-duration: 1440ms !important;
 }
 
 .bi-slow .bi-track {
-  animation-delay: 2280ms !important;
-  animation-duration: 1800ms !important;
+  animation-delay: 1560ms !important;
+  animation-duration: 1320ms !important;
 }
 
 .bi-slow .bi-k {
-  animation-duration: 2280ms !important;
+  animation-duration: 1560ms !important;
 }
 
 .bi-slow .brand-intro-stage .bi-k-base {
-  animation-duration: 2280ms, 1ms !important;
-  animation-delay: 0ms, 2280ms !important;
+  animation-duration: 1560ms, 1ms !important;
+  animation-delay: 0ms, 1560ms !important;
 }
 
 .bi-slow .bi-full {
-  animation-duration: 1800ms !important;
-  animation-delay: 2280ms !important;
+  animation-duration: 1320ms !important;
+  animation-delay: 1560ms !important;
+}
+
+/**
+ * The page's own entrance, run as the overlay fades so the two overlap. Movement only —
+ * no layout change, so nothing shifts once it settles.
+ */
+.app-content {
+  display: block;
+}
+
+.app-content[data-entering] {
+  animation: app-enter 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes app-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-content[data-entering] {
+    animation: app-enter-fade 180ms linear both;
+  }
+
+  @keyframes app-enter-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }

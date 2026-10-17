@@ -23,7 +23,14 @@ export default function App() {
   // The cold open plays on every load of the signed-out view. A restored session skips
   // it, so a returning signed-in user goes straight to their journal.
   const [intro, setIntro] = useState(true);
-  const endIntro = useCallback(() => setIntro(false), []);
+  // The page animates in under the fading overlay, then the flag clears so the
+  // animation never replays on a later render.
+  const [entering, setEntering] = useState(false);
+  const beginEntrance = useCallback(() => setEntering(true), []);
+  const endIntro = useCallback(() => {
+    setIntro(false);
+    window.setTimeout(() => setEntering(false), 500);
+  }, []);
   const entrySequence = useRef(0);
   const authGate = useRef(createAuthEntryGate<AuthSession>());
   const finishEntry = useCallback(() => setEntry(null), []);
@@ -78,8 +85,12 @@ export default function App() {
         onExit={async () => { if (session) await supabase?.auth.signOut(); enterDemo(false); }} />;
   const showIntro = intro && !loading && !session && !demo;
   return <>
-    <div inert={entry !== null || showIntro || undefined} style={{ display: "contents" }}>{content}</div>
-    {showIntro && <BrandIntro onComplete={endIntro} />}
+    <div
+      className="app-content"
+      data-entering={entering || undefined}
+      inert={entry !== null || showIntro || undefined}
+    >{content}</div>
+    {showIntro && <BrandIntro onExitStart={beginEntrance} onComplete={endIntro} />}
     {entry !== null && <AuthTransition key={entry} onComplete={finishEntry} />}
   </>;
 }
