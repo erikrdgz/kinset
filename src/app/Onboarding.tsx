@@ -1,20 +1,25 @@
 import { useState, type FormEvent } from "react";
 import { ArrowUpRight, ChevronLeft, Check } from "lucide-react";
 import { Select } from "../Select";
-import { convertLoad, profileSchema, type Profile } from "../domain";
+import {
+  convertLoad,
+  experienceLevels,
+  profileSchema,
+  type Profile,
+} from "../domain";
 import { Brand } from "../ui/Brand";
 
 /** The demo profile's defaults, reused as the starting shape of a new one. */
 const demoProfile: Profile = {
   name: "Alex", goal: "Build consistency", days: 3, equipment: "Dumbbells",
-  experience: "Returning", unit: "lb", weight: "", height: "",
+  experience: "Getting back into it", unit: "lb", weight: "", height: "",
 };
 export { demoProfile };
 
 export function Onboarding({ initial, onSave, onBack }: {
   initial?: Profile; onSave: (profile: Profile) => void; onBack: () => void;
 }) {
-  const [p, setP] = useState<Profile>(initial || { ...demoProfile, name: "", experience: "New to training" });
+  const [p, setP] = useState<Profile>(initial || { ...demoProfile, name: "", experience: "New to lifting" });
   const [error, setError] = useState("");
   const field = <K extends keyof Profile>(key: K, value: Profile[K]) => setP({ ...p, [key]: value });
   function changeUnit(unit: Profile["unit"]) {
@@ -54,7 +59,7 @@ export function Onboarding({ initial, onSave, onBack }: {
           <Select label="Your main goal" value={p.goal} onValueChange={(value) => field("goal", value as Profile["goal"])} options={["Build consistency", "Build strength", "Support getting leaner"]} />
         </label>
         <label>Training experience
-          <Select label="Training experience" value={p.experience} onValueChange={(value) => field("experience", value as Profile["experience"])} options={["New to training", "Returning", "Consistent"]} />
+          <Select label="Training experience" value={p.experience} onValueChange={(value) => field("experience", value as Profile["experience"])} options={[...experienceLevels]} />
         </label>
       </fieldset>
       <fieldset className="onboarding-section">

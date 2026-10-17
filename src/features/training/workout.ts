@@ -13,6 +13,7 @@ import {
   type Session2,
   type SessionExercise,
   type Unit,
+  startingSets,
 } from "../../domain";
 import { defaultEntry, targetReps, type PlanEntry } from "../../plans";
 import type { Lineup } from "../../domain";
@@ -58,7 +59,7 @@ export function nextWorkout(journal: Journal, profile: Profile): Workout {
     undefined,
     journal.demoSeed === undefined ? undefined : (id) => demoIds.has(id),
   );
-  const sets = profile.experience === "New to training" ? 2 : 3;
+  const sets = startingSets(profile.experience);
 
   return {
     name: `Full body ${finished % 2 ? "B" : "A"}`,

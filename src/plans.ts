@@ -4,6 +4,7 @@ import { findExercise } from "./domain/exercises";
 import {
   program,
   shuffledProgram,
+  startingSets,
   type Profile,
   type Session,
   type State,
@@ -82,7 +83,7 @@ export function foundationPlan(p: Profile): WorkoutPlan {
       name: `Full body ${String.fromCharCode(65 + i)}`,
       entries: program(p, i).map((e) => ({
         ...defaultEntry(e.id),
-        sets: p.experience === "New to training" ? 2 : 3,
+        sets: startingSets(p.experience),
       })),
     })),
   };
@@ -118,7 +119,7 @@ export function nextWorkout(data: State) {
         )
     ).map((e) => ({
       ...defaultEntry(e.id),
-      sets: p.experience === "New to training" ? 2 : 3,
+      sets: startingSets(p.experience),
     })),
   };
 }

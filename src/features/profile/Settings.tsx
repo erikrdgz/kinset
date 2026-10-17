@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { Select } from "../../Select";
-import { profileSchema, type Journal, type Profile } from "../../domain";
+import {
+  experienceLevels,
+  profileSchema,
+  type Journal,
+  type Profile,
+} from "../../domain";
 import "../../ui/settings.css";
 
 /**
@@ -92,11 +97,10 @@ export function SettingsPanel({
             label="Sessions per week"
             value={String(profile.days)}
             onValueChange={(v) => set("days", Number(v) as Profile["days"])}
-            options={[
-              { value: "2", label: "2 days" },
-              { value: "3", label: "3 days" },
-              { value: "4", label: "4 days" },
-            ]}
+            options={Array.from({ length: 7 }, (_, i) => ({
+              value: String(i + 1),
+              label: i === 0 ? "1 day" : `${i + 1} days`,
+            }))}
           />
         </div>
 
@@ -106,7 +110,7 @@ export function SettingsPanel({
             label="Experience"
             value={profile.experience}
             onValueChange={(v) => set("experience", v as Profile["experience"])}
-            options={["New to training", "Returning", "Consistent"]}
+            options={[...experienceLevels]}
           />
         </div>
 

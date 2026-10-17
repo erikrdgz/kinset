@@ -3,7 +3,7 @@ import { emptyJournal, findExercise, type Profile } from "../../domain";
 import { nextWorkout, buildSession } from "./workout";
 import { planSchema } from "../../plans";
 
-const profile: Profile = { name: "Test", goal: "Build strength", days: 3, equipment: "Dumbbells", experience: "Returning", unit: "kg", weight: "", height: "" };
+const profile: Profile = { name: "Test", goal: "Build strength", days: 3, equipment: "Dumbbells", experience: "Getting back into it", unit: "kg", weight: "", height: "" };
 
 describe("first workout from the full catalog", () => {
   it.each(["Dumbbells", "Full gym", "Bodyweight"] as const)("generates and snapshots %s without a legacy lookup", (equipment) => {

@@ -14,7 +14,7 @@ const profile: Profile = {
   goal: "Build consistency",
   days: 3,
   equipment: "Dumbbells",
-  experience: "Returning",
+  experience: "Getting back into it",
   unit: "lb",
   height: "",
   weight: "",

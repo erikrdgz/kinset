@@ -3,7 +3,7 @@ import { bodyWeightKg, energyDurationMs, estimateTrainingEnergy, grossEnergyKcal
 import type { Profile } from "./legacy";
 import type { Journal, Session2 } from "./schema";
 
-const profile: Profile = { name: "Alex", goal: "Build strength", days: 3, equipment: "Dumbbells", experience: "Consistent", unit: "kg", weight: 70, height: "" };
+const profile: Profile = { name: "Alex", goal: "Build strength", days: 3, equipment: "Dumbbells", experience: "Training regularly", unit: "kg", weight: 70, height: "" };
 const start = "2026-10-16T08:00:00.000Z";
 const end = "2026-10-16T08:30:00.000Z";
 function session(overrides: Partial<Session2> = {}): Session2 {
